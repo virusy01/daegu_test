@@ -1,0 +1,137 @@
+<!-- <link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" /> -->
+
+<link rel="import" href="../common/behavior-page.html" />
+<link rel="import" href="../style/c3-chart-style.html" />
+<link rel="import" href="../style/bootstrap-style.html" />
+<link rel="import" href="../style/common-style.html" />
+
+<dom-module id="summary-dist-by-chart">
+    <template>
+        <style include="bootstrap-style"></style>
+        <style include="common-style"></style>
+        <style include="c3-chart-style">
+            :host {
+                @apply(--layout-vertical);
+                margin-top: 20px;
+            }
+        </style>
+
+        <iron-ajax id="protocolGetKpiChart" url="/api/corp/kpis/depth1" headers='{"X-Requested-With": "XMLHttpRequest"}' method="GET" content-type="application/json" on-response="_drawChart" on-error="_onErrorHandler"></iron-ajax>
+
+        <div id="searchForm" class="panel panel-default">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label for="year">연도</label>
+                    <normal-select id="year" items="{{_year}}" value={{_evalYear}} on-value-changed="_assignEvalYear"></normal-select>
+                </div>
+            </div>
+        </div>
+
+        <div id="chart"></div>
+    </template>
+
+    <!-- <script src="/scripts/d3.min.js"></script>
+    <script src="/scripts/c3.min.js"></script> -->
+    <script>
+        Polymer({
+            is: 'summary-dist-by-chart',
+
+            behaviors: [PS.BehaviorPage],
+
+            properties: {
+                loadChart: Boolean,
+                _data: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _isAttached: Boolean,
+                _chart: Object,
+            },
+
+            observers: [
+                '_fetchData(_evalYear, _isAttached)'
+            ],
+
+            ready: function() {
+                this.scopeSubtree(this.$.chart, true);
+            },
+
+            attached: function() {
+                this._isAttached = true;
+
+                this._createYears();
+            },
+
+            _fetchData: function() {
+                this.$.protocolGetKpiChart.params = {
+                    evalYear: this._evalYear
+                };
+
+                if (this.getBoundingClientRect().width > 0)
+                    this.$.protocolGetKpiChart.generateRequest();
+            },
+
+            _drawChart: function(e) {
+                this._data = e.target.lastResponse;
+                this.$.chart.innerHTML = "";
+
+                this.renderChart();
+            },
+
+            renderChart: function(resizeByPercent) {
+                var pieData = [];
+                var i;
+
+                if (this._data && this._data.length > 0) {
+                    for (i = 0; i < this._data.length; i++) {
+                        pieData.push([this._data[i].depth1Nm, this._data[i].score]);
+                    }
+
+                    var chartSize = {
+                        height: 500
+                    };
+
+                    if (resizeByPercent) {
+                        chartSize.width = 600
+                    };
+
+                    this._chart = c3.generate({
+                        bindto: this.$.chart,
+                        data: {
+                            columns: pieData,
+                            keys: {
+                                value: ['score']
+                            },
+                            type: 'pie'
+                        },
+                        size: chartSize,
+                        color: {
+                            pattern: ['#2fd05f', '#5cefa1', '#f46464', '#fca6a6', '#44cddb', '#6be8ee', '#9ef5f7', '#fa77c3', '#fdb9ea', '#fee6f8']
+                        },
+                        onrendered: function() {
+                            this._closeOverlay();
+                        }.bind(this)
+                    });
+                } else {
+                    var msg = document.createElement("span");
+                    msg.setAttribute("style", "width: 100%; text-align: center; display: inline-block;");
+                    msg.innerHTML = "데이타 없음";
+                    this.$.chart.appendChild(msg);
+                }
+            },
+
+            refresh: function() {
+                if (this._data.length == 0)
+                    this._fetchData();
+            },
+
+            get chart() {
+                return this._chart;
+            }
+        })
+    </script>
+</dom-module>

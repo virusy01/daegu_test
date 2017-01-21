@@ -1,0 +1,14 @@
+<dom-module id="kpi-info-chart">
+    <template>
+        <style>
+        </style>
+
+        chart
+    </template>
+
+    <script>
+        Polymer({
+            is: 'kpi-info-chart'
+        })
+    </script>
+</dom-module>

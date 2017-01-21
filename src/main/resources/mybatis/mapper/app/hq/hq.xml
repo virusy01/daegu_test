@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="snp.app.hq.HqRepository">
+	<!-- 센터 목록 -->
+	<select id="findCorps" resultType="hashmap">
+		SELECT
+			    CORP_SEQ
+			  , CENTER_NM
+			  , UP_INSTITUTE_NM
+			  , OPEN_DT
+			  , TEL_NO
+			  , FAX_NO
+			  , ADDRESS
+			  , CEO_NM
+			  , CEO_MOBILE_NO
+			  , MANAGER_NM
+			  , MANAGER_MOBILE_NO
+			  , CORP_TYPE
+			  , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'CORP_TYPE' AND CD = CORP_TYPE) AS CORP_TYPE_NM
+			  , SE_CERT_YN
+			  , SE_CERT_REV_NO
+			  , SE_NM
+			  , SE_DT
+			  , JOB_SUPP_BEGIN_DT
+			  , JOB_SUPP_END_DT
+			  , REG_ID
+			  , REG_DT
+		      , MOD_ID
+			  , MOD_DT
+		 FROM CORP_INFO
+	</select>
+
+	<!-- 월간실적(비용현황)-->
+	<select id="findCosts" resultType="hashmap">
+		SELECT Y.YEAR
+			 , Y.MONTH
+			 , SUM(IFNULL(C.FOOD_MATERIAL       , 0)) AS FOOD_MATERIAL
+			 , SUM(IFNULL(C.LABOR               , 0)) AS LABOR
+			 , SUM(IFNULL(C.MANAGEMENT          , 0)) AS MANAGEMENT
+			 , SUM(IFNULL(C.DEPRECIATION        , 0)) AS DEPRECIATION
+			 , SUM(IFNULL(C.NON_SALES           , 0)) AS NON_SALES
+			 , SUM(IFNULL(C.RETIRE_SAVING       , 0)) AS RETIRE_SAVING
+			 , SUM(IFNULL(C.INDEPENDENCY_SAVING , 0)) AS INDEPENDENCY_SAVING
+		 FROM M_COSTS AS C
+   RIGHT JOIN YM AS Y ON (
+                             C.YEAR = Y.YEAR AND
+                             C.MONTH = Y.MONTH)
+		WHERE Y.YEAR = #{p.YEAR}
+	GROUP BY Y.YEAR, Y.MONTH
+	</select>
+
+	<!-- 월간실적(고용현황)-->
+	<select id="findEmployment" resultType="hashmap">
+		SELECT Y.YEAR
+			  , Y.MONTH
+			  , SUM(IFNULL(E.GENERAL_MALE         , 0)) AS GENERAL_MALE
+			  , SUM(IFNULL(E.GENERAL_FEMALE       , 0)) AS GENERAL_FEMALE
+			  , SUM(IFNULL(E.GOV_MALE             , 0)) AS GOV_MALE
+			  , SUM(IFNULL(E.GOV_FEMALE           , 0)) AS GOV_FEMALE
+			  , SUM(IFNULL(E.SELF_SUPPORT_MALE    , 0)) AS SELF_SUPPORT_MALE
+			  , SUM(IFNULL(E.SELF_SUPPORT_FEMALE  , 0)) AS SELF_SUPPORT_FEMALE
+			  , SUM(IFNULL(E.ROLE_CEO             , 0)) AS ROLE_CEO
+			  , SUM(IFNULL(E.ROLE_DIETITION       , 0)) AS ROLE_DIETITION
+			  , SUM(IFNULL(E.ROLE_MANAGER         , 0)) AS ROLE_MANAGER
+			  , SUM(IFNULL(E.ROLE_GENERAL_AFFAIRS , 0)) AS ROLE_GENERAL_AFFAIRS
+			  , SUM(IFNULL(E.ROLE_COOK            , 0)) AS ROLE_COOK
+			  , SUM(IFNULL(E.ROLE_DELIVERY_DRIVER , 0)) AS ROLE_DELIVERY_DRIVER
+			  , SUM(IFNULL(E.ROLE_DELIVERY_LABOR  , 0)) AS ROLE_DELIVERY_LABOR
+			  , SUM(IFNULL(E.ROLE_ETC             , 0)) AS ROLE_ETC
+		 FROM M_EMPLOYMENT AS E
+   RIGHT JOIN YM AS Y ON (
+                              E.YEAR = Y.YEAR
+                              AND E.MONTH = Y.MONTH)
+		WHERE Y.YEAR = #{p.YEAR}
+	 GROUP BY Y.YEAR, Y.MONTH
+	</select>
+
+	<!-- 월간실적(수입현황-유료급식)-->
+	<select id="findIncomePaidMeals" resultType="hashmap">
+		SELECT Y.YEAR
+			  , Y.MONTH
+			  , SUM(IFNULL(PA.LUNCH_BOX     , 0)) AS LUNCH_BOX
+			  , SUM(IFNULL(PA.CATERING      , 0)) AS CATERING
+			  , SUM(IFNULL(PA.RESERVE_FORCES, 0)) AS RESERVE_FORCES
+			  , SUM(IFNULL(PA.SCHOOL        , 0)) AS SCHOOL
+			  , SUM(IFNULL(PA.LUNCH_ROOM    , 0)) AS LUNCH_ROOM
+			  , SUM(IFNULL(PA.SPECIALTY     , 0)) AS SPECIALTY
+			  , SUM(IFNULL(PA.HYNIX_SUPPORT , 0)) AS HYNIX_SUPPORT
+			  , SUM(IFNULL(PA.ETC           , 0)) AS ETC
+		 FROM M_INCOME_PAID_MEALS AS PA
+   RIGHT JOIN YM AS Y ON (
+                              PA.YEAR = Y.YEAR
+                              AND PA.MONTH = Y.MONTH)
+		WHERE Y.YEAR = #{p.YEAR}
+	 GROUP BY Y.YEAR, Y.MONTH
+	</select>
+
+	<!-- 월간실적(수입현황-공공급식)-->
+	<select id="findIncomePublicMeals" resultType="hashmap">
+		SELECT Y.YEAR
+			  , Y.MONTH
+			  , SUM(IFNULL(PU.KIDS_LUNCH_BOX         , 0)) AS KIDS_LUNCH_BOX
+			  , SUM(IFNULL(PU.KIDS_LUNCH_CAR         , 0)) AS KIDS_LUNCH_CAR
+			  , SUM(IFNULL(PU.SILVER_LUNCH_BOX       , 0)) AS SILVER_LUNCH_BOX
+			  , SUM(IFNULL(PU.SILVER_SIDE_DISH       , 0)) AS SILVER_SIDE_DISH
+			  , SUM(IFNULL(PU.SILVER_LUNCH_ROOM      , 0)) AS SILVER_LUNCH_ROOM
+			  , SUM(IFNULL(PU.ETC                    , 0)) AS ETC
+			  , SUM(IFNULL(PU.SALES_KIDS_LUNCH_BOX   , 0)) AS SALES_KIDS_LUNCH_BOX
+			  , SUM(IFNULL(PU.SALES_KIDS_LUNCH_CAR   , 0)) AS SALES_KIDS_LUNCH_CAR
+			  , SUM(IFNULL(PU.SALES_SILVER_LUNCH_BOX , 0)) AS SALES_SILVER_LUNCH_BOX
+			  , SUM(IFNULL(PU.SALES_SILVER_SIDE_DISH , 0)) AS SALES_SILVER_SIDE_DISH
+			  , SUM(IFNULL(PU.SALES_SILVER_LUNCH_ROOM, 0)) AS SALES_SILVER_LUNCH_ROOM
+			  , SUM(IFNULL(PU.SALES_ETC              , 0)) AS SALES_ETC
+			  , SUM(IFNULL(PU.SELF_PAY               , 0)) AS SELF_PAY
+		 FROM M_INCOME_PUBLIC_MEALS AS PU
+   RIGHT JOIN YM AS Y ON (
+                             PU.YEAR = Y.YEAR
+                             AND PU.MONTH = Y.MONTH)
+		WHERE Y.YEAR = #{p.YEAR}
+		GROUP BY Y.YEAR, Y.MONTH
+	</select>
+
+	<!-- 월간실적(지원금)-->
+	<select id="findIncomeSupport" resultType="hashmap">
+		SELECT Y.YEAR
+			  , Y.MONTH
+			  , SUM(IFNULL(SU.GOV_LABOR_COSTS       , 0)) AS GOV_LABOR_COSTS
+			  , SUM(IFNULL(SU.GOV_BIZ_DEVELOPMENT   , 0)) AS GOV_BIZ_DEVELOPMENT
+			  , SUM(IFNULL(SU.GOV_MANAGEMENT        , 0)) AS GOV_MANAGEMENT
+			  , SUM(IFNULL(SU.GOV_ETC               , 0)) AS GOV_ETC
+			  , SUM(IFNULL(SU.GOV_NOTE              , 0)) AS GOV_NOTE
+			  , SUM(IFNULL(SU.EXT_DONATION          , 0)) AS EXT_DONATION
+			  , SUM(IFNULL(SU.EXT_FOUNDATION_SUPPORT, 0)) AS EXT_FOUNDATION_SUPPORT
+			  , SUM(IFNULL(SU.EXT_ETC               , 0)) AS EXT_ETC
+		 FROM M_INCOME_SUPPORT AS SU
+   RIGHT JOIN YM AS Y ON (
+                             SU.YEAR = Y.YEAR
+                             AND SU.MONTH = Y.MONTH)
+		WHERE Y.YEAR = #{p.YEAR}
+	 GROUP BY Y.YEAR, Y.MONTH
+	</select>
+
+	<!-- 월간실적(사회적공헌)-->
+	<select id="findDonation" resultType="hashmap">
+		SELECT Y.YEAR
+			 , Y.MONTH
+			 , '-'                            AS NAME
+			 , '-'							  AS TARGET
+			 , SUM(IFNULL(DN.REQ_PERSON , 0)) AS REQ_PERSON
+			 , SUM(IFNULL(DN.REQ_TIME   , 0)) AS REQ_TIME
+			 , SUM(IFNULL(DN.REQ_AMT    , 0)) AS REQ_AMT
+			 , SUM(IFNULL(DN.TOTAL_AMT  , 0)) AS TOTAL_AMT
+		FROM M_DONATION AS DN
+		RIGHT JOIN YM AS Y ON (
+								    DN.YEAR = Y.YEAR
+								AND DN.MONTH = Y.MONTH)
+		WHERE Y.YEAR = #{p.YEAR}
+	 GROUP BY Y.YEAR, Y.MONTH
+	</select>
+
+	<!-- 월간 실적 - 월평균 임금 -->
+	<select id="findSalary" resultType="hashmap">
+		SELECT
+		YEAR
+		, AVG(LABOR) SALARY_AVG
+		FROM M_COSTS
+		WHERE YEAR = #{p.YEAR}
+		GROUP BY YEAR
+	</select>
+
+	<!-- 월간 운영현황 -->
+	<select id="findMonthlyOperationStatus" resultType="hashmap">
+		SELECT
+		YEAR
+		, MONTH
+		, SUMMARY_TOTAL_SALES      /* 총매출 */
+		, PUBLIC_TOTAL_SALES       /* 공공 급식 매출 */
+		, PAID_TOTAL_SALES         /* 유료 급식 매출 */
+		, SUMMARY_OP_PROFIT        /* 영업이익 */
+		, SUMMARY_NET_PROFIT       /* 순이익 */
+		, SUMMARY_INDEPEND_POWER_A /* 자립도_A */
+		, SUMMARY_INDEPEND_POWER_B /* 자립도_B */
+		, SUMMARY_EMP_WEAK_RATE    /* 취약계층 고용율 */
+		FROM VIEW_Y_SUMMARY
+		WHERE YEAR = #{p.YEAR}
+	</select>
+	<!--
+    /*공공급식수 */        PUBLIC_MEALS_CNT
+    /*공공매출*/           PUBLIC_TOTAL_SALES
+    /*공공자부담급식수*/    PUBLIC_SELF_PAY
+    /*유료매출*/           PAID_TOTAL_SALES
+    /*수익B-인건비*/       SUPPORT_GOV_LABOR_COSTS
+    /*수익B-사업개발비*/   SUPPORT_GOV_BIZ_DEVELOPMENT
+    /*수익B-운영비*/       SUPPORT_GOV_MANAGEMENT
+    /*수익B-기타*/         SUPPORT_GOV_ETC
+    /*수익B-합계*/         SUPPORT_GOV_TOTAL
+    /*수익B-기타수입*/     SUPPORT_ETC_TOTAL
+    /*비용-식재료비*/      COSTS_FOOD_MATERIAL
+    /*비용-인건비*/        COSTS_LABOR
+    /*비용-운영비*/        COSTS_MANAGEMENT
+    /*비용-감가상각비*/     COSTS_DEPRECIATION
+    /*비용-영업외비용*/     COSTS_NON_SALES
+    /*비용-합계*/          COSTS_TOTAL
+    /*비용-월퇴직 적립금*/  COSTS_RETIRE_SAVING
+    /*비용-자립적립급*/     COSTS_INDEPENDENCY_SAVING
+    /*고용-일반고용합계*/   EMP_GENERAL_SUM
+    /*고용-정부지원합계*/   EMP_GOV_SUM
+    /*고용-자활근로*/      EMP_SELP_SUPPORT_SUM
+    /*고용-합계*/         EMP_SUM
+    /*매출합계*/           SUMMARY_TOTAL_SALES
+    /*영업이익*/           SUMMARY_OP_PROFIT
+    /*순이익*/            SUMMARY_NET_PROFIT
+    /*수익A*/             PROFIT_A
+    /*수익B*/             PROFIT_B
+    /*자립도A*/           SUMMARY_INDEPEND_POWER_A
+    /*자립도B*/           SUMMARY_INDEPEND_POWER_B
+    /*취약계층고용율*/     SUMMARY_EMP_WEAK_RATE
+    -->
+	<!-- 요약 1 -->
+	<select id="findMonthlySummary1" resultType="hashmap">
+		SELECT
+		YEAR
+		, MONTH
+		, PUBLIC_MEALS_CNT       	            /* 공공급식수*/
+		, SUMMARY_TOTAL_SALES       	            /* 총매출*/
+		, PUBLIC_TOTAL_SALES         	            /* 공공 급식 매출*/
+		, PAID_TOTAL_SALES        		            /* 유료 급식 매출*/
+		, PAID_TOTAL_SALES / PUBLIC_MEALS_CNT * 100
+							  AS PAID_TOTAL_RATE    /*유료매출 비율*/
+		, PUBLIC_SELF_PAY 				            /* 자부담 급식수*/
+		FROM VIEW_Y_SUMMARY
+		WHERE YEAR = #{p.YEAR}
+	</select>
+
+	<!-- 요약 2 -->
+	<select id="findMonthlySummary2" resultType="hashmap">
+		SELECT
+		YEAR
+		, MONTH
+		, PUBLIC_TOTAL_SALES           /*공공 급식 매출*/
+		, PAID_TOTAL_SALES             /*유료 급식 매출*/
+		, SUPPORT_ETC_TOTAL            /*기타 수익*/
+		, COSTS_LABOR                  /*비용-인건비*/
+		, COSTS_FOOD_MATERIAL          /*비용-식재료비*/
+	    , COSTS_MANAGEMENT             /*비용-운영비*/
+	    , COSTS_DEPRECIATION           /*비용-감가상각비*/
+	    , COSTS_NON_SALES              /*비용-영업외비용*/
+	    , SUPPORT_GOV_LABOR_COSTS      /*수익B-인건비*/
+		, SUPPORT_GOV_BIZ_DEVELOPMENT  /*수익B-사업개발비*/
+	    , SUPPORT_GOV_MANAGEMENT       /*수익B-운영비*/
+	    , SUPPORT_GOV_ETC              /*수익B-기타*/
+	    , COSTS_RETIRE_SAVING          /*비용-월퇴직 적립금*/
+	    , COSTS_INDEPENDENCY_SAVING    /*비용-자립적립급*/
+		FROM VIEW_Y_SUMMARY
+		WHERE YEAR = #{p.YEAR}
+	</select>
+
+	<!-- 요약 3 -->
+	<select id="findMonthlySummary3" resultType="hashmap">
+		SELECT
+	    YEAR
+		, MONTH
+		, SUMMARY_INDEPEND_POWER_A                 /*자립도A*/
+	    , SUMMARY_INDEPEND_POWER_B                 /*자립도B*/
+	    , PROFIT_A                                 /*수익A*/
+	    , PROFIT_B                                 /*수익B*/
+		, COSTS_TOTAL                              /*비용-합계*/
+		, EMP_SUM                                  /*고용-합계*/
+	    , SUMMARY_TOTAL_SALES                      /*매출합계*/
+	    , SUMMARY_OP_PROFIT                        /*영업이익*/
+	    , SUMMARY_NET_PROFIT                       /*순이익*/
+	    , COSTS_LABOR / EMP_SUM AS COSTS_LABOR_AVG /*평균인건비*/
+	    , COSTS_LABOR / SUMMARY_TOTAL_SALES * 100
+	                  AS COSTS_LABOR_RATE          /*인건비율*/
+	    , COSTS_FOOD_MATERIAL / SUMMARY_TOTAL_SALES * 100
+	                          AS COSTS_FOOD_MATERIAL_RATE /*총재료비율*/
+	    , SUMMARY_OP_PROFIT                               /*영업이익*/
+	    , SUMMARY_NET_PROFIT                              /*순이익*/
+		FROM VIEW_Y_SUMMARY
+		WHERE YEAR = #{p.YEAR}
+	</select>
+
+	<!-- 요약 4 -->
+	<select id="findMonthlySummary4" resultType="hashmap">
+		SELECT
+		YEAR
+		, MONTH
+		, EMP_GENERAL_SUM                        /*일반고용*/
+	    , IFNULL(EMP_GENERAL_SUM        / EMP_SUM * 100, 0)
+	                         AS EMP_GENERAL_RATE /*일반고용비율*/
+	    , EMP_GOV_SUM                            /*고용-노동부*/
+	    , IFNULL(EMP_GOV_SUM           / EMP_SUM * 100, 0)
+	                              AS EMP_GOVRATE /*고용-노동부비율*/
+	    , EMP_SELF_SUPPORT_SUM                   /*고용-자활근로*/
+	    , IFNULL(EMP_SELF_SUPPORT_SUM  / EMP_SUM * 100, 0)
+	                    AS EMP_SELF_SUPPORT_RATE /*고용-자활근로*/
+	    , EMP_SUM                                /*고용-합계*/
+	    , EMP_WEAK_SUM							 /*취약계층*/
+	    , IFNULL(EMP_WEAK_SUM         / EMP_SUM * 100, 0)
+	                           AS EMP_WEAK_RATE  /*취약게층*/
+	    , EMP_FEMALE_SUM                         /*여성*/
+	    , IFNULL(EMP_FEMALE_SUM       / EMP_SUM * 100, 0)
+	                          AS EMP_FEMALE_RATE /*여성비율*/
+		FROM VIEW_Y_SUMMARY
+		WHERE YEAR = #{p.YEAR}
+	</select>
+	<!-- 연간실적 필요없음-->
+
+	<!--//////////////////////// -->
+	<!-- 전체 센터 성과지표 조회, CORP_SEQ 로 서비스에서 피벗팅 함 -->
+	<select id="findAllCorpKpiByYear" resultType="hashmap">
+		SELECT
+		BK.CORP_SEQ
+		, BK.YEAR
+		, BK.L1_KPI_NM
+		, BK.L2_KPI_NM
+		, BK.L3_KPI_NM
+		, BK.L3_KPI_CD
+		, NULL AS STATUS
+		FROM VIEW_CORP_YEAR_KPI BK
+		LEFT JOIN Y_MANUAL_KPI MK ON (BK.CORP_SEQ = MK.CORP_SEQ AND BK.YEAR = MK.YEAR AND BK.L3_KPI_CD = MK.KPI_CD)
+		WHERE BK.YEAR = #{p.YEAR}
+		ORDER BY BK.YEAR, BK.L3_KPI_CD, BK.CORP_SEQ
+	</select>
+
+	<!-- CORP_SEQ로 피벗하기 때문에 CORP_INFO 정보도 같이 내려준다.-->
+	<select id="findAllCorpKpiByYear_corpInfo" resultType="hashmap">
+		SELECT
+		CORP_SEQ
+		, CENTER_NM
+		FROM CORP_INFO
+	   WHERE USE_YN = 'Y'
+	</select>
+
+</mapper>

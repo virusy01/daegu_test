@@ -1,0 +1,69 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/app-route/app-route.html">
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+
+<link rel="import" href="common/behavior-page.html" />
+
+<dom-module id="group-general">
+    <template>
+        <style></style>
+
+        <app-route route="{{route}}" pattern="/:subpage" data="{{routeData}}" tail="{{subroute}}"></app-route>
+
+        <iron-pages role="submain" selected="[[subpage]]" attr-for-selected="id" fallback-selection="all" on-iron-select="_notifySelection">
+            <general-list id="all"></general-list>
+            <general-info id="info" route="{{subroute}}"></general-info>
+        </iron-pages>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'group-general',
+
+            behaviors: [PS.BehaviorPage],
+
+            properties: {
+                route: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    }
+                },
+                subpage: {
+                    type: String,
+                    observer: '_subPageChanged'
+                },
+                _htmlNames: {
+                  type: Object,
+                  value: function() {
+                    return {
+                      all: 'general-list',
+                      info: 'general-info'
+                    }
+                  }
+                }
+            },
+
+            observers: [
+                '_subRoutePageChanged(routeData.subpage)'
+            ],
+
+            _subRoutePageChanged: function(path) {
+                this.subpage = path || 'all';
+            },
+
+            _subPageChanged: function(subpage) {
+                if (this._htmlNames[subpage])
+                    this.importHref(this.resolveUrl('general/' + this._htmlNames[subpage] + '.html'), null, null, true);
+            },
+
+            _notifySelection: function(e) {
+                this._openOverlay(e);
+                var selectedItem = e.detail.item;
+
+                if (typeof selectedItem.refresh === 'function')
+                    selectedItem.refresh();
+            }
+        })
+    </script>
+</dom-module>

@@ -1,0 +1,129 @@
+<dom-module id="common-style">
+    <template>
+        <style>
+            :host {
+                --table-border: {
+                    border: 1px solid #d2d2d2;
+                }
+                --paper-button: {
+                    background-color: #fff;
+                    border: 1px solid #cccccc;
+                    height: 34px;
+                }
+                --paper-tabs-selection-bar-color: #00a388;
+                --paper-tabs-selection-bar: {
+                    height: 5px;
+                }
+                --paper-tab-ink: white;
+                --iron-icon-height: 15px;
+                --iron-icon-width: 15px;
+            }
+
+            paper-tabs,
+            paper-toolbar {
+                background-color: #eeeeee;
+                border: 1px solid #e1e1e1;
+            }
+
+            paper-tabs.toolbar-head,
+            paper-toolbar.toolbar-head {
+                background: none;
+                border: none;
+                border-top: 5px solid #00a388;
+                color: inherit;
+            }
+
+            paper-button iron-icon {
+                margin-right: 3px;
+            }
+
+            html {
+                font-size: 12px;
+            }
+
+            a:link,
+            a:active,
+            a:visited,
+            a:hover {
+                text-decoration: none !important;
+                color: inherit !important;
+            }
+
+            .hidden {
+                display: none;
+            }
+
+            .table th {
+                background-color: #eeeeee;
+                text-align: center;
+                vertical-align: middle !important;
+            }
+
+            .table td {
+                vertical-align: middle !important;
+            }
+
+            .page-header {
+                margin-top: 10px !important;
+            }
+
+            .page-header h1 {
+                margin-top: 10px !important;
+            }
+
+            .card-actions {
+                padding: 10px !important;
+                height: 55px;
+            }
+
+            paper-toolbar .title {
+                margin-left: 0 !important;
+            }
+
+            #searchForm {
+                margin-bottom: 20px;
+                background-color: #f3f3f3;
+            }
+
+            #searchForm .form-group {
+                width: 170px;
+                display: inline-block;
+                margin-right: 10px;
+            }
+
+            #searchForm normal-input {
+                width: 200px;
+            }
+
+            .panel-body {
+                padding: 15px 15px 0 15px !important;
+            }
+
+            paper-button.header {
+                vertical-align: bottom;
+                margin-bottom: 16px;
+            }
+
+            .chart-tooltip {
+                background-color: white;
+                /*border: 1px solid #337ab7;*/
+                border-radius: 5px;
+                font-size: 11px;
+                line-height: 200%;
+                box-sizing: border-box;
+            }
+
+            .chart-tooltip-header {
+                /*background-color: #337ab7;*/
+                padding: 5px;
+                /*border-bottom: 1px solid #337ab7;*/
+                color: white;
+                font-weight: bold;
+            }
+
+            .chart-tooltip-content {
+                padding: 5px;
+            }
+        </style>
+    </template>
+</dom-module>

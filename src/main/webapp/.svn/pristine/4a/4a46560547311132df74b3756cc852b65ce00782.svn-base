@@ -1,0 +1,141 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/paper-radio-group/paper-radio-group.html" />
+<link rel="import" href="/bower_components/paper-radio-button/paper-radio-button.html" />
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+<link rel="import" href="/bower_components/iron-form/iron-form.html" />
+<link rel="import" href="/bower_components/paper-dialog/paper-dialog.html" />
+
+<link rel="import" href="../common/dialog-alert.html" />
+
+<link rel="import" href="../style/common-style.html" />
+
+<dom-module id="user-create">
+    <template>
+        <style include="common-style">
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+                --iron-icon-height: 15px;
+                --iron-icon-width: 15px;
+                --paper-button: {
+                    background-color: #ff6138;
+                    color: white;
+                    font-size: 13px;
+                }
+            }
+
+            paper-button iron-icon {
+                margin-right: 5px;
+            }
+
+            .card-content table {
+                font-size: 12px;
+                width: 100%;
+            }
+
+            .card-content table th {
+                text-align: right;
+                padding-right: 30px;
+            }
+        </style>
+
+        <h1>사용자 등록</h1>
+
+        <paper-card elevation="1">
+            <form is="iron-form" id="userForm" method="POST" action="/api/user" content-type="application/json" on-iron-form-response="_formResponse">
+                <div class="card-content">
+                    <table>
+                        <colgroup>
+                            <col width="20%" />
+                            <col />
+                        </colgroup>
+                        <tr>
+                            <th>
+                                사용자명
+                            </th>
+                            <td>
+                                <paper-input name="userNm" required></paper-input>
+                            </td>
+                            <th>
+                                Email
+                            </th>
+                            <td>
+                                <paper-input name="email"></paper-input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                ID
+                            </th>
+                            <td colspan="3">
+                                <paper-input name="userId" required></paper-input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                Password
+                            </th>
+                            <td colspan="3">
+                                <paper-input name="password" type="password" required></paper-input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                관리자 여부
+                            </th>
+                            <td colspan="3">
+                                <paper-radio-group attr-for-selected="value">
+                                    <paper-radio-button name="adminYn" value="Y">예</paper-radio-button>
+                                    <paper-radio-button name="adminYn" value="N" checked>아니오</paper-radio-button>
+                                </paper-radio-group>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card-actions">
+                    <a href="/user/all" tabindex="-1">
+                        <paper-button>
+                            <iron-icon icon="toc"></iron-icon>
+                            목록
+                        </paper-button>
+                    </a>
+                    <paper-button on-tap="_save">
+                        <iron-icon icon="save"></iron-icon>
+                        저장
+                    </paper-button>
+                </div>
+            </form>
+        </paper-card>
+
+        <dialog-alert id="alert"></dialog-alert>
+
+    </template>
+
+    <script src="/scripts/moment.min.js"></script>
+    <script>
+        Polymer({
+            is: "user-create",
+
+            _save: function() {
+                this.$.userForm.submit();
+            },
+
+            _formResponse: function(e) {
+                switch (e.detail.status) {
+                    case 200:
+                        this.$.alert.msg = "정상적으로 반영되었습니다.";
+                        this.$.alert.dialog.open();
+                        break;
+                    default:
+                        this.$.alert.msg = "오류가 발생했습니다.";
+                        this.$.alert.dialog.open();
+                        break;
+                }
+            }
+
+        })
+    </script>
+</dom-module>

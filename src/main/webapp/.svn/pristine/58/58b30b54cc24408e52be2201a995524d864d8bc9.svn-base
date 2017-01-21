@@ -1,0 +1,76 @@
+<link rel="import" href="../common/behavior-page.html" />
+<link rel="import" href="../style/c3-chart-style.html" />
+
+<dom-module id="kpi-info-chart">
+    <template>
+        <style include="bootstrap-style"></style>
+        <style include="c3-chart-style">
+            :host {
+                @apply(--layout-vertical);
+                margin-top: 40px;
+            }
+        </style>
+
+        <iron-ajax id="protocolGetKpiRadar" url$="/api/corp/{{corpId}}/kpi" headers='{"X-Requested-With": "XMLHttpRequest"}' method="post" content-type="application/json" on-response="_onKpiDataLoad" on-error="_redirectOnError"></iron-ajax>
+
+        <div id="chartContainer" class="text-center">
+        </div>
+    </template>
+
+    <script src="/scripts/d3.min.js"></script>
+    <script src="/scripts/RadarChart.js"></script>
+    <script>
+        Polymer({
+            is: 'kpi-info-chart',
+
+            behaviors: [PS.BehaviorPage],
+
+            properties: {
+                corpId: Number,
+                _kpi: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _isAttached: Boolean,
+            },
+
+            observers: [
+                '_properlyAttached(_isAttached, corpId)'
+            ],
+
+            attached: function() {
+                this._isAttached = true;
+            },
+
+            _properlyAttached: function() {
+                this.$.protocolGetKpiRadar.generateRequest();
+            },
+
+            _onKpiDataLoad: function(e) {
+                this._kpi = e.target.lastResponse;
+                var num, chart, data, radarChart;
+
+                this.$.chartContainer.innerHTML = "";
+
+                radarChart = new RadarChart();
+
+                var options = {
+                    contentHolder: this.$.chartContainer,
+                    maxValue: 10,
+                    categoryField: "depth1Nm",
+                    valueField: "score",
+                    data: [this._kpi],
+                    dataTipFunction: function(d, tooltip) {
+                        tooltip.innerHTML = "";
+                        tooltip.innerHTML = "<span>" + d.depth1Nm + " : </span><span style='color:#b2485f;font-weight: bold'>" + d.score + "<span><br>";
+                    }
+                }
+                radarChart.options = options;
+                radarChart.draw();
+                this._closeOverlay();
+            },
+        })
+    </script>
+</dom-module>

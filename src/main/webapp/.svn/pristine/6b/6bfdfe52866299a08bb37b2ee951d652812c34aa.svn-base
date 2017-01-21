@@ -1,0 +1,239 @@
+<link rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html" />
+<link rel="import" href="/bower_components/vaadin-date-picker/vaadin-date-picker.html" />
+
+<link rel="import" href="../common/dialog-alert.html" />
+<link rel="import" href="../gp-text-field/gp-text-field.html" />
+
+<dom-module id="corp-detail-fund">
+    <template>
+        <style include="common-style">
+            :host {
+                --paper-toolbar-height: 50px;
+            }
+
+            paper-toolbar .title {
+                margin-left: 0 !important;
+            }
+        </style>
+
+        <iron-ajax id="protocolGetCorpFund" url$="/api/corp/help/{{corpId}}/last3year" headers='{"X-Requested-With": "XMLHttpRequest"}' method="GET" content-type="application/json" last-response="{{_corpDetail}}" on-response="_insertFundData" on-error="_onErrorHandler"></iron-ajax>
+        <iron-ajax id="protocolSaveCorpFund" url="/api/corp/help" method="POST" headers='{"X-Requested-With": "XMLHttpRequest"}' content-type="application/json" on-response="_formResponse" on-error="_onErrorHandler"></iron-ajax>
+        <iron-ajax id="protocolDeleteCorpFund" url$="/api/corp/help/{{_helpSeq}}" headers='{"X-Requested-With": "XMLHttpRequest"}' method="DELETE" content-type="application/json" on-response="_formResponse" on-error="_onErrorHandler"></iron-ajax>
+
+        <paper-toolbar>
+            <span class="title">최근 3년간 중앙정부, 지자체, 민간단체 등 외부로부터 받은 지원사항</span>
+            <paper-button on-tap="_addRow">행추가</paper-button>
+            <paper-button on-tap="_save">저장</paper-button>
+        </paper-toolbar>
+
+        <form id="formCorpFund" is="iron-form">
+            <table id="tableCorpFund" class="table">
+                <thead>
+                  <tr>
+                    <th>
+                      지원처
+                    </th>
+                    <th>
+                      사업명
+                    </th>
+                    <th>
+                      지원기간
+                    </th>
+                    <th>
+                      금액
+                    </th>
+                    <th>
+                      -
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </form>
+
+        <dialog-alert id="alert" on-confirm-ok="_onConfirmOk"></dialog-alert>
+
+    </template>
+
+    <script src="/scripts/moment.min.js"></script>
+    <script>
+        Polymer({
+            is: 'corp-detail-fund',
+
+            properties: {
+                corpId: Number,
+                _isAttached: Boolean,
+                _corpDetail: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    }
+                },
+                _helpSeq: String,
+            },
+
+            observers: [
+                '_search(corpId, _isAttached)'
+            ],
+
+            attached: function() {
+                this._isAttached = true;
+            },
+
+            _search: function() {
+                this.$.protocolGetCorpFund.generateRequest();
+            },
+
+            _insertFundData: function(e) {
+                var table = this.$.tableCorpFund.querySelector("tbody");
+                var data = e.target.lastResponse;
+                var i;
+
+                table.innerHTML = "";
+
+                for (i = 0; i < data.length; i++) {
+                    this._appendRow(
+                        data[i].helper,
+                        data[i].prjNm,
+                        moment(data[i].helpStDt).format("YYYY-MM-DD"),
+                        moment(data[i].helpEndDt).format("YYYY-MM-DD"),
+                        data[i].helpAmt,
+                        data[i].helpSeq
+                    )
+                }
+            },
+
+            _save: function() {
+                if (this.$.formCorpFund.validate()) {
+                    var data = this.$.formCorpFund.serialize();
+                    var parsedData = [];
+                    var length = Array.isArray(data.helper) ? data.helper.length : 1;
+
+                    for (var i = 0; i < length; i++) {
+                        parsedData.push({
+                            helper: Array.isArray(data.helper) ? data.helper[i] : data.helper,
+                            prjNm: Array.isArray(data.prjNm) ? data.prjNm[i] : data.prjNm,
+                            helpStDt: Array.isArray(data.helpStDt) ? data.helpStDt[i] : data.helpStDt,
+                            helpEndDt: Array.isArray(data.helpEndDt) ? data.helpEndDt[i] : data.helpEndDt,
+                            helpAmt:  accounting.unformat(Array.isArray(data.helpAmt) ? data.helpAmt[i] : data.helpAmt),
+                            helpSeq: Array.isArray(data.helpSeq) ? data.helpSeq[i] : data.helpSeq,
+                            corpSeq: this.corpId
+                        });
+                    }
+
+                    this.$.protocolSaveCorpFund.body = parsedData;
+                    this.$.protocolSaveCorpFund.generateRequest();
+                }
+            },
+
+            _formResponse: function(e) {
+                this.$.alert.type = "alert";
+
+                switch (e.detail.status) {
+                    case 200:
+                        this.$.alert.msg = "정상적으로 반영되었습니다.";
+                        this.$.alert.dialog.open();
+                        this._search();
+                        break;
+                    default:
+                        this.$.alert.msg = "오류가 발생했습니다.";
+                        this.$.alert.dialog.open();
+                        break;
+                }
+            },
+
+            _addRow: function() {
+                this._appendRow();
+            },
+
+            _appendRow: function(helper, prjNm, helpStDt, helpEndDt, helpAmt, helpSeq) {
+                var table = this.$.tableCorpFund.querySelector("tbody");
+                var tr, td, input, button, hidden;
+
+                tr = document.createElement("tr");
+
+                td = document.createElement("td");
+                input = document.createElement("paper-input");
+                input.setAttribute("name", "helper");
+                input.setAttribute("required", true);
+                input.setAttribute("value", helper ? helper : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                input = document.createElement("paper-input");
+                input.setAttribute("name", "prjNm");
+                input.setAttribute("required", true);
+                input.setAttribute("value", prjNm ? prjNm : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                td.setAttribute("class", "align-center");
+                input = document.createElement("vaadin-date-picker");
+                input.setAttribute("name", "helpStDt");
+                input.setAttribute("required", true);
+                input.setAttribute("value", helpStDt ? helpStDt : "");
+                td.appendChild(input);
+                input = document.createElement("vaadin-date-picker");
+                input.setAttribute("name", "helpEndDt");
+                input.setAttribute("required", true);
+                input.setAttribute("value", helpEndDt ? helpEndDt : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                td.setAttribute("class", "align-right");
+                input = document.createElement("gp-text-field");
+                input.setAttribute("name", "helpAmt");
+                input.setAttribute("type", "number");
+                input.setAttribute("show-thousands", true);
+                input.setAttribute("required", true);
+                input.setAttribute("bind-value", helpAmt ? helpAmt : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                button = document.createElement("paper-button");
+                button.addEventListener("tap", this._deleteRow.bind(this));
+                button.innerHTML = "삭제";
+                td.appendChild(button);
+
+                hidden = document.createElement("paper-input");
+                hidden.setAttribute("name", "helpSeq");
+                hidden.setAttribute("value", helpSeq ? helpSeq : "");
+                hidden.setAttribute("class", "hidden helpSeq");
+                td.appendChild(hidden);
+                tr.appendChild(td);
+
+                if (helpSeq)
+                  table.appendChild(tr);
+                else
+                  table.insertBefore(tr, table.firstChild);
+            },
+
+            _deleteRow: function(e) {
+                var tr = e.target.parentNode.parentNode;
+                var helpSeq = tr.getElementsByClassName("helpSeq")[0].value;
+
+                if (!helpSeq) {
+                    tr.remove();
+                } else {
+                    this._helpSeq = helpSeq;
+                    this.$.protocolDeleteCorpFund.generateRequest();
+                }
+            },
+            _onErrorHandler : function(e)
+            {
+            	var status = e.detail.request.status;
+            	if(status == 403)
+           		{
+           			location.href = "/";
+           		}
+            }
+
+        })
+    </script>
+</dom-module>

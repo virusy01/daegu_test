@@ -1,0 +1,113 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/app-route/app-location.html">
+<link rel="import" href="/bower_components/app-route/app-route.html">
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+<link rel="import" href="/bower_components/iron-form/iron-form.html" />
+<link rel="import" href="/bower_components/paper-dialog/paper-dialog.html" />
+<link rel="import" href="/bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="/bower_components/paper-tabs/paper-tab.html">
+
+<link rel="import" href="corp-detail-kpi.html" />
+<link rel="import" href="corp-detail-finance.html" />
+<link rel="import" href="corp-detail-fund.html" />
+<link rel="import" href="corp-detail-employee.html" />
+
+<link rel="import" href="../style/common-style.html" />
+<link rel="import" href="../style/bootstrap-style.html" />
+
+<dom-module id="corp-detail">
+    <template>
+        <style include="common-style"></style>
+        <style include="bootstrap-style">
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+            }
+
+            paper-tabs {
+                border-bottom: 0;
+            }
+        </style>
+
+        <app-route route="{{route}}" pattern="/:id" data="{{routeData}}"></app-route>
+
+        <iron-ajax id="protocolGetInfo" url$="/api/corp/info/{{_id}}" headers='{"X-Requested-With": "XMLHttpRequest"}' method="GET" content-type="application/json" last-response="{{_info}}" on-error="_onErrorHandler"></iron-ajax>
+
+        <paper-card>
+            <div class="card-content">
+                <div class="page-header">
+                    <h2>성과 및 기타정보 <small>[[_info.corpNm]]</small></h2>
+                </div>
+
+                <paper-tabs selected="{{_tab}}" attr-for-selected="key">
+                    <paper-tab key="kpi">성과지표</paper-tab>
+                    <paper-tab key="finance">재정현황</paper-tab>
+                    <paper-tab key="fund">외부지원사항</paper-tab>
+                    <paper-tab key="employee">고용현황</paper-tab>
+                </paper-tabs>
+
+                <iron-pages role="tab" selected="{{_tab}}" attr-for-selected="name">
+                    <corp-detail-kpi name="kpi" corp-id="{{_id}}"></corp-detail-kpi>
+                    <corp-detail-finance name="finance" corp-id="{{_id}}"></corp-detail-finance>
+                    <corp-detail-fund name="fund" corp-id="{{_id}}"></corp-detail-fund>
+                    <corp-detail-employee name="employee" corp-id="{{_id}}"></corp-detail-employee>
+                </iron-pages>
+            </div>
+        </paper-card>
+    </template>
+    <script>
+        Polymer({
+            is: 'corp-detail',
+
+            properties: {
+                _id: Number,
+                _isAttached: Boolean,
+                route: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    }
+                },
+                _corpDetail: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _tab: {
+                    type: String,
+                    value: "kpi"
+                },
+            },
+
+            observers: [
+                '_routeIdChanged(routeData.id, _isAttached)'
+            ],
+
+            attached: function() {
+                this._isAttached = true;
+            },
+
+            _routeIdChanged: function(id) {
+                this._id = id;
+                this._search();
+            },
+
+            _search: function() {
+                this.$.protocolGetInfo.generateRequest();
+            },
+            _onErrorHandler : function(e)
+            {
+            	var status = e.detail.request.status;
+            	if(status == 403)
+           		{
+           			location.href = "/";
+           		}
+            }
+        })
+    </script>
+</dom-module>

@@ -1,0 +1,120 @@
+<link rel="import" href="../style/common-style.html" />
+<link rel="import" href="../style/bootstrap-style.html" />
+
+<dom-module id="overall-all">
+    <template>
+        <style include="common-style"></style>
+        <style include="c3-chart-style"></style>
+        <style include="bootstrap-style">
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+            }
+        </style>
+
+        <iron-ajax id="protocolGetBiz" url="/api/corp/info/find/" headers='{"X-Requested-With": "XMLHttpRequest"}' method="post" content-type="application/json" last-response="{{_corpList}}" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax id="protocolGetOverallKpi" url$="/api/corp/{{_corpSeq}}/kpis/depth1" headers='{"X-Requested-With": "XMLHttpRequest"}' method="GET" content-type="application/json" on-response="_drawChart" on-error="_onErrorHandler"></iron-ajax>
+
+        <paper-card elevation="1">
+            <div class="card-content">
+                <div class="page-header">
+                    <h2>기업별 통합 성과지표 <small>목록</small></h2>
+                </div>
+
+                <div id="searchForm" class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label for="corp">기업</label>
+                            <normal-select id="corp" items="{{_corpList}}" name-from="corpNm" value-from="corpSeq" on-value-changed="_setCorpSeq"></normal-select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="chart"></div>
+            </div>
+        </paper-card>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'overall-all',
+
+            behaviors: [PS.BehaviorPage],
+
+            properties: {
+                _corpSeq: String,
+                _data: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                }
+            },
+
+            observers: [
+                '_getKpi(_corpSeq)'
+            ],
+
+            ready: function() {
+                this.scopeSubtree(this.$.chart, true);
+            },
+
+            attached: function() {
+                this.$.protocolGetBiz.body = {
+                    corpType: '',
+                    compKind: '',
+                    bizSect: '',
+                    corpNm: ''
+                };
+
+                this.$.protocolGetBiz.generateRequest();
+            },
+
+            _getKpi: function(value) {
+                this.$.protocolGetOverallKpi.generateRequest();
+            },
+
+            _drawChart: function(e) {
+                this._data = e.target.lastResponse;
+
+                c3.generate({
+                    bindto: this.$.chart,
+                    size: {
+                        height: 500
+                    },
+                    data: {
+                        json: this._data,
+                        keys: {
+                            x: 'EVAL_YEAR',
+                            value: ['01', '02', '03', '04', '05', '06', '07' ,'08', '09', '10']
+                        },
+                        names: {
+                            '01': '사회적 가치 창출',
+                            '02': '경제적 가치 창출',
+                            '03': '사회적자본 활용',
+                            '04': '제품/서비스 품질관리',
+                            '05': '제품/서비스 차별화 체계',
+                            '06': '판로 확대 체계',
+                            '07': '지배구조 체계',
+                            '08': '조직몰입도',
+                            '09': '사업역량',
+                            '10': '구성원 인사관리'
+                        },
+                    },
+                    color: {
+                        pattern: ['#f46464', '#e74c3c', '#1f8a70', '#00a388', '#ffb03b', '#e8cb0d', '#ffe11a', '#ff8598', '#ffc0a9', '#f2836b']
+                    },
+                    axis: {
+                        x: {
+                            type: 'category'
+                        }
+                    }
+                });
+            },
+
+            _setCorpSeq: function(e) {
+                this._corpSeq = this.$.corp.value;
+            }
+        })
+    </script>
+</dom-module>

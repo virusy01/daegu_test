@@ -1,0 +1,28 @@
+// This is bundled with the Parsley library
+
+Parsley.addMessages('ko', {
+    defaultMessage: "값이 정확하지 않습니다.",
+    type: {
+        email:        "유효한 이메일이 아닙니다..",
+        url:          "유효한 URL이 아닙니다..",
+        number:       "숫자만 입력할 수 있습니다.",
+        integer:      "정수만 입력할 수 있습니다.",
+        digits:       "실수만 입력할 수 있습니다.",
+        alphanum:     "숫자와 알파벳만 입력할 수 있습니다."
+    },
+    notblank:       "빈값을 허용하지 않습니다.",
+    required:       "필수 입력 항목입니다..",
+    pattern:        "패턴이 정확하지 않습니다.",
+    min:            "최소값 %s보다 아래값은 허용되지 않습니다.",
+    max:            "최대값 %s보다 큰값은 허용되지 않습니다.",
+    range:          "%s 와 %s 사이의 값만 허용됩니다.",
+    minlength:      "문자열 길이가 %s보다 길어야합니다.",
+    maxlength:      "문자열 길이가 %s보다 작아야합니다..",
+    length:         "문자열 길이가 %s 와 %s 사이에 있어야합니다.",
+    mincheck:       "최소값 %s보다 높은 값을 선택하세요.",
+    maxcheck:       "최대값 %s보다 낮을 값을 선택하세요.",
+    check:          "%s와 %s 사이의 값을 선택하세요.",
+    equalto:        "값이 같아야합니다.."
+});
+
+Parsley.setLocale('ko');

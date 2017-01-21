@@ -1,0 +1,604 @@
+<!--
+ * @Desc 포탈 엘리먼트
+ * @Author patrick.sung
+ * @Created 2016-03-28
+ -->
+
+<link rel="import" href="/bower_components/iron-resizable-behavior/iron-resizable-behavior.html"/>
+<link rel="import" href="/bower_components/iron-signals/iron-signals.html"/>
+<link rel="import" href="../gp-behaviors/gp-behavior-coordinates.html"/>
+<link rel="import" href="../gp-behaviors/gp-behavior-id-generator.html"/>
+<link rel="import" href="../gp-widget/gp-widget.html"/>
+
+<link rel="import" href="gp-portal-style.html"/>
+<link rel="import" href="../style/common-style.html"/>
+
+<dom-module id="gp-portal">
+    <template>
+        <style include="common-style"></style>
+        <style include="gp-portal-style">
+            :host {
+                --grid-size: 0px;
+                --portal-user-select: all;
+                --grid-size-width : 0px;
+                --grid-size-height: 0px;
+                
+                display: inline-block;
+                position: absolute;
+                overflow: auto;
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+
+                background-size: var(--grid-size-width) var(--grid-size-height);
+                background-image: repeating-linear-gradient(0deg, var(--grid-line-color), var(--grid-line-color) 1px, transparent 1px, transparent var(--grid-size-height)), repeating-linear-gradient(-90deg, var(--grid-line-color), var(--grid-line-color) 1px, transparent 1px, transparent var(--grid-size-width));
+
+                -webkit-user-select: var(--portal-user-select);
+                -moz-user-select: var(--portal-user-select);
+                -ms-user-select: var(--portal-user-select);
+                user-select: var(--portal-user-select);
+
+                opacity: 0.99;
+                border-radius: inherit;
+            }
+        </style>
+
+        <iron-signals on-iron-signal-content-resize="_onResize"></iron-signals>
+
+        <sc-ajax id="protocolSaveLayout" url="/gate/saveUserLayout.do"
+                   body='{{_widgetLayout}}'
+                   handle-as="json"
+                   method="post" contentType="application/json"></sc-ajax>
+
+        <sc-ajax id="protocolLoadLayout" url="/gate/findUserLayout.do" handle-as="json" last-response="{{layout}}" on-response="_loadLayout"
+                   debounce-duration="300"></sc-ajax>
+
+        <sc-ajax id="protocolDeleteWidgetProperty" url="/gate/deleteWidgetProperties.do" contentType="application/json" handle-as="json" method="post"></sc-ajax>
+
+        <iron-signals on-iron-signal-goto-page="_onGotoPage" on-iron-signal-del-page="_onDeletePage"></iron-signals>
+
+        <content></content>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'gp-portal',
+
+            behaviors: [BehaviorCoordinates, BehaviorIDGenerator, Polymer.IronResizableBehavior],
+
+            properties: {
+                width: {
+                    type: String,
+                    value: '1000',
+                    observer: '_widthChanged'
+                },
+                height: {
+                    type: String,
+                    value: '600',
+                    observer: '_heightChanged'
+                },
+                gridSize: {
+                    type: Number,
+                    value: 20,
+                    observer: '_gridSizeChanged'
+                },
+                _gridWidth: {
+                    type: Number,
+                },
+                _gridHeight: {
+                    type: Number,
+                },
+                doScaleWidth: {
+                    type: Boolean,
+                    value: false
+                },
+                doScaleHeight: {
+                    type: Boolean,
+                    value: false
+                },
+                noSnappingPosition: {
+                    type: Boolean,
+                    value: false
+                },
+                noSnappingSize: {
+                    type: Boolean,
+                    value: false,
+                    notify: true
+                },
+                auto: {
+                    type: Boolean,
+                    value: false
+                },
+                standardWidth: {
+                    type: Number,
+                    value: 1280
+                },
+                standardHeight: {
+                    type: Number,
+                    value: 800
+                },
+                pageId: Number,
+                _editMode: {
+                    type: Boolean,
+                    value: false
+                },
+                _maxZindex: {
+                    type: Number,
+                    value: 0,
+                },
+                _widgets: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    },
+                },
+                _userIdx: Number,
+                _widgetLayout: Object,
+                _importList: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _previousOffsetWidth: Number,
+                _previousOffsetHeight: Number,
+                _gridMultipleOfWidth: Number,
+                _gridMultipleOfHeight: Number,
+                _toLayoutId: Number
+            },
+
+            ready: function () {
+                this.applyEvents();
+            },
+
+            attached: function () {
+                if (this.auto) {
+                    this.$.protocolLoadLayout.generateRequest();
+                }
+
+                if (this.doScaleWidth || this.doScaleHeight)
+                    this.listen(this, 'iron-resize', '_onResize');
+
+                this.setScaleStandards();
+            },
+
+            setScaleStandards: function () {
+                if (this.doScaleWidth) {
+                    this._gridMultipleOfWidth = this.gridSize / this.standardWidth;
+                    this._gridWidth = Math.round(this.parent.offsetWidth * this._gridMultipleOfWidth)
+                }
+
+                if (this.doScaleHeight) {
+                    this._gridMultipleOfHeight = this.gridSize / this.standardHeight;
+                    this._gridHeight = Math.round(this.parent.offsetHeight * this._gridMultipleOfHeight);
+                }
+            },
+
+            _loadLayout: function () {
+                this.layout = typeof this.layout == "string" ? JSON.parse(this.layout) : this.layout;
+                this.pageId = this.layout.page_id;
+                this.layout = JSON.parse(this.layout.layt_src);
+
+                for (var i = 0; i < this.layout.length; i++) {
+                    this.addWidget(this.layout[i]);
+                }
+                this.auto = false;
+                this.fire('iron-signal', {name:'enable-toggle', detail:null});
+            },
+
+            applyEvents: function () {
+                for (var i = 0; i < this.getContentChildren('content').length; i++) {
+                    var widget = this.getContentChildren('content')[i];
+
+                    this.applyEvent(widget);
+                }
+            },
+
+            applyEvent: function (widget) {
+                widget.addEventListener('selected', this.handleZindex);
+                widget.addEventListener('drag', this.onDrag);
+                widget.addEventListener('resize', this.onDrag);
+            },
+
+            handleZindex: function (e) {
+                e.target.setZindex(++this.parentNode._maxZindex);
+            },
+
+            onDrag: function (e) {
+                if (!e.target.disableMovement) {
+                    if (e.detail.state == 'started') {
+                        this.parentNode.toggleSelection(true);
+                    } else if (e.detail.state == 'ended') {
+                        this.parentNode.toggleSelection(false);
+                    }
+                }
+            },
+
+            toggleGrid: function (show) {
+                this.customStyle['--grid-size-width'] = !show ? '0px' : this._gridWidth + 'px';
+                this.customStyle['--grid-size-height'] = !show ? '0px' : this._gridHeight + 'px';
+                this.updateStyles();
+            },
+
+            updateGrid: function() {
+                if (this._editMode) {
+                    this.customStyle['--grid-size-width'] = this._gridWidth + 'px';
+                    this.customStyle['--grid-size-height'] = this._gridHeight + 'px';
+                    this.updateStyles();
+                }
+            },
+
+            toggleSelection: function (disable) {
+                this.customStyle['--portal-user-select'] = disable ? 'none' : 'all';
+                this.updateStyles();
+            },
+
+            addWidget: function (info) {
+                if (this.auto) {
+                    this.createWidget(info, info.UUID);
+                } else {
+                    this.createWidget(info.info, this.generateUUID())
+                }
+            },
+
+            createWidget: function (info, uuid) {
+                var widget = document.createElement('gp-widget');
+
+                widget.setAttribute('id', 'WGT' + uuid);
+                widget.setAttribute('title', info.title);
+                widget.setAttribute('width', info.width);
+                widget.setAttribute('height', info.height);
+
+                if (info.resizable.toString() != 'true')
+                    widget.setAttribute('disable-resizing', '');
+
+                if (info.draggable.toString() != 'true')
+                    widget.setAttribute('disable-movement', '');
+
+                if (info.closeable.toString() != 'true')
+                    widget.setAttribute('disable-close', '');
+
+                if (info.editable.toString() != 'true') {
+                    widget.setAttribute('disable-settings', '');
+                    this.importWidgetHTML(info.type);
+                } else
+                    this.importWidgetHTML(info.type, true);
+
+                var content = this.createWidgetContent(widget, uuid, info);
+
+                Polymer.dom(this).appendChild(widget);
+                widget.setZindex(info.zIndex ? info.zIndex : ++this._maxZindex);
+                Polymer.dom.flush();
+
+                this._maxZindex = this._maxZindex < Number(info.zIndex) ? info.zIndex : this._maxZindex;
+
+                var position = this.auto ? info : this.globalToLocal({x: info.x + this.scrollLeft, y: info.y + this.scrollTop});
+
+                widget.x = position.x;
+                widget.y = position.y;
+
+                if (this.auto && (this.doScaleWidth || this.doScaleHeight)) {
+                    this.proportionWidget(widget);
+                } else if (this.doScaleWidth || this.doScaleHeight) {
+                    this.setWidgetScaleStandards(widget);
+                }
+
+                widget.snapWidget();
+                widget.snapSizeToGrid();
+
+                this.applyEvent(widget);
+                this.appendToWidgets(widget);
+
+                if (info.editable.toString() == 'true')
+                    this.createWidgetPropertyContent(widget, content);
+
+                if (this._editMode)
+                    widget.editMode = true;
+            },
+
+            createWidgetContent: function (widget, uuid, info) {
+                var content = document.createElement(info.type);
+                content.setAttribute('widget-id', uuid);
+                content.widgetID = uuid;
+                content.style.display = 'inline';
+
+                widget.appendChild(content);
+
+                return content;
+            },
+
+            createWidgetPropertyContent: function (widget, contentWidget) {
+                var propertyWidget = document.createElement(contentWidget.nodeName.toLowerCase() + '-property');
+                var uuid = contentWidget.getAttribute('widget-id');
+
+                propertyWidget.setAttribute('widget-id', uuid);
+                propertyWidget.widgetID = uuid;
+                propertyWidget.style.display = 'none';
+                propertyWidget.relatedObject = contentWidget;
+                contentWidget.relatedObject = propertyWidget;
+
+                widget.appendChild(propertyWidget);
+                widget.contentWidget = contentWidget;
+                widget.contentWidgetProperty = propertyWidget;
+            },
+
+            importWidgetHTML: function (widgetName, includeProperty) {
+                includeProperty = includeProperty == undefined ? false : true;
+
+                if (this._importList.indexOf(widgetName)) {
+                    this.importHref('/ui/lib/' + widgetName + '/' + widgetName + '.html');
+
+                    if (includeProperty)
+                        this.importHref('/ui/lib/' + widgetName + '/' + widgetName + '-property.html');
+
+                    this.push('_importList', widgetName);
+                }
+            },
+
+            appendToWidgets: function (widget) {
+                this.push('_widgets', widget);
+            },
+
+            setWidgetScaleStandards: function (widget) {
+                if (this.doScaleWidth) {
+                    widget._snapValueWidth = Math.round(this.parent.offsetWidth * this._gridMultipleOfWidth);
+                }
+
+                if (this.doScaleHeight) {
+                    widget._snapValueHeight = Math.round(this.parent.offsetHeight * this._gridMultipleOfHeight);
+                }
+            },
+
+            _widthChanged: function (value) {
+                this.style.width = value.indexOf('%') !== -1 ? value : value + 'px';
+            },
+
+            _heightChanged: function (value) {
+                this.style.height = value.indexOf('%') !== -1 ? value : value + 'px';
+            },
+
+            saveLayout: function () {
+                if (this.doScaleWidth) {
+                    var gridWidth = Math.round(this.standardWidth * this._gridMultipleOfWidth);
+                    var prevGridWidth = this._gridWidth;
+                }
+
+                if (this.doScaleHeight) {
+                    var gridHeight = Math.round(this.standardHeight * this._gridMultipleOfHeight);
+                    var prevGridHeight = this._gridHeight;
+                }
+
+                var data = [];
+                for (var i = 0; i < this._widgets.length; i++) {
+                    var widget = this._widgets[i];
+                    var widgetData = Object();
+
+                    if (this.doScaleWidth) {
+                        var cellX = widget.getAttribute('x') / prevGridWidth;
+                        var cellWidth = widget.getAttribute('width') / prevGridWidth;
+
+                        widgetData['x'] = cellX * gridWidth;
+                        widgetData['width'] = cellWidth * gridWidth;
+                    }else {
+                        widgetData['x'] = widget.getAttribute('x');
+                        widgetData['width'] = widget.getAttribute('width');
+                    }
+
+                    if (this.doScaleHeight) {
+                        var cellY = widget.getAttribute('y') / prevGridHeight;
+                        var cellHeight = widget.getAttribute('height') / prevGridHeight;
+
+                        widgetData['y'] = cellY * gridHeight;
+                        widgetData['height'] = cellHeight * gridHeight;
+                    }else {
+                        widgetData['y'] = widget.getAttribute('y');
+                        widgetData['height'] = widget.getAttribute('height');
+                    }
+
+                    widgetData['title'] = widget.getAttribute('title');
+                    widgetData['zIndex'] = widget.style.zIndex;
+                    widgetData['resizable'] = widget.getAttribute('disable-resizing') == '' ? false : true;
+                    widgetData['draggable'] = widget.getAttribute('disable-movement') == '' ? false : true;
+                    widgetData['closeable'] = widget.getAttribute('disable-close') == '' ? false : true;
+                    widgetData['editable'] = widget.getAttribute('disable-settings') == '' ? false : true;
+                    widgetData['UUID'] = widget.children[2].getAttribute('widget-id');
+                    widgetData['type'] = widget.children[2].nodeName.toLowerCase();
+
+                    data.push(widgetData);
+                }
+
+                this._widgetLayout = {
+                    layt_src: JSON.stringify(data), page_id: this.pageId
+                };
+
+                this.$.protocolSaveLayout.generateRequest();
+
+                if (this._toLayoutId)
+                    this._onGotoPage();
+            },
+
+            proportionWidget: function (widget) {
+                if (this.doScaleWidth) {
+                    this.scaleHorizontalAxis(widget, undefined, this.gridSize);
+                    this._previousOffsetWidth = this.standardWidth;
+                }
+
+                if (this.doScaleHeight) {
+                    this.scaleVerticalAxis(widget, undefined, this.gridSize);
+                    this._previousOffsetHeight = this.standardHeight;
+                }
+            },
+
+            _onResize: function (e) {
+                if (this.offsetChanged()) {
+
+                    var gridWidth;
+                    var gridHeight;
+                    var prevGridWidth;
+                    var prevGridHeight;
+                    var widget;
+
+                    if (this.doScaleWidth) {
+                        gridWidth = Math.round(this.parent.offsetWidth * this._gridMultipleOfWidth);
+                        gridWidth = gridWidth < 1 ? 1 : gridWidth;
+                        prevGridWidth = this._gridWidth;
+                    }
+
+                    if (this.doScaleHeight) {
+                        gridHeight = Math.round(this.parent.offsetHeight * this._gridMultipleOfHeight);
+                        gridHeight = gridHeight < 1 ? 1 : gridHeight;
+                        prevGridHeight = this._gridHeight;
+                    }
+
+                    for (var i = 0; i < this._widgets.length; i++) {
+                        widget = this._widgets[i];
+
+                        if (this.doScaleWidth) {
+                            this.scaleHorizontalAxis(widget, gridWidth, prevGridWidth);
+                        }
+
+                        if (this.doScaleHeight) {
+                            this.scaleVerticalAxis(widget, gridHeight, prevGridHeight);
+                        }
+                        widget.snapWidget();
+                        widget.snapSizeToGrid();
+                    }
+
+                    this.updateGrid();
+                    this._previousOffsetWidth = this.parent.offsetWidth;
+                    this._previousOffsetHeight = this.parent.offsetHeight;
+                }
+            },
+
+            offsetChanged: function () {
+                return this.parent.offsetWidth != this._previousOffsetWidth || this.parent.offsetHeight != this._previousOffsetHeight;
+            },
+
+            scaleHorizontalAxis: function (widget, gridWidth, prevGridWidth) {
+                gridWidth = gridWidth == undefined || !gridWidth ? Math.round(this.parent.offsetWidth * this._gridMultipleOfWidth) : gridWidth;
+                prevGridWidth = prevGridWidth == undefined || !prevGridWidth ? this._gridWidth : prevGridWidth;
+
+                var cellX = widget.x / prevGridWidth;
+                var cellWidth = widget.width / prevGridWidth;
+
+                widget._snapValueWidth = this._gridWidth = gridWidth;
+
+                widget.x = cellX * this._gridWidth;
+                widget.width = cellWidth * this._gridWidth;
+            },
+
+            scaleVerticalAxis: function (widget, gridHeight, prevGridHeight) {
+                gridHeight = gridHeight == undefined || !gridHeight ? Math.round(this.parent.offsetHeight * this._gridMultipleOfHeight) : gridHeight;
+                prevGridHeight = prevGridHeight == undefined || !prevGridHeight ? this._gridHeight : prevGridHeight;
+
+                var cellY = widget.y / prevGridHeight;
+                var cellHeight = widget.height / prevGridHeight;
+
+                widget._snapValueHeight = this._gridHeight = gridHeight;
+
+                widget.y = cellY * this._gridHeight;
+                widget.height = cellHeight * this._gridHeight;
+            },
+
+            _gridSizeChanged: function (value) {
+                this._gridWidth = this._gridHeight = value;
+            },
+
+            toggleEditMode: function () {
+                this._editMode = !this._editMode;
+
+                this.toggleGrid(this._editMode);
+
+                var widget;
+
+                for (var i = 0; i < this._widgets.length; i++) {
+                    widget = this._widgets[i];
+                    widget.editMode = this._editMode;
+                }
+
+                if (this._editMode == false)
+                    this.saveLayout();
+            },
+
+            removeWidget: function(widget) {
+                for (var i = 0; i < this._widgets.length; i++) {
+                    if (this._widgets[i].getAttribute('id') == widget.getAttribute('id'))
+                        this._widgets.splice(i, 1);
+                }
+
+                var widgetId = widget.children[2].getAttribute('widget-id');
+
+                this.$.protocolDeleteWidgetProperty.body = {
+                    wdgt_id : widgetId
+                };
+
+                this.$.protocolDeleteWidgetProperty.generateRequest();
+
+                Polymer.dom(this).removeChild(widget);
+                Polymer.dom.flush();
+            },
+
+            _onGotoPage: function(e, detail) {
+                if (!this._toLayoutId) {
+                    this._toLayoutId = detail;
+                    this.saveLayout();
+                }else {
+                    var pageId = this._toLayoutId;
+                    this._toLayoutId = null;
+
+                    this._closeLayout();
+                    this._initVars();
+
+                    this.$.protocolLoadLayout.params = {
+                        page_id: pageId
+                    };
+
+                    this.pageId = pageId;
+
+                    this.$.protocolLoadLayout.generateRequest();
+                }
+
+            },
+
+            _closeLayout: function() {
+                var widget;
+
+                for (var i = 0; i < this._widgets.length; i++) {
+                    widget = this._widgets[i];
+                    Polymer.dom(this).removeChild(widget);
+                }
+
+                Polymer.dom.flush();
+            },
+
+            _initVars: function() {
+                this._widgets = [];
+                this._maxZindex = 0;
+                this.layout = [];
+                this.auto = true;
+            },
+
+            _onDeletePage: function(page) {
+                var widget;
+
+                for (var i = 0; i < this._widgets.length; i++) {
+                    widget = this._widgets[i];
+                    var widgetId = widget.children[2].getAttribute('widget-id');
+
+                    this.$.protocolDeleteWidgetProperty.body = {
+                        wdgt_id : widgetId
+                    };
+
+                    this.$.protocolDeleteWidgetProperty.generateRequest();
+                }
+            },
+
+            get parent() {
+                if (this.parentNode.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+                    return this.parentNode.host;
+                }
+                return this.parentNode;
+            },
+        })
+    </script>
+</dom-module>

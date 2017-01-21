@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes" />
+	<meta name="theme-color" content="#fff" />
+	<title>광명시 사회적기업 성과관리시스템</title>
+
+	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+	<style>
+		@import url('//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/nanumgothic.css');
+		body {
+			font-family: 'Nanum Gothic', sans-serif;
+			color: #333;
+			margin: 0;
+			background-color: #fafafa;
+		}
+
+		ul,
+		li {
+			list-style: none;
+		}
+
+		.panel {
+			margin: 50px auto;
+			width: 400px;
+		}
+
+		.panel-default>.panel-heading {
+			background-color: #1565c0;
+			padding-bottom: 15px;
+		}
+	</style>
+
+	<script src="/scripts/jquery-1.12.3.min.js"></script>
+	<script>
+		function doLogin() {
+			$.ajax({
+				url: "/login",
+				method: "POST",
+				data: {
+					username: $("#loginId").val(),
+					password: $("#loginPassword").val()
+				},
+				success: function(responseData) {
+					location.href = "/";
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					alert(jqXHR.status);
+				}
+			});
+		}
+
+		function hitEnterKey(e) {
+			if (e.keyCode == 13) {
+				doLogin();
+			}
+		}
+	</script>
+</head>
+
+<body>
+		<div class="panel panel-default">
+			<div class="panel-heading"><img id="logo" src="images/logo.png" /></div>
+			<div class="panel-body">
+				<form name="loginForm" method="post" onsubmit="return false">
+					<div class="form-group">
+						<label for="loginId">아이디</label>
+						<input type="text" id="loginId" name="userId" type="text" maxlength="20" class="form-control" value="admin4" tabindex="1" />
+					</div>
+					<div class="form-group">
+						<label for="loginPassword">비밀번호</label>
+						<input type="password" id="loginPassword" name="password" value="" maxlength="20" class="form-control" tabindex="2" onkeypress="hitEnterKey(event)" />
+					</div>
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" id="remember" name="remember" /> 로그인 유지
+						</label>
+					</div>
+					<button type="submit" class="btn btn-primary" onclick="javascript:doLogin()">로그인</button>
+				</form>
+			</div>
+		</div>
+
+</body>
+
+</html>

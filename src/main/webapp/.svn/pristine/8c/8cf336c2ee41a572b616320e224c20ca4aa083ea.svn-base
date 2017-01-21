@@ -1,0 +1,59 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+
+<link rel="import" href="../style/common-style.html" />
+<link rel="import" href="../style/bootstrap-style.html" />
+<link rel="import" href="../common/behavior-page.html" />
+
+<dom-module id="dashboard-page">
+    <template>
+        <style include="common-style"></style>
+        <style include="bootstrap-style">
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+            }
+
+            #dashboard {
+                display: block;
+                position: relative;
+                width: 100%;
+                height: 600px;
+            }
+
+            gp-portal {
+                background-color: white;
+                border: 1px solid #d6d6d6;
+                border-radius: 4px;
+            }
+        </style>
+        <paper-card elevation="1">
+            <div class="card-content">
+                <div class="page-header">
+                    <h2>대시보드</h2>
+                </div>
+                <div id="dashboard">
+                </div>
+            </div>
+        </paper-card>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'dashboard-page',
+
+            behaviors: [PS.BehaviorPage],
+
+            properties: {
+                _editMode: {
+                    type: Boolean,
+                    value: false
+                }
+            },
+
+            attached: function() {
+                this._closeOverlay();
+            },
+        })
+    </script>
+</dom-module>

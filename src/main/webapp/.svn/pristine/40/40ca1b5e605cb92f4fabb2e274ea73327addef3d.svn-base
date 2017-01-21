@@ -1,0 +1,280 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/app-route/app-location.html">
+<link rel="import" href="/bower_components/app-route/app-route.html">
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/vaadin-combo-box/vaadin-combo-box.html" />
+<link rel="import" href="/bower_components/vaadin-date-picker/vaadin-date-picker.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input-container.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+<link rel="import" href="/bower_components/iron-form/iron-form.html" />
+<link rel="import" href="/bower_components/paper-dialog/paper-dialog.html" />
+
+<link rel="import" href="../common/input-business-number.html" />
+<link rel="import" href="../common/dialog-alert.html" />
+
+<link rel="import" href="../style/common-style.html" />
+
+<dom-module id="corp-info">
+    <template>
+        <style include="common-style">
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+                --iron-icon-height: 15px;
+                --iron-icon-width: 15px;
+                --paper-button: {
+                    background-color: #ff6138;
+                    color: white;
+                    font-size: 13px;
+                }
+            }
+
+            paper-button iron-icon {
+                margin-right: 5px;
+            }
+
+            .card-content table {
+                font-size: 12px;
+                width: 100%;
+            }
+
+            .card-content table th {
+                text-align: right;
+                padding-right: 30px;
+            }
+        </style>
+
+        <app-route route="{{route}}" pattern="/:id" data="{{routeData}}"></app-route>
+
+        <iron-ajax auto url="/api/common/comp_kind/code/" headers='{"X-Requested-With": "XMLHttpRequest"}' last-response="{{_codes.compKind}}" on-error="_onErrorHandler"></iron-ajax>
+        <iron-ajax auto url="/api/common/corp_type/code/" headers='{"X-Requested-With": "XMLHttpRequest"}' last-response="{{_codes.corpType}}" on-error="_onErrorHandler"></iron-ajax>
+        <iron-ajax auto url="/api/common/biz_sect/code/" headers='{"X-Requested-With": "XMLHttpRequest"}' last-response="{{_codes.bizSect}}" on-error="_onErrorHandler"></iron-ajax>
+
+        <iron-ajax id="protocolGetCorpInfo" url$="/api/corp/info/{{_id}}" headers='{"X-Requested-With": "XMLHttpRequest"}' method="POST" content-type="application/json" last-response="{{_corpInfo}}" on-error="_onErrorHandler"></iron-ajax>
+        <iron-ajax id="protocolDeleteCorp" url$="/api/corp/info/{{_id}}" headers='{"X-Requested-With": "XMLHttpRequest"}' method="DELETE" content-type="application/json" on-response="_onCorpDeleted" on-error="_onErrorHandler"></iron-ajax>
+        <iron-ajax id="protocolSaveCorpInfo" url="/api/corp/info" headers='{"X-Requested-With": "XMLHttpRequest"}' method="POST" content-type="application/json" on-response="_formResponse" on-error="_onErrorHandler"></iron-ajax>
+
+        <h1>기업현황 수정 - [[_corpInfo.corpNm]]</h1>
+
+        <paper-card elevation="1">
+            <form is="iron-form" id="corpForm" method="POST" action="/api/corp/info" content-type="application/json">
+                <div class="card-content">
+                    <table>
+                        <colgroup>
+                            <col width="20%" />
+                            <col />
+                            <col width="20%" />
+                            <col />
+                        </colgroup>
+                        <tr>
+                            <th>
+                                기업명
+                            </th>
+                            <td>
+                                <paper-input name="corpNm" value="{{_corpInfo.corpNm}}" required></paper-input>
+                            </td>
+                            <th>
+                                사업개시일
+                            </th>
+                            <td>
+                                <vaadin-date-picker id="bizDt" name="bizDt" required></vaadin-date-picker>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                대표자
+                            </th>
+                            <td>
+                                <paper-input name="ceoNm" value="{{_corpInfo.ceoNm}}" required></paper-input>
+                            </td>
+                            <th>
+                                사업자번호
+                            </th>
+                            <td>
+                                <paper-input-container name="bizNo" attr-for-value="value">
+                                    <input-business-number id="bizNo" class="paper-input-input" bind-value="{{_corpInfo.bizNo}}"></input-business-number>
+                                </paper-input-container>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                법인형태
+                            </th>
+                            <td>
+                                <vaadin-combo-box id="corpType" name="corpType" label="법인형태" items="{{_codes.corpType}}" item-label-path="cdNm" item-value-path="cd" on-value-changed="_onCorpTypeChanged" value="{{_corpInfo.corpType}}" required></vaadin-combo-box>
+                                <paper-input id="corpType2" name="corpType2" class="hidden" value="{{_corpInfo.corpType2}}"></paper-input>
+                            </td>
+                            <th>
+                                기업분류
+                            </th>
+                            <td>
+                                <vaadin-combo-box id="compKind" name="compKind" label="기업분류" items="{{_codes.compKind}}" item-label-path="cdNm" item-value-path="cd" value="{{_corpInfo.compKind}}" required></vaadin-combo-box>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                사업업종
+                            </th>
+                            <td colspan="3">
+                                <vaadin-combo-box id="bizSect" name="bizSect" label="업종분류" items="{{_codes.bizSect}}" item-label-path="cdNm" item-value-path="cd" on-value-changed="_onBizSectChanged" value="{{_corpInfo.bizSect}}" required></vaadin-combo-box>
+                                <paper-input id="bizSect2" name="bizSect2" class="hidden" value="{{_corpInfo.bizSect2}}"></paper-input>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card-actions">
+                    <a href="/corp/all" tabindex="-1">
+                        <paper-button>
+                            <iron-icon icon="toc"></iron-icon>
+                            목록
+                        </paper-button>
+                    </a>
+                    <paper-button on-tap="_save">
+                        <iron-icon icon="save"></iron-icon>
+                        저장
+                    </paper-button>
+                    <paper-button on-tap="_delete">
+                        <iron-icon icon="clear"></iron-icon>
+                        삭제
+                    </paper-button>
+                </div>
+                <paper-input name="corpSeq" value="{{_corpInfo.corpSeq}}" class="hidden"></paper-input>
+            </form>
+        </paper-card>
+
+        <dialog-alert id="alert" on-confirm-ok="_onConfirmOk"></dialog-alert>
+
+    </template>
+
+    <script src="/scripts/moment.min.js"></script>
+    <script>
+        Polymer({
+            is: "corp-info",
+
+            properties: {
+                _codes: {
+                    type: Object,
+                    value: function() {
+                        return {
+                            compKind: [],
+                            corpType: [],
+                            bizSect: [],
+                        };
+                    }
+                },
+                _id: Number,
+                _corpInfo: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _isAttached: Boolean,
+                route: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    }
+                },
+            },
+
+            observers: [
+                '_routeIdChanged(routeData.id, _isAttached)',
+                '_bizDtChanged(_corpInfo.bizDt)'
+            ],
+
+            attached: function() {
+                this._isAttached = true;
+            },
+
+            _routeIdChanged: function(id) {
+                this._id = id;
+                this._search();
+            },
+
+            _search: function() {
+                this.$.protocolGetCorpInfo.generateRequest();
+            },
+
+            _save: function() {
+                if (this.$.corpForm.validate()) {
+                    var body = this.$.corpForm.serialize();
+                    body.bizNo = this.$.bizNo.value;
+
+                    this.$.protocolSaveCorpInfo.body = [body];
+
+                    this.$.protocolSaveCorpInfo.generateRequest();
+                }
+            },
+
+            _delete: function() {
+                this.$.alert.type = "confirm";
+                this.$.alert.msg = "삭제하시겠습니까?";
+                this.$.alert.dialog.open();
+            },
+
+            _onConfirmOk: function() {
+                this.$.protocolDeleteCorp.generateRequest();
+            },
+
+            _formResponse: function(e) {
+                switch (e.detail.status) {
+                    case 200:
+                        this.$.alert.msg = "정상적으로 반영되었습니다.";
+                        this.$.alert.dialog.open();
+                        break;
+                    default:
+                        this.$.alert.msg = "오류가 발생했습니다.";
+                        this.$.alert.dialog.open();
+                        break;
+                }
+            },
+
+            refresh: function() {
+                this.$.corpForm.reset();
+            },
+
+            _onCorpTypeChanged: function(e) {
+                if (e.target.value == "06")
+                    this.$.corpType2.classList.remove("hidden");
+                else
+                    this.$.corpType2.classList.add("hidden");
+            },
+
+            _onBizSectChanged: function(e) {
+                if (e.target.value == "16")
+                    this.$.bizSect2.classList.remove("hidden");
+                else
+                    this.$.bizSect2.classList.add("hidden");
+            },
+
+            _bizDtChanged: function(date) {
+                this.$.bizDt.value = moment(date).format("YYYY-MM-DD");
+            },
+
+            _onCorpDeleted: function(e) {
+                switch (e.detail.status) {
+                    case 200:
+                        location.href = "/corp/all";
+                        break;
+                    default:
+                        this.$.alert.type = "alert";
+                        this.$.alert.msg = "오류가 발생했습니다.";
+                        this.$.alert.dialog.open();
+                        break;
+                }
+            },
+            _onErrorHandler : function(e)
+            {
+            	var status = e.detail.request.status;
+            	if(status == 403)
+           		{
+           			location.href = "/";
+           		}
+            }
+        })
+    </script>
+</dom-module>

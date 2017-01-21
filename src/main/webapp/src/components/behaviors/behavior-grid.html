@@ -1,0 +1,205 @@
+<script>
+window.Lunch = window.Lunch || {};
+Lunch.GridBehavior = {
+
+	properties: {
+		readId: {
+			type: Number,
+			observer: '_callAPI'
+		},
+		_adminAPIURL: String,
+		_hideTotal: {
+			type: Boolean,
+			value: false
+		},
+		_hideSum: {
+			type: Boolean,
+			value: false
+		},
+		_isYearly: {
+			type: Boolean,
+			value: false
+		},
+
+	},
+
+	requestData: function() {
+		this._clearData();
+		if (!this.adminMode) {
+			var corpSeq = this.readId ? this.readId : this._corpSeq;
+
+			this.$.getData.params = {
+				CORP_SEQ: corpSeq,
+				YEAR: this.year
+			};
+
+			this.$.getData.generateRequest();	
+		}else 
+			this._loadOverallAPI();
+	},
+
+	_callAPI: function(value) {
+		if (value > 0) {
+			this.readId = value;
+			this._corpSeq = value;
+		}
+	},
+
+	_assignDataToTable: function(prefix, table, data, guide) { 
+		var body = table.querySelector('tbody');
+		var tr, th, td, value;
+		var input;
+		var total = {};
+
+		Polymer.dom(body).innerHTML = '';
+
+		for (var i = 0; i < 12; i++) {
+			tr = document.createElement('tr');	
+			th = document.createElement('th');
+			Polymer.dom(th).innerHTML = data[i].MONTH;
+
+			Polymer.dom(body).appendChild(tr);
+			Polymer.dom(tr).appendChild(th);
+
+			for (var attribute in guide) {
+				td = document.createElement('td');
+				Polymer.dom(tr).appendChild(td);
+
+				value = data[i][guide[attribute]];
+
+				input = document.createElement('number-input');
+				input.setAttribute('transparent', true);
+				input.setAttribute('id', prefix + '_' + guide[attribute] + i);
+				input.setAttribute('name', prefix + '_' + guide[attribute]);
+				input.setAttribute('value', value);
+				Polymer.dom(td).appendChild(input);
+
+				this.listen(input, 'value-changed', '_recalculateTotal');
+
+				if (!total[guide[attribute]])
+					total[guide[attribute]] = 0;
+
+				total[guide[attribute]] += value;
+
+				if (this.adminMode) input.setAttribute('readonly', true);
+			}
+		}	
+
+		this._drawFooter(prefix, table, total);
+	},
+
+	_drawFooter: function(prefix, table, total) {
+
+		var foot = table.querySelector('tfoot');
+		Polymer.dom(foot).innerHTML = '';
+
+		if (!this._hideTotal) {
+			// total
+			tr = document.createElement('tr');
+			th = document.createElement('th');
+			Polymer.dom(th).innerHTML = '합계';
+			Polymer.dom(tr).appendChild(th);
+			Polymer.dom(foot).appendChild(tr);
+
+			for (var t in total) {
+				td = document.createElement('td');
+				td.setAttribute('id', 'total_' + prefix + '_' + t);
+				td.innerHTML = accounting.formatNumber(total[t]);
+
+				Polymer.dom(tr).appendChild(td);
+			}
+		}
+
+		if (!this._hideSum) {
+			// sum
+			tr = document.createElement('tr');
+			th = document.createElement('th');
+			Polymer.dom(th).innerHTML = '월평균';
+			Polymer.dom(tr).appendChild(th);
+			Polymer.dom(foot).appendChild(tr);
+
+			for (var t in total) {
+				td = document.createElement('td');
+				td.setAttribute('id', 'sum_' + prefix + '_' + t);
+				td.innerHTML = accounting.formatNumber(total[t] / 12);
+
+				Polymer.dom(tr).appendChild(td);
+			}
+		}
+
+	},
+
+	_recalculateTotal: function(e) {
+		var name = e.currentTarget.name;
+		var prefix = name.split('_')[0];
+		var total = 0, sum;
+
+		for (var i = 0; i < 12; i++) {
+			total += this.$$("#"+name+i).number;
+		}
+
+		// set total
+		if (!this._hideTotal)
+			this.$$('#total_' + name).innerHTML = accounting.formatNumber(total);
+
+		// set sum
+		if (!this._hideSum)
+			this.$$('#sum_' + name).innerHTML = accounting.formatNumber(total / 12);
+
+		this._refreshHeaderTotal();
+	},
+
+	_submitResponse: function(e) {
+		if (e.detail.response == 1) {
+			this.$.alert.innerHTML = '수정되었습니다';
+			this.$.alert.classList.remove('hide');	
+			this.$.alert.classList.add('alert-success');
+		}else {
+			this.$.alert.innerHTML = '오류가 발생하였습니다';
+			this.$.alert.classList.remove('hide');
+			this.$.alert.classList.add('alert-danger');
+		}
+
+		this.async(function() {
+			this.$.alert.classList.add('hide');
+		}, 2000);
+	},
+
+	_loadOverallAPI: function() {
+		if (!this.year) 
+			this.year = moment().year();
+
+		this.$.getData.url = this._adminAPIURL;
+
+		this.$.getData.params = {
+			YEAR: this.year
+		};
+
+		this.$.getData.generateRequest();	
+	},
+
+	_submitForm: function(e) {
+		if (this.$.gridForm.validate()) {
+			this.$.gridForm.submit();
+		}
+	},
+
+	_resetData: function(e) {
+		this._clearData();
+		this.$.getData.generateRequest();
+	},
+
+	_refreshHeaderTotal: function() {
+		//abstract
+	},
+
+	_downloadExcel: function(e) {
+		alert('준비중입니다.');
+	},
+
+	_clearData: function() {
+		//abstract
+	},
+	
+};
+</script>

@@ -1,0 +1,136 @@
+/**
+ * Created by jwm_000 on 2015-10-06.
+ */
+
+var StackChart = (function (window, d3, undefined){
+
+    var padding = {left: 40, right: 20, top: 40, bottom: 30},
+        width = 500,
+        height = 500,
+        gutter = {left:4, bottom:0},
+        categoryField = "label",
+        fills = ["#f76869", "#5da2e6", "#00bf88", "#f4c100", "#bf5bf3", "#3eb5ac" , "#f58410", "#f94a76", "#97d54c", "#f0a0dd" ,
+            "#b2485f", "#9b9c9a", "#49ddff", "#306555", "#003366", "#7fbcff", "#ba8d72", "#ba8d72", "#8c7721", "#6db5a1"];
+
+    var StackChart = function () {
+        this.options = {};
+
+        this.draw = function () {
+
+            var options = this.options;
+
+            options.categoryField = options.categoryField || categoryField;
+            options.padding = options.padding || padding;
+            options.gutter = options.gutter || gutter;
+            options.fills = options.fills || fills;
+
+            options.width = options.width || width;
+            options.height = options.height || height;
+
+            var innerWidth = options.width - padding.left - padding.right;
+            var innerHeight = options.height - padding.top - padding.bottom;
+
+            var data = options.data;
+
+            if (!data || data.length < 1) {
+                return;
+            }
+
+            var xScale = d3.scale.linear()
+                .rangeRound([0, innerWidth]);
+
+            var yScale = d3.scale.ordinal()
+                .rangeRoundBands([innerHeight, 0], 0.25, 0.1);
+
+            var color = d3.scale.ordinal()
+                .range(options.fills);
+
+            var xAxis = d3.svg.axis()
+                .scale(xScale)
+                .orient("top");
+
+            var yAxis = d3.svg.axis()
+                .scale(yScale)
+                .orient("left");
+
+            var holder = document.getElementById(options.contentHolder || "stackChart");
+            var svg = d3.select(holder).append("svg")
+                .attr("width", innerWidth + padding.left + padding.right)
+                .attr("height", innerHeight + padding.top + padding.bottom)
+                .append("g")
+                .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
+
+            // series
+            var seriesNames;
+            if (options.series){
+                seriesNames = options.series.map(function (d) {
+                    return d.name;
+                });
+            }else {
+                seriesNames = d3.keys(data[0]).filter(function (key) {
+                    return key != options.categoryField
+                });
+            }
+
+            color.domain(seriesNames);
+
+            data.forEach(function (d) {
+                var y0 = 0;
+                d.accums = color.domain().map(function (accum) {
+                    return {accum: accum, y0: y0, y1: y0 += +d[accum]};
+                });
+                d.total = d.accums[d.accums.length - 1].y1;
+            });
+
+            yScale.domain(data.map(function (d) {
+                return d[options.categoryField];
+            }));
+            xScale.domain([0, d3.max(data, function (d) {
+                return d.total;
+            })]);
+
+            var categories = svg.selectAll(".category")
+                .data(data)
+                .enter()
+                .append("g")
+                .attr("class", "g")
+                .attr("transform", function (d) {
+                    return "translate(0," + yScale(d[options.categoryField]) + ")";
+                });
+
+            categories.selectAll("rect")
+                .data(function (d) {
+                    return d.accums.reverse();
+                })
+                .enter()
+                .append("rect")
+                .attr("height", yScale.rangeBand())
+                .attr("x", 0)
+                .attr("width", 0)
+                .style("fill", "#fff")
+                .transition()
+                .duration(1000)
+                .attr("width", function (d) {
+                    return xScale(d.y1);
+                })
+                .style("fill", function (d) {
+                    return color(d.accum);
+                });
+
+
+            // y 축
+            svg.append("g")
+                .attr("class", "y axis")
+                .call(yAxis);
+
+            // x 축
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0,0)")
+                .call(xAxis);
+
+
+        }
+    }
+    return StackChart;
+})(window, d3, undefined);

@@ -1,0 +1,215 @@
+/**
+ * Created by jwm_000 on 2015-10-09.
+ */
+
+;var corpInfo = (function (window, $, undefined) {
+    var pagenator;
+
+    var corpList;
+    var corpDetailData;
+    $(document).ready(function () {
+        $("#btnSearch").on("click", getCorpCount);
+        $("#btnGoBack").on("click", togglePage);
+
+        corpInfo.initialize();
+    });
+
+    function initialize(){
+        var options1 = {
+            cache: true,
+            data: {grpCd:"CORP_TYPE"},
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                var promptData = {CD:'', CD_NM:"전체"};
+                var selectBuilder = new SelectBuilder($("#selCorpType"), "CD", "CD_NM");
+                selectBuilder.buildOptions(result, promptData);
+            }
+        };
+
+        var options2 = {
+            cache: true,
+            data: {grpCd:"COMP_KIND"},
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                var promptData = {CD:'', CD_NM:"전체"};
+                var selectBuilder = new SelectBuilder($("#selCompKind"), "CD", "CD_NM");
+                selectBuilder.buildOptions(result, promptData);
+            }
+        };
+
+        var options3 = {
+            cache: true,
+            data: {grpCd:"BIZ_SECT"},
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                var promptData = {CD:'', CD_NM:"전체"};
+                var selectBuilder = new SelectBuilder($("#selBizSect"), "CD", "CD_NM");
+                selectBuilder.buildOptions(result, promptData);
+            }
+        };
+        var promises = [
+            $.ajax("../php/code.php", options1),
+            $.ajax("../php/code.php", options2),
+            $.ajax("../php/code.php", options3)];
+
+        $.when(promises).then(getCorpCount);
+    }
+
+    function getCorpCount(){
+        var form = document.commonForm;
+
+        var options = {
+            cache: false,
+            url: "../php/corp_info_count.php",
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                $("#detailGridCorpCount").text("(" + result.ROW_COUNT + ")");
+                drawPagenation(result);
+                searchCorp();
+            }
+        };
+
+        $(form).ajaxSubmit(options);
+    }
+
+    function searchCorp() {
+        var form = document.commonForm;
+
+        var options = {
+            cache: false,
+            url: "../php/corp_info.php",
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                drawRows(result);
+            }
+        };
+
+        $(form).ajaxSubmit(options);
+    }
+
+    function drawRows(result){
+        $("#grid > tbody").children("tr").remove();
+
+        if (result.length < 1){
+            $("#grid > tbody").append("<tr><td colspan='5'>조회된 데이터가 없습니다.</td><td>");
+        }else {
+            for (var index in result) {
+                var item = result[index];
+                $("#grid > tbody").append("<tr><td><a href='javascript:;' onclick='corpInfo.showCorpDetail(this)' data-corpseq='" + item.CORP_SEQ + "'>" + item.CORP_NM + "</a></td><td>"
+                    + item.CEO_NM +  "</td><td>" + item.BIZ_NO + "</td><td>" +
+                    item.CORP_TYPE_NM + "</td><td>" + item.COMP_KIND_NM + "</td><td>" + item.BIZ_SECT_NM + "</td>");
+            }
+        }
+    }
+
+    function togglePage(){
+        if ($("#corpList").css("display") == "none") {
+            $("#corpList").css("display", "");
+            $("#corpDetail").css("display", "none");
+        }else {
+            $("#corpList").css("display", "none");
+            $("#corpDetail").css("display", "");
+        }
+    }
+
+    function showCorpDetail(anchor){
+        var $anchor = $(anchor);
+        var corpSeq = $anchor.attr("data-corpseq");
+        //alert(corpSeq);
+
+        $("#corpDetailHeader").text("기업현황 - " + $anchor.text());
+
+        var form = document.commonForm;
+        $("input[type='hidden'][name='corpSeq']").val(corpSeq);
+
+        var options = {
+            cache: false,
+            url: "../php/corp_detail_all.php",
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                var tmpl = $.templates("#tblCorpInfo");
+                var html = tmpl.render(result.CORP_INFO);
+                $("#tblCorpInfo").children().remove()
+                $("#tblCorpInfo").append(html);
+
+                tmpl = $.templates("#tblSocInfo");
+                html = tmpl.render(result.CORP_INFO);
+                $("#tblSocInfo").children().remove()
+                $("#tblSocInfo").append(html);
+
+                tmpl = $.templates("#tblEmpInfo");
+                html = tmpl.render(result.CORP_EMP);
+                $("#tblEmpInfo").children().remove()
+                $("#tblEmpInfo").append(html);
+
+                tmpl = $.templates("#tblHelp");
+                html = tmpl.render(result.CORP_HELP, {
+                    getCurrency: function(item){
+                        return accounting.formatNumber(Math.round(item/1000000));
+                    }
+                });
+                $("#tblHelp").children().remove()
+                $("#tblHelp").append(html);
+
+                tmpl = $.templates("#tblFinance");
+                html = tmpl.render(result.CORP_FINN, {
+                    getCurrency: function(item){
+                        return accounting.formatNumber(Math.round(item/10000));
+                    }
+                });
+                $("#tblFinance").children().remove()
+                $("#tblFinance").append(html);
+
+
+               /* $("#tblCorpInfo").template(result.CORP_INFO);
+                $("#tblSocInfo").template(result.CORP_INFO);
+                $("#tblEmpInfo").template(result.CORP_INFO);
+                $("#tblHelp").template(result.CORP_HELP);
+                $("#tblFinance").template(result.CORP_FINN);*/
+                togglePage();
+            }
+        };
+
+        $(form).ajaxSubmit(options);
+    }
+
+    function drawPagenation(result){
+        if (!pagenator){
+            pagenator = new Pagenator();
+        }
+        pagenator.options = {
+            totalRowCount: result.ROW_COUNT,
+            pageAnchorCount: 10,
+            pageRowCount: 10,
+            currentPageNo: 1,
+            anchorGroupId: "pageIndex",
+            anchorPrevGroupId: "prevPageGroup",
+            anchorNextGroupId: "nextPageGroup",
+            onPageClick: function(pageNo){
+                $("input[type='hidden'][name='pageNo']").val(pageNo);
+                searchCorp();
+            }
+        };
+
+        $("input[type='hidden'][name='pageRowCount']").val(pagenator.options.pageRowCount);
+        $("input[type='hidden'][name='pageNo']").val(pagenator.options.currentPageNo);
+        pagenator.draw();
+    }
+
+    return {
+        initialize:initialize,
+        showCorpDetail:showCorpDetail,
+        searchCorp: searchCorp
+    };
+
+})(window, jQuery, undefined);
+
+function corpInfoDetailCtrl($scope){
+    $scope.corpInfo = corpInfo;
+}

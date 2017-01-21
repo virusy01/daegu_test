@@ -1,0 +1,155 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+
+<link rel="import" href="../common/normal-input.html" />
+
+<link rel="import" href="../style/common-style.html" />
+<link rel="import" href="../style/bootstrap-style.html" />
+
+<dom-module id="header-search">
+    <template>
+        <style include="common-style"></style>
+        <style include="bootstrap-style">
+            :host {
+                --iron-icon-height: 15px;
+                --iron-icon-width: 15px;
+                --paper-button: {
+                    background-color: #ff6138;
+                    color: white;
+                    height: 34px;
+                }
+            }
+        </style>
+
+        <iron-ajax auto url="/api/common/comp_kind/code/" last-response="{{_codes.compKind}}"></iron-ajax>
+        <iron-ajax auto url="/api/common/corp_type/code/" last-response="{{_codes.corpType}}"></iron-ajax>
+        <iron-ajax auto url="/api/common/biz_sect/code/" last-response="{{_codes.bizSect}}"></iron-ajax>
+
+        <div id="searchForm" class="panel panel-default">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label for="corpType">법인형태</label>
+                    <select id="corpType" class="form-control" on-change="_assignCorpType">
+                        <option value="">
+                            전체
+                        </option>
+                        <template is="dom-repeat" items="{{_codes.corpType}}" as="item">
+                            <option value="[[item.cd]]">
+                                [[item.cdNm]]
+                            </option>
+                        </template>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="compKind">기업분류</label>
+                    <select id="compKind" class="form-control" on-change="_assignCompKind">
+                        <option value="">
+                            전체
+                        </option>
+                        <template is="dom-repeat" items="{{_codes.compKind}}" as="item">
+                            <option value="[[item.cd]]">
+                                [[item.cdNm]]
+                            </option>
+                        </template>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="bizSect">업종분류</label>
+                    <select id="bizSect" class="form-control" on-change="_assignBizSect">
+                        <option value="">
+                            전체
+                        </option>
+                        <template is="dom-repeat" items="{{_codes.bizSect}}" as="item">
+                            <option value="[[item.cd]]">
+                                [[item.cdNm]]
+                            </option>
+                        </template>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="keyword">검색어</label>
+                    <normal-input id="keyword" placeholder="기업명/대표자명/사업자번호"></normal-input>
+                </div>
+                <paper-button on-tap="_onSearchTap">
+                    <iron-icon icon="search"></iron-icon>
+                    조회
+                </paper-button>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: "header-search",
+
+            properties: {
+                keyword: {
+                    type: String,
+                    value: ""
+                },
+                compKind: {
+                    type: String,
+                    value: ""
+                },
+                corpType: {
+                    type: String,
+                    value: ""
+                },
+                bizSect: {
+                    type: String,
+                    value: ""
+                },
+                order: {
+                    type: String,
+                    value: ""
+                },
+                _codes: {
+                    type: Object,
+                    value: function() {
+                        return {
+                            compKind: [],
+                            corpType: [],
+                            bizSect: [],
+                        };
+                    }
+                },
+            },
+
+            _onSearchTap: function() {
+                this.keyword = this.$.keyword.value;
+
+                this.fire("search");
+            },
+
+            _refactorCompKind: function(e) {
+                var refactoredArray = [];
+                var i, data;
+
+                for (i = 0; i < e.target.lastResponse.length; i++) {
+                    data = e.target.lastResponse[i];
+                    refactoredArray.push({
+                        val: data.cdNm
+                    });
+                }
+
+                this._codes.compKind = refactoredArray;
+                this.$.dropdownCompKind.items = this._codes.compKind;
+            },
+
+            _assignCompKind: function(e) {
+                this.compKind = e.target.value;
+            },
+
+            _assignCorpType: function(e) {
+                this.corpType = e.target.value;
+            },
+
+            _assignBizSect: function(e) {
+                this.bizSect = e.target.value;
+            }
+        })
+    </script>
+</dom-module>

@@ -1,0 +1,277 @@
+/**
+ * Created by jwm_000 on 2015-10-09.
+ */
+
+;var corpSumAll = (function (window, $, undefined) {
+    var allOrderChart;
+    var allOrderChartData;
+
+    var kpiOrderChart;
+    var kpiOrderChartData;
+
+    var kpiPercentChart;
+    var kpiPercentChartData;
+
+    $(window).resize(function(){
+        if (allOrderChart){
+            allOrderChart.draw(false);
+        }
+
+        if (kpiOrderChart){
+            kpiOrderChart.draw(false);
+        }
+    })
+
+    $(document).ready(function () {
+        $("#navTab > li > a").on("click", toggleTab);
+        corpSumAll.initialize();
+    });
+
+    function initialize(){
+
+        $("#selCorpType, #selCompKind, #selBizSect").change(function(){
+            getAllOrder();
+        });
+
+        $("#selKpiDepth1").change(function(){
+            getKpiOrder();
+        });
+
+        var options1 = {
+            cache: true,
+            data: {grpCd:"KPI_DEPTH_1"},
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                var selectBuilder = new SelectBuilder($("#selKpiDepth1"), "CD", "CD_NM");
+                selectBuilder.buildOptions(result);
+            }
+        };
+
+        var options2 = {
+            cache: true,
+            data: {grpCd:"CORP_TYPE"},
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                var promptData = {CD:'', CD_NM:"전체"};
+                var selectBuilder = new SelectBuilder($("#selCorpType"), "CD", "CD_NM");
+                selectBuilder.buildOptions(result, promptData);
+            }
+        };
+
+        var options3 = {
+            cache: true,
+            data: {grpCd:"COMP_KIND"},
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                var promptData = {CD:'', CD_NM:"전체"};
+                var selectBuilder = new SelectBuilder($("#selCompKind"), "CD", "CD_NM");
+                selectBuilder.buildOptions(result, promptData);
+            }
+        };
+
+        var options4 = {
+            cache: true,
+            data: {grpCd:"BIZ_SECT"},
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                var promptData = {CD:'', CD_NM:"전체"};
+                var selectBuilder = new SelectBuilder($("#selBizSect"), "CD", "CD_NM");
+                selectBuilder.buildOptions(result, promptData);
+            }
+        };
+        var promises = [
+            $.ajax("../php/code.php", options1),
+            $.ajax("../php/code.php", options2),
+            $.ajax("../php/code.php", options3),
+            $.ajax("../php/code.php", options4)
+        ];
+
+        $.when(promises).then(getAllOrder);
+    }
+
+    function getAllOrder(){
+        var param = $(document.commonForm).serialize();
+        var options = {
+            cache: false,
+            url: "../php/corp_sum_depth1.php",
+            type: "post",
+            data: param,
+            dataType: "json",
+            success: function (result) {
+                allOrderChartData = result;
+                drawAllOrder(result);
+            }
+        };
+
+        $.ajax(options);
+    }
+    function getKpiOrder(){
+        var param = $(document.commonForm).serialize();
+        var options = {
+            cache: false,
+            url: "../php/corp_sum_depth1_kpi.php",
+            type: "post",
+            data: param,
+            dataType: "json",
+            success: function (result) {
+                kpiOrderChartData = result;
+                drawKpiOrder(result);
+            }
+        };
+
+        $.ajax(options);
+    }
+
+    function getKpiPercent(){
+        var options = {
+            cache: false,
+            url: "../php/corp_all_sum_depth1.php",
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                kpiPercentChartData = result;
+                drawKpiPercent(result);
+            }
+        };
+
+        $.ajax(options);
+    }
+
+    function drawAllOrder(result){
+        var options = {
+            contentHolder: "allOrderChart",
+            categoryField: "CORP_NM",
+            height: result.length * 40,
+            percentWidth: 100,
+            maxValue: 100,
+            showDataTip:true,
+            data:result,
+            series: [
+                {name:"DEPTH_1_01"},
+                {name:"DEPTH_1_02"},
+                {name:"DEPTH_1_03"},
+                {name:"DEPTH_1_04"},
+                {name:"DEPTH_1_05"},
+                {name:"DEPTH_1_06"},
+                {name:"DEPTH_1_07"},
+                {name:"DEPTH_1_08"},
+                {name:"DEPTH_1_09"},
+                {name:"DEPTH_1_10"}
+            ],
+            dataTipFunction:function(d, tooltip){
+                $(tooltip).children().remove();
+                //$(tooltip).append("<span>" + d.DEPTH_1_NM + " : </span><span style='color:#b2485f;font-weight: bold'>" + d.SCORE + "<span><br>");
+            }
+        }
+
+        if (!allOrderChart){
+            allOrderChart = new HStackChart();
+        }
+        $("#allOrderChart").children().remove();
+
+        allOrderChart.options = options;
+        allOrderChart.draw(true);
+    }
+
+    function drawKpiOrder(result) {
+        var options = {
+            contentHolder: "kpiOrderChart",
+            categoryField: "CORP_NM",
+            height: result.length * 40,
+            percentWidth: 100,
+            maxValue: 10,
+            data:result,
+            series: [
+                {name:"SCORE"}
+            ],
+            dataTipFunction:function(d, tooltip){
+                $(tooltip).children().remove();
+                //$(tooltip).append("<span>" + d.DEPTH_1_NM + " : </span><span style='color:#b2485f;font-weight: bold'>" + d.SCORE + "<span><br>");
+            }
+        }
+
+        if (!kpiOrderChart){
+            kpiOrderChart = new HColumnChart();
+        }
+        $("#kpiOrderChart").children().remove();
+
+        kpiOrderChart.options = options;
+        kpiOrderChart.draw();
+    }
+
+    function drawKpiPercent(result){
+        var options = {
+            contentHolder: "kpiPercentChart",
+            outerRadius: 250,
+            valueField: "SCORE",
+            data:result,
+            labelFunction: function (d, angle, i){
+                return d.DEPTH_1_NM + "\n(" + Math.round(angle.value * 10000) / 100 + "%)";
+            },
+            dataTipFunction:function(d, tooltip){
+                $(tooltip).children().remove();
+                //$(tooltip).append("<span>" + d.DEPTH_1_NM + " : </span><span style='color:#b2485f;font-weight: bold'>" + d.SCORE + "<span><br>");
+            }
+        }
+
+        if (!kpiPercentChart){
+            kpiPercentChart = new PieChart();
+        }
+        $("#kpiPercentChart").children().remove();
+
+        kpiPercentChart.options = options;
+        kpiPercentChart.draw();
+    }
+
+
+    function toggleTab(event){
+        $("#navTab > li").attr("class", "");
+        var $a = $(event.currentTarget)
+        $($a.parent()).attr("class", "active");
+
+        if ($a.attr("data-page") == "allOrder"){
+            $("#allOrder").css("display", "");
+            $("#kpiOrder").css("display", "none");
+            $("#kpiPercent").css("display", "none");
+
+            if(!allOrderChartData){
+                getAllOrder();
+            }
+            else{
+                drawAllOrder(allOrderChartData);
+            }
+
+        }else if ($a.attr("data-page") == "kpiOrder") {
+            $("#allOrder").css("display", "none");
+            $("#kpiOrder").css("display", "");
+            $("#kpiPercent").css("display", "none");
+
+            if (!kpiOrderChartData){
+                getKpiOrder();
+            }else {
+                drawKpiOrder(kpiOrderChartData);
+            }
+
+            drawKpiOrder(kpiOrderChartData);
+        }else{
+            $("#allOrder").css("display", "none");
+            $("#kpiOrder").css("display", "none");
+            $("#kpiPercent").css("display", "");
+
+            if (!kpiPercentChartData){
+                getKpiPercent();
+            }else {
+                drawKpiPercent(kpiPercentChartData);
+            }
+        }
+    }
+
+    return {
+        initialize:initialize
+    };
+
+})(window, jQuery, undefined)

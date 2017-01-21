@@ -1,0 +1,54 @@
+body {
+	font-family: 'Nanum Gothic', sans-serif;
+	background-color: #eee;
+	font-size: 12px;
+}
+
+h5 {
+	font-weight: bold;
+	margin-bottom: 20px;
+	background: #eee;
+	height: 30px;
+	padding: 7px 10px;
+	box-sizing: border-box;
+}
+
+a {
+	&:link,
+	&:visited,
+	&:active,
+	&:hover {
+		color: inherit;
+		text-decoration: inherit;
+	}
+}
+
+/*
+ *bootstrap reset
+ */
+.form-control-feedback {
+	right: 0 !important;
+}
+
+.btn-primary {
+	background-color: #ff7504;
+	border-color: #ed6b00;
+
+	&:hover, &:active, &:focus {
+		background-color: #ed6b00 !important;
+		border-color: #da6200 !important;
+	}
+}
+
+/*
+ *polymer components reset
+ */
+
+.paper-radio-group-0  > * {
+	padding: 7px !important;
+}
+
+paper-checkbox {
+	margin-top: 6px;
+	width: 16px;
+}

@@ -1,0 +1,267 @@
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+<link rel="import" href="/bower_components/iron-icons/av-icons.html" />
+
+<link rel="import" href="../common/behavior-page.html" />
+
+<link rel="import" href="../style/common-style.html" />
+<link rel="import" href="../style/bootstrap-style.html" />
+<link rel="import" href="../style/c3-chart-style.html" />
+
+<dom-module id="kpi-info-grid">
+    <template>
+        <style include="common-style"></style>
+        <style include="bootstrap-style"></style>
+        <style include="c3-chart-style">
+            :host {
+                @apply(--layout-vertical);
+                margin-top: 40px;
+            }
+
+            .legend {
+                display: flex;
+                margin-bottom: 10px;
+            }
+
+            .axis path,
+            .axis line {
+                fill: none;
+                stroke: black;
+            }
+
+            .axis text {
+                font-size: 10px;
+            }
+        </style>
+
+        <iron-ajax id="protocolGetKpiGrid" url$="/api/corp/{{corpId}}/kpi" headers='{"X-Requested-With": "XMLHttpRequest"}' method="POST" content-type="application/json" on-response="_onKpiDataLoad" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax id="protocolGetCorpCount" url="/api/corp/info/find" headers='{"X-Requested-With": "XMLHttpRequest"}' method="POST" content-type="application/json" on-response="_appendCorpCount" on-error="_redirectOnError"></iron-ajax>
+
+        <div class="legend">
+            <iron-icon icon="av:fiber-manual-record" style="color:rgb(249, 74, 118);"></iron-icon>심각
+            <iron-icon icon="av:fiber-manual-record" style="color:rgb(244, 193, 0);"></iron-icon>정상
+            <iron-icon icon="av:fiber-manual-record" style="color:rgb(0, 191, 136);"></iron-icon>양호
+        </div>
+
+        <div class="table-responsive">
+            <table id="tableCorpKpiGrid" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>
+                            성과지표
+                        </th>
+                        <th>
+                            세부 성과지표
+                        </th>
+                        <th>
+                            배점
+                        </th>
+                        <th>
+                            점수
+                        </th>
+                        <th>
+                            합계
+                        </th>
+                        <th>
+                            순위([[_corpTotal]])
+                        </th>
+                        <th>
+                            지원활동
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+    </template>
+
+    <script src="/scripts/d3.min.js"></script>
+    <script src="/scripts/SimpleBarChart.js"></script>
+    <script>
+        Polymer({
+            is: 'kpi-info-grid',
+
+            behaviors: [PS.BehaviorPage],
+
+            properties: {
+                loadChart: Boolean,
+                corpId: Number,
+                _kpi: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _isAttached: Boolean,
+                _corpTotal: Number
+            },
+
+            observers: [
+                '_properlyAttached(loadChart, _isAttached, corpId)'
+            ],
+
+            ready: function() {
+                this.scopeSubtree(this.$.tableCorpKpiGrid, true);
+            },
+
+            attached: function() {
+                this._isAttached = true;
+            },
+
+            _properlyAttached: function() {
+                this.loadChart = undefined;
+                this.$.protocolGetCorpCount.body = {
+                    corpType: '',
+                    compKind: '',
+                    bizSect: '',
+                    corpNm: ''
+                };
+
+                this.$.protocolGetCorpCount.generateRequest();
+                this.$.protocolGetKpiGrid.generateRequest();
+            },
+
+            _onKpiDataLoad: function(e) {
+                var table = this.$.tableCorpKpiGrid.querySelector("tbody");
+                var data = e.target.lastResponse;
+                var i, j, tr, th, td, depth2, chartTotal, chartRank, simpleBarChart1, simpleBarChart2, depth1;
+
+                table.innerHTML = "";
+
+                for (i = 0; i < data.length; i++) {
+                    depth1 = data[i];
+
+                    for (j = 0; j < data[i].depth2.length; j++) {
+                        tr = document.createElement("tr");
+
+                        if (j == 0) {
+                            th = document.createElement("th");
+                            th.setAttribute("rowspan", data[i].depth2.length);
+                            th.setAttribute("class", "text-center");
+                            th.innerHTML = data[i].depth1Nm;
+                            tr.appendChild(th);
+                        }
+
+                        depth2 = data[i].depth2[j];
+
+                        td = document.createElement("td");
+                        td.setAttribute("class", "text-center");
+                        td.innerHTML = depth2.depth2Nm;
+                        tr.appendChild(td);
+
+                        td = document.createElement("td");
+                        td.setAttribute("class", "text-center");
+                        td.innerHTML = depth2.maxScore;
+                        tr.appendChild(td);
+
+                        td = document.createElement("td");
+                        td.setAttribute("class", "text-center");
+                        td.innerHTML = depth2.score;
+                        tr.appendChild(td);
+
+                        if (j == 0) {
+                            td = document.createElement("td");
+                            td.setAttribute("rowspan", depth1.depth2.length);
+                            td.setAttribute("class", "text-center");
+                            chartTotal = document.createElement("div");
+                            chartTotal.setAttribute("id", "chartTotal" + i);
+                            chartTotal.setAttribute("class", "chartTotal" + i);
+                            td.appendChild(chartTotal);
+                            tr.appendChild(td);
+
+                            td = document.createElement("td");
+                            td.setAttribute("rowspan", depth1.depth2.length);
+                            td.setAttribute("class", "text-center");
+                            chartRank = document.createElement("div");
+                            chartRank.setAttribute("class", "chartRank" + i);
+                            td.appendChild(chartRank);
+                            tr.appendChild(td);
+
+                            td = document.createElement("td");
+                            td.setAttribute("rowspan", depth1.depth2.length);
+                            td.setAttribute("class", "text-center");
+                            td.innerHTML = "지원활동";
+                            tr.appendChild(td);
+                        }
+
+                        table.appendChild(tr);
+                    }
+
+                    simpleBarChart1 = new SimpleBarChart();
+                    simpleBarChart1.options = {
+                        width: 100,
+                        height: 140,
+                        data: [{
+                            label: '점수',
+                            value: depth1.score,
+                            avg: depth1.avg,
+                            max: 10,
+                            depth2: depth1.depth2
+                        }],
+                        contentHolder: table.getElementsByClassName("chartTotal" + i)[0],
+                        labelFunction: function(d, num) {
+                            return d.value + "점";
+                        },
+                        dataTipFunction: function(d, num, tooltip) {
+                            var depth2 = d.depth2;
+                            var cont = "";
+
+                            tooltip.innerHTML = "";
+                            for (index in depth2) {
+                                var depth2Item = depth2[index];
+                                cont += "<span style='color:#666666;'>" + depth2Item.depth2Nm + " : </span><span style='color:#b2485f;font-weight: bold'>" + depth2Item.score + "<span><br>";
+                            }
+                            tooltip.innerHTML = cont;
+                        },
+                        backgroundTipFunction: function(d, num, tooltip) {
+                            tooltip.innerHTML = "";
+                            tooltip.innerHTML = "<span style='color:#666666;'>평균 : </span><span style='color:#222222;font-weight: bold'>" + Math.round(d.avg * 100) / 100 + "<span><br>";
+                        },
+                        colorFunction: function(d, num) {
+                            if (num == 0) {
+                                if (d.value <= 3) {
+                                    return "#f94a76";
+                                } else if (d.value >= 8) {
+                                    return "#00bf88"
+                                } else {
+                                    return "#f4c100";
+                                }
+                            } else {
+                                return "#5da2e6";
+                            }
+                        }
+                    };
+                    simpleBarChart1.draw(true);
+
+                    simpleBarChart2 = new SimpleBarChart();
+                    simpleBarChart2.options = {
+                        width: 100,
+                        height: 140,
+                        data: [{
+                            label: '순위',
+                            value: (depth1.corpCount - depth1.ranking),
+                            max: depth1.corpCount
+                        }],
+                        showDataTip: false,
+                        contentHolder: table.getElementsByClassName("chartRank" + i)[0],
+                        labelFunction: function(d, num) {
+                            return (d.max - d.value) + "위";;
+                        },
+                        colorFunction: function(d, num) {
+                            return "#5da2e6";
+                        }
+
+                    };
+                    simpleBarChart2.draw(true);
+                }
+                this._closeOverlay();
+            },
+
+            _appendCorpCount: function(e) {
+                this._corpTotal = e.target.lastResponse.length;
+            }
+
+        })
+    </script>
+</dom-module>

@@ -1,0 +1,66 @@
+package com.sck.modules.corp;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+
+import com.sck.model.Corp;
+import com.sck.model.CorpEmployee;
+import com.sck.model.CorpFinance;
+import com.sck.model.CorpHelp;
+import com.sck.model.CorpKpi;
+import com.sck.model.CorpKpiDepth1;
+import com.sck.model.CorpKpiDetail;
+import com.sck.model.Kpi;
+import com.sck.model.Page;
+
+@Repository
+public interface CorpRepository
+{
+	
+	int countCorpInfos(@Param("p") Corp param);
+	List<Corp> findCorpInfos(@Param("p") Corp param, @Param("page") Page p);
+	List<Corp> findCorpKpis(@Param("p") Corp param, @Param("page") Page p);
+	
+	Corp findCorpInfo(Integer corpSeq);
+	int insertCorpInfo(@Param("p") Corp param);
+	int updateCorpInfo(@Param("p") Corp param);
+	int deleteCorpInfo(Integer corpSeq);
+	
+	List<CorpEmployee> findCorpEmployeeLast5Years(Integer corpSeq);
+	CorpEmployee findCorpEmployee(Integer corpSeq);
+	int insertCorpEmployee(@Param("p") CorpEmployee param);
+	int updateCorpEmployee(@Param("p") CorpEmployee param);
+	int deleteCorpEmployee(Integer employeeSeq);
+	
+	CorpFinance findCorpFinance(Integer corpSeq);
+	List<CorpFinance> findCorpFinanceLast10Years(Integer corpSeq);
+	int insertCorpFinance(@Param("p") CorpFinance param);
+	int updateCorpFinance(@Param("p") CorpFinance param);
+	int deleteCorpFinance(Integer finnSeq);
+	
+	List<CorpHelp> findCorpHelpLast3Years(Integer corpSeq);
+	int insertCorpHelp(@Param("p") CorpHelp param);
+	int updateCorpHelp(@Param("p") CorpHelp param);
+	int deleteCorpHelp(Integer helpSeq);
+	
+	Integer findCurrentYearKpi(@Param("p") Kpi param);
+	Integer findCurrentYear();
+	Integer findMaxYear();
+	int insertCorpKpi(@Param("p") CorpKpi param);
+	int updateCorpKpi(@Param("p") CorpKpi param);
+	List<CorpKpiDetail> findCorpKpiDetailDepth1(@Param("corpSeq") Integer corpSeq, @Param("evalYear") Integer evalYear);
+	List<CorpKpi> findAllCorpKpiDetailDepth1(@Param("evalYear") Integer evalYear, @Param("depth1") String depth1);
+	List<Kpi> findAllCorpKpiDetailDepth2(@Param("evalYear") Integer evalYear, @Param("corpSeq") Integer corpSeq, @Param("depth1") String depth1);
+	List<Kpi> findKpiDetailDepth1Avg(@Param("evalYear") Integer evalYear);
+	
+	List<Kpi> findKpiDepth1(Integer evalYear);
+	List<CorpKpi> findCorpKpiDepth1(@Param("evalYear") Integer evalYear, @Param("depth1") String depth1);
+	List<CorpKpiDepth1> findCorpKpiAllDepth1(@Param("evalYear") Integer evalYear, Corp param);
+	List<Kpi> findCorpKpiAllDepth2(@Param("corpSeq") Integer corpSeq, @Param("evalYear") Integer evalYear);
+	
+	
+	
+}
+	

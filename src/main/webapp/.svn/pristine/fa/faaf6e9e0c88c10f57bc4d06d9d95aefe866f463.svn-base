@@ -1,0 +1,184 @@
+/**
+ * Created by jwm_000 on 2015-10-09.
+ */
+
+;var users = (function (window, $, undefined) {
+    var pagenator;
+    var radarChart;
+
+    var corpList;
+    var corpDetailData;
+    $(document).ready(function () {
+        $("#btnSearch").on("click", getUserCount);
+        $("#btnGoBack").on("click", togglePage);
+
+        $("#btnAdd").on("click", showNewUserInfo);
+        $("#btnSave").on("click", addUserInfo);
+
+        users.initialize();
+    });
+
+    function initialize(){
+        getUserCount();
+    }
+
+    function getUserCount(callback, args){
+        var form = document.commonForm;
+
+        var options = {
+            cache: false,
+            url: "../php/user_info_count.php",
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                drawPagenation(result);
+                searchUser(callback, args);
+            }
+        };
+
+        $(form).ajaxSubmit(options);
+    }
+
+    function searchUser(callback, args) {
+        var form = document.commonForm;
+
+        var options = {
+            cache: false,
+            url: "../php/user_info.php",
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                drawRows(result);
+
+                if (callback){
+                    callback.apply(users, args)
+                }
+            }
+        };
+
+        $(form).ajaxSubmit(options);
+    }
+
+    function drawRows(result){
+        $("#grid > tbody").children("tr").remove();
+
+        if (result.length < 1){
+            $("#grid > tbody").append("<tr><td colspan='5'>조회된 데이터가 없습니다.</td></tr>");
+        }else {
+            for (var index in result) {
+                var item = result[index];
+                $("#grid > tbody").append("<tr><td><a href='javascript:;' onclick='users.showUserDetail(this)' data-userseq='" + item.USER_SEQ + "'>" + item.USER_NM + "</a></td><td>"
+                    + item.USER_ID +  "</td><td>" + item.EMAIL + "</td><td>" +
+                    item.ADMIN_YN + "</td><td>" + item.CRE_DT + "</td></tr>");
+            }
+        }
+    }
+
+    function togglePage(){
+        if ($("#userList").css("display") == "none") {
+            $("#userList").css("display", "");
+            $("#userDetail").css("display", "none");
+        }else {
+            $("#userList").css("display", "none");
+            $("#userDetail").css("display", "");
+        }
+    }
+
+    function showUserDetail(anchor){
+        var $anchor = $(anchor);
+        var userSeq = $anchor.attr("data-userseq");
+        //alert(corpSeq);
+
+        $("#userDetailHeader").text("사용자정보 수정- " + $anchor.text());
+
+        var form = document.detailForm;
+        $("input[type='hidden'][name='userSeq']").val(userSeq);
+
+        var options = {
+            cache: false,
+            url: "../php/user_detail.php",
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                var tmpl = $.templates("#tblUserInfo");
+                var html = tmpl.render(result);
+                $("#tblUserInfo").children().remove()
+                $("#tblUserInfo").append(html);
+
+                $("input[type='radio'][name='adminYn'][value='" + result.ADMIN_YN + "']").attr("checked", "checked");
+
+                togglePage();
+            }
+        };
+
+        $(form).ajaxSubmit(options);
+    }
+
+    function showNewUserInfo(){
+
+        var userSeq = -1;
+        //alert(corpSeq);
+
+        $("#userDetailHeader").text("사용자 등록");
+
+        var form = document.detailForm;
+        $(form).find("input[type='hidden'][name='userSeq']").val(userSeq);
+
+        var result = {}
+
+        var tmpl = $.templates("#tblUserInfo");
+        var html = tmpl.render(result);
+        $("#tblUserInfo").children().remove()
+        $("#tblUserInfo").append(html);
+
+        togglePage();
+    }
+
+    function addUserInfo(){
+        var form = document.detailForm;
+        var options = {
+            cache: false,
+            url: "../php/user_save.php",
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                alert("저장되었습니다.");
+                getUserCount(togglePage);
+            }
+        };
+
+        $(form).ajaxSubmit(options);
+    }
+
+    function drawPagenation(result){
+        if (!pagenator){
+            pagenator = new Pagenator();
+        }
+        pagenator.options = {
+            totalRowCount: result.ROW_COUNT,
+            pageAnchorCount: 10,
+            pageRowCount: 10,
+            currentPageNo: 1,
+            anchorGroupId: "pageIndex",
+            anchorPrevGroupId: "prevPageGroup",
+            anchorNextGroupId: "nextPageGroup",
+            onPageClick: function(pageNo){
+                $("input[type='hidden'][name='pageNo']").val(pageNo);
+                searchUser();
+            }
+        };
+
+        $("input[type='hidden'][name='pageRowCount']").val(pagenator.options.pageRowCount);
+        $("input[type='hidden'][name='pageNo']").val(pagenator.options.currentPageNo);
+        pagenator.draw();
+    }
+
+    return {
+        initialize:initialize,
+        searchUser: searchUser,
+        showUserDetail:showUserDetail,
+        addUserInfo: showNewUserInfo
+    };
+
+})(window, jQuery, undefined);
+

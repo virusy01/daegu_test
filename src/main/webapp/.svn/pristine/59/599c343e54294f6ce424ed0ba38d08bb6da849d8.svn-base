@@ -1,0 +1,111 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html" />
+
+<link rel="import" href="../style/common-style.html" />
+<link rel="import" href="../px-data-table/px-data-table.html" />
+
+<dom-module id="menu-list">
+    <template>
+        <style include="common-style">
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+                --iron-icon-height: 15px;
+                --iron-icon-width: 15px;
+                --paper-button: {
+                    background-color: #ff6138;
+                    color: white;
+                    font-size: 13px;
+                }
+            }
+
+            .gridDepth1 {
+                width: 49%;
+                float: left;
+            }
+
+            .gridDepth2 {
+                width: 49%;
+                float: right;
+            }
+
+            paper-toolbar .title {
+                margin-left: 0 !important;
+            }
+
+            paper-button iron-icon {
+                margin-right: 5px;
+            }
+        </style>
+
+        <iron-ajax id="protocolGetMenu" url="/api/user/find" method="GET" last-response="{{_menuList}}" on-response="_onDataLoad"></iron-ajax>
+
+        <h1>메뉴 관리</h1>
+
+        <paper-card elevation="1">
+            <div class="card-content">
+                <div class="gridDepth1">
+                    <paper-toolbar>
+                        <span class="title">대메뉴</span>
+                        <paper-button on-tap="_addRow">행추가</paper-button>
+                        <paper-button on-tap="_deleteRow">삭제</paper-button>
+                        <paper-button on-tap="_save">저장</paper-button>
+                    </paper-toolbar>
+
+                    <px-data-table table-data="{{_menuList}}" selectable hide-pagination-control enable-column-resize>
+                        <px-data-table-column label="메뉴명" name="menuNm" editable></px-data-table-column>
+                        <px-data-table-column label="메뉴코드" name="menuCd"></px-data-table-column>
+                        <px-data-table-column label="URL" name="menuUrl" editable></px-data-table-column>
+                        <px-data-table-column label="순서" name="menuOrd" editable></px-data-table-column>
+                        <px-data-table-column label="사용여부" name="menuAvail"></px-data-table-column>
+                    </px-data-table>
+                </div>
+                <div class="gridDepth2">
+                    <paper-toolbar>
+                        <span class="title">소메뉴</span>
+                        <paper-button on-tap="_addRow">행추가</paper-button>
+                        <paper-button on-tap="_deleteRow">삭제</paper-button>
+                        <paper-button on-tap="_save">저장</paper-button>
+                    </paper-toolbar>
+                    <px-data-table table-data="{{_menuList}}" selectable hide-pagination-control enable-column-resize>
+                        <px-data-table-column label="메뉴명" name="menuNm" editable></px-data-table-column>
+                        <px-data-table-column label="메뉴코드" name="menuCd"></px-data-table-column>
+                        <px-data-table-column label="URL" name="menuUrl" editable></px-data-table-column>
+                        <px-data-table-column label="순서" name="menuOrd" editable></px-data-table-column>
+                        <px-data-table-column label="사용여부" name="menuAvail"></px-data-table-column>
+                    </px-data-table>
+
+                </div>
+            </div>
+        </paper-card>
+
+    </template>
+
+    <script src="/scripts/moment.min.js"></script>
+    <script>
+        Polymer({
+            is: "menu-list",
+
+            properties: {},
+
+            attached: function() {
+                this._search();
+            },
+
+            _search: function() {
+                // this.$.protocolGetMenu.generateRequest();
+            },
+
+            _onDataLoad: function() {},
+
+            refresh: function() {
+                //   this.$.keyword.value = "";
+                //   this._search();
+            }
+        })
+    </script>
+</dom-module>

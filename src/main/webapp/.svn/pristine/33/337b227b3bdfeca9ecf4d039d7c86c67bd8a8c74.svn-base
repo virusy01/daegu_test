@@ -1,0 +1,15 @@
+<?php
+/**
+ * Created by IntelliJ IDEA.
+ * User: jwm_000
+ * Date: 2015-10-09
+ * Time: 오후 10:00
+ */
+session_start();
+$isDev = false;
+if (!$isDev) {
+    if (is_null($_SESSION["USER_ID"])) {
+        header("Location: /kpi/login.php");
+        //print($_SESSION);
+    }
+}

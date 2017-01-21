@@ -1,0 +1,34 @@
+<link rel="import" href="/bower_components/paper-input/paper-input.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input-container.html" />
+<link rel="import" href="/bower_components/iron-input/iron-input.html" />
+
+<dom-module id="number-input">
+    <template>
+        <style></style>
+
+        <input is="iron-input" id="input" bind-value="{{value}}"></input>
+    </template>
+
+    <script src="https://code.jquery.com/jquery-3.0.0.min.js" integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0=" crossorigin="anonymous"></script>
+    <script src="js/autoNumeric-min.js"></script>
+    <script>
+        Polymer({
+            is: "number-input",
+
+            properties: {
+                name: String,
+                value: {
+                    type: String,
+                    notify: true
+                },
+                _maskObj: String,
+            },
+
+            attached: function() {
+                // var input = Polymer.dom(this).querySelector('input');
+                // input.autoNumeric('init');
+                $("#input").autoNumeric('init')
+            }
+        })
+    </script>
+</dom-module>

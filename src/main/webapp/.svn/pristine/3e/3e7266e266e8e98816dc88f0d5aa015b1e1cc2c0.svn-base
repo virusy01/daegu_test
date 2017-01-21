@@ -1,0 +1,104 @@
+<link rel="import" href="../gp-portal/gp-portal.html" />
+<link rel="import" href="../gp-widget/gp-widget.html" />
+
+<dom-module id="kpi-info-dashboard">
+    <template>
+        <style>
+            :host {
+                width: 100%;
+                height: 600px;
+                border: 1px solid #eeeeee;
+                display: block;
+                position: relative;
+                margin-top: 10px;
+            }
+        </style>
+
+        <iron-ajax auto id="protocolGetKpi" url$="/api/corp/{{corpId}}/kpi" method="post" content-type="application/json" last-response="{{_kpi}}" on-response="_onKpiDataLoad"></iron-ajax>
+
+        <gp-portal id="dashboard" width="100%" height="100%" grid-size="10" do-scale-width>
+        </gp-portal>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'kpi-info-dashboard',
+
+            properties: {
+                corpId: Number,
+                _kpi: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _positions: {
+                    type: Array,
+                    value: function() {
+                        return [{
+                            x: 10,
+                            y: 10
+                        }, {
+                            x: 170,
+                            y: 10
+                        }, {
+                            x: 330,
+                            y: 10
+                        }, {
+                            x: 490,
+                            y: 10
+                        }, {
+                            x: 650,
+                            y: 10
+                        }, {
+                            x: 10,
+                            y: 270
+                        }, {
+                            x: 170,
+                            y: 270
+                        }, {
+                            x: 330,
+                            y: 270
+                        }, {
+                            x: 490,
+                            y: 270
+                        }, {
+                            x: 650,
+                            y: 270
+                        }, ];
+                    }
+                }
+            },
+
+            _getInfo: function(index, name) {
+                return this._kpi[index][name];
+            },
+
+            _onKpiDataLoad: function() {
+                var i;
+                var widget;
+                for (i = 0; i < this._kpi.length; i++) {
+                    widget = document.createElement("gp-widget");
+                    widget.id = "widget-" + i;
+                    widget.title = this._kpi[i].depth1Nm;
+                    widget.width = "150";
+                    widget.height = "250";
+                    widget.x = this._positions[i].x;
+                    widget.y = this._positions[i].y;
+                    widget.disableClose = true;
+                    widget.disableSettings = true;
+                    widget.disableResizing = true;
+
+                    this.$.dashboard.appendChild(widget);
+                }
+
+                this.$.dashboard.toggleEditMode();
+                this.$.dashboard.applyEvents();
+            },
+
+            _onWidgetsLoaded: function() {
+                this.$.dashboard.applyEvents();
+            }
+        })
+    </script>
+</dom-module>

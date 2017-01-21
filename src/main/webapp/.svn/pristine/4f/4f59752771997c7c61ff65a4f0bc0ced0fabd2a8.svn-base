@@ -1,0 +1,38 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/iron-overlay-behavior/iron-overlay-behavior.html" />
+<link rel="import" href="/bower_components/paper-spinner/paper-spinner.html" />
+<link rel="import" href="/bower_components/iron-image/iron-image.html" />
+<link rel="import" href="/bower_components/iron-signals/iron-signals.html" />
+
+<dom-module id="loading-overlay">
+    <template>
+        <style>
+            :host {
+                background: white;
+                color: black;
+                box-shadow: rgba(0, 0, 0, 0.24) -2.3408942051048403px 5.524510324047423px 12.090680100755666px 0px, rgba(0, 0, 0, 0.12) 0px 0px 12px 0px;
+                --iron-image-width: 100px;
+                --iron-image-height: 100px;
+                border-radius: 50px;
+            }
+        </style>
+        <iron-signals on-iron-signal-spinner-open="_openOverlay" on-iron-signal-spinner-close="_closeOverlay"></iron-signals>
+        <!-- <paper-spinner active></paper-spinner> -->
+        <iron-image src="/images/giphy.gif"></iron-image>
+    </template>
+    <script>
+        Polymer({
+            is: 'loading-overlay',
+
+            behaviors: [Polymer.IronOverlayBehavior],
+
+            _openOverlay: function() {
+                this.open();
+            },
+
+            _closeOverlay: function() {
+                this.close();
+            }
+        })
+    </script>
+</dom-module>

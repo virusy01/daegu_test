@@ -1,0 +1,51 @@
+<link rel="import" href="/bower_components/app-route/app-route.html">
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="/src/pages/page-report-chart.html">
+
+<dom-module id="page-center-kpi">
+<template>
+	<app-route route="{{route}}"
+		   pattern="/app/center-kpi/:mode/:id"
+		   data="{{routeData}}"
+		   active>
+	</app-route>
+
+	<div class="page-header">
+		<h2>센터별 성과지표 조회 <small>Center KPI</small></h2>
+	</div>
+
+	<iron-pages id="center-status" selected="[[mode]]" attr-for-selected="name">
+		<center-kpi-list name="list"></center-kpi-list>
+		<page-report-chart name="view" id="{{routeData.id}}" admin-mode="true"></page-report-chart>
+	</iron-pages>
+
+</template>
+<script>
+Polymer({
+	is: 'page-center-kpi',
+
+	properties: {
+		mode: {
+			type: String,
+			value: 'list',
+			observer: '_importHTML'
+		},
+		id: Number,
+	},
+
+	observers: [
+		'_determineMode(routeData.mode)',
+	],
+
+	_determineMode: function(value) {
+		this.mode = value || 'list'; 
+	},
+
+	_importHTML: function(newValue) {
+		if (newValue != 'view')
+			this.importHref(this.resolveUrl('center-kpi/center-kpi-' + newValue + '.html'), null, null, true);
+	},
+});
+</script>
+</dom-module>
+

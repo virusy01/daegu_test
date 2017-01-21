@@ -1,0 +1,198 @@
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/src/components/common/normal-select.html">
+<link rel="import" href="/src/components/behaviors/behavior-loader.html">
+
+<dom-module id="page-report-graph">
+<template>
+	<iron-ajax id="getData" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
+			 on-request="_startLoader"
+			   url="/api/corp/yearly-report/operationTrend"
+		      on-response="_drawChart">
+	</iron-ajax>
+
+	<div class="page-header">
+		<h2>운영실적 추이 <small>KPI</small></h2>
+	</div>
+
+	<div class="row">
+		<div class="col-xs-2">
+			<span>기간</span>
+		</div>	
+		<div class="col-xs-2 col-xs-offset-2">
+			성과지표
+		</div>
+	</div>		
+
+	<div class="horizontal-margin-10"></div>	
+
+	<div class="row">
+		<div class="col-xs-2">
+			<normal-select name="dateFrom" value="{{_fromYear}}" items="{{_yearList}}"></normal-select>
+		</div>
+		<div class="col-xs-2">
+			<normal-select name="dateTo" value="{{_toYear}}" items="{{_yearList}}"></normal-select>
+		</div>
+		<div class="col-xs-2">
+			<normal-select id="year" value="{{_kpiType}}" items="{{_kpiTypeList}}"></normal-select>
+		</div>
+		<div class="col-xs-2">
+			<button on-tap="_fetchData" class="btn btn-sm btn-primary">조회</button>
+		</div>
+	</div>
+
+	<div class="horizontal-margin-20"></div>
+
+	<hr/>
+
+	<div class="row">
+		<div class="col-xs-12">
+			<canvas id="kpiChart" width="500" height="300"></canvas>
+		</div>
+	</div>
+</template>
+<script>
+Polymer({
+	is: 'page-report-graph',
+
+	behaviors: [Lunch.LoaderBehavior],
+
+	properties: {
+		_fromYear: {
+			type: Number,
+			value: function() {
+				return moment().subtract(3, 'years').year();
+			}
+		},
+		_toYear: {
+			type: Number,
+			value: function() {
+				return moment().year();
+			}
+		},
+		_yearList: {
+			type: Array,
+			value: function() {
+				var list = [];
+
+				for (var i = 2008; i <= 2030; i++) {
+					list.push({cdNm:i, cd:i});
+				}
+
+				return list;
+			}
+		},	
+		_corpSeq: {
+			type: Number,
+			value: function() {
+				return parseInt(sessionStorage.corpSeq);
+			}
+		},
+		_kpiTypeList: {
+			type: Array,
+			value: function() {
+				return [
+					{cdNm: '매출액', cd: 0},
+					{cdNm: '인당생산성', cd: 1},
+					{cdNm: '사업개발/자문활용 횟수', cd: 2},
+					{cdNm: '사업개발/자문활용 금색', cd: 3},
+					{cdNm: '교육/학습 횟수', cd: 4},
+					{cdNm: '교육/학습 시간', cd: 5},
+				];
+			}
+		},
+		_kpiType: {
+			type: Number,
+			value: function() {
+				return 0;
+			}
+		},
+		_data: {
+			type: Array,
+			value: function() {
+				return [];
+			}
+		},
+	},
+
+	attached: function() {
+		this._fetchData();
+	},
+
+	_fetchData: function() {
+		this.$.getData.params = {
+			CORP_SEQ: this._corpSeq,
+			FROM_YEAR: this._fromYear,
+			TO_YEAR: this._toYear,
+			KPI_KIND: this._kpiType
+		};
+
+		this.$.getData.generateRequest();
+	},
+
+	_drawChart: function(e) {
+		var labels = [];
+		var data = [];
+		this._data = e.currentTarget.lastResponse;
+
+		for (var key in this._data) {
+			labels.push(this._data[key].YEAR);
+			data.push(this._data[key].KPI_VALUE);
+		}
+
+		var data = {
+		    labels: labels,
+		    datasets: [
+			{
+			    label: this._kpiTypeList[this._kpiType].cdNm,
+			    fill: false,
+			    lineTension: 0.1,
+			    backgroundColor: "rgba(75,192,192,0.4)",
+			    borderColor: "rgba(75,192,192,1)",
+			    borderCapStyle: 'butt',
+			    borderDash: [],
+			    borderDashOffset: 0.0,
+			    borderJoinStyle: 'miter',
+			    pointBorderColor: "rgba(75,192,192,1)",
+			    pointBackgroundColor: "#fff",
+			    pointBorderWidth: 1,
+			    pointHoverRadius: 5,
+			    pointHoverBackgroundColor: "rgba(75,192,192,1)",
+			    pointHoverBorderColor: "rgba(220,220,220,1)",
+			    pointHoverBorderWidth: 2,
+			    pointRadius: 1,
+			    pointHitRadius: 10,
+			    data: data,
+			    spanGaps: false,
+			}
+		    ]
+		};
+
+		var myLineChart = new Chart(this.$.kpiChart, {
+		    type: 'line',
+		    data: data,
+		    options: {
+			    scales: {
+				    yAxes: [{
+					    ticks: {
+						    callback: function(value) {
+							    return accounting.formatNumber(value);
+						    }
+					    }
+				    }]
+			    },
+			    tooltips: {
+				    callbacks: {
+					    label: function(items) {
+						    return accounting.formatNumber(items.yLabel);
+					    }
+				    }
+			    }
+
+		    }
+		});	
+
+		this._stopLoader();
+	},
+});
+</script>
+</dom-module>

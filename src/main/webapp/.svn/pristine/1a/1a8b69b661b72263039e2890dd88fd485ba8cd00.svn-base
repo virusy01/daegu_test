@@ -1,0 +1,47 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/app-route/app-route.html">
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+
+<dom-module id="group-user">
+    <template>
+        <style></style>
+
+        <app-route route="{{route}}" pattern="/:subpage" data="{{routeData}}" tail="{{subroute}}"></app-route>
+
+        <iron-pages role="submain" selected="[[subpage]]" attr-for-selected="id">
+            <user-list id="all"></user-list>
+            <user-info id="detail" route="{{subroute}}"></user-info>
+        </iron-pages>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'group-user',
+
+            properties: {
+                route: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    }
+                },
+                subpage: {
+                    type: String,
+                    observer: '_subPageChanged'
+                },
+            },
+
+            observers: [
+                '_subRoutePageChanged(routeData.subpage)'
+            ],
+
+            _subRoutePageChanged: function(path) {
+                this.subpage = path || 'all';
+            },
+
+            _subPageChanged: function(subpage) {
+                this.importHref(this.resolveUrl('user/' + this.$[subpage].nodeName.toLowerCase() + '.html'), null, null, true);
+            }
+        })
+    </script>
+</dom-module>

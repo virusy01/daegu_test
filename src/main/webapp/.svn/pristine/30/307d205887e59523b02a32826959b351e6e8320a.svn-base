@@ -1,0 +1,417 @@
+<!-- <link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/app-route/app-route.html">
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" /> -->
+
+<!-- <link rel="import" href="../common/behavior-page.html" />
+<link rel="import" href="../px-data-table/px-data-table.html" />
+<link rel="import" href="../px-data-table/px-data-table-column.html" /> -->
+
+<link rel="import" href="../style/common-style.html" />
+<link rel="import" href="../style/bootstrap-style.html" />
+
+<dom-module id="general-info">
+    <template>
+        <style include="common-style"></style>
+        <style include="bootstrap-style">
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+            }
+        </style>
+
+        <app-route route="{{route}}" pattern="/:id" data="{{routeData}}"></app-route>
+
+        <iron-ajax id="protocolGetGeneralInfo" url$="/api/corp/info/[[_id]]" headers='{"X-Requested-With": "XMLHttpRequest"}' method="GET" last-response="{{_detail}}" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax id="protocolGetEmployeeInfo" url$="/api/corp/employee/[[_id]]" headers='{"X-Requested-With": "XMLHttpRequest"}' method="GET" last-response="{{_employee}}" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax id="protocolGetFundInfo" url$="/api/corp/help/[[_id]]/last3year" headers='{"X-Requested-With": "XMLHttpRequest"}' method="GET" on-response="_onFundDataLoad" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax id="protocolGetFinancialInfo" url$="/api/corp/finance/[[_id]]" headers='{"X-Requested-With": "XMLHttpRequest"}' method="GET" last-response="{{_financial}}" on-error="_redirectOnError"></iron-ajax>
+
+        <paper-card>
+            <div class="card-content">
+                <div class="page-header">
+                    <h2>기업 일반정보 <small>[[_detail.corpNm]]</small></h2>
+                </div>
+                <h3>일반사항</h3>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>
+                                기업명
+                            </th>
+                            <td>
+                                [[_detail.corpNm]]
+                            </td>
+                            <th>
+                                사업개시일
+                            </th>
+                            <td>
+                                [[_formatDate(_detail.bizDt)]]
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                대표자
+                            </th>
+                            <td>
+                                [[_detail.ceoNm]]
+                            </td>
+                            <th>
+                                사업자번호
+                            </th>
+                            <td>
+                                [[_detail.bizNo]]
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                법인형태
+                            </th>
+                            <td>
+                                [[_detail.corpTypeNm]]
+                            </td>
+                            <th>
+                                기업분류
+                            </th>
+                            <td>
+                                [[_detail.compKindNm]]
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                사업업종
+                            </th>
+                            <td colspan="3">
+                                [[_detail.bizSectNm]]
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <h3>사회적기업일 경우</h3>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>
+                                사회적기업 유형
+                            </th>
+                            <td>
+                                [[_detail.socTypeNm]]
+                            </td>
+                            <th>
+                                인증만료일
+                            </th>
+                            <td>
+                                [[_formatDate(_detail.socCertEndDt)]]
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div id="areaEmployee">
+                    <h3>고용현황과 고용자 특성</h3>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>
+                                    고용인원
+                                </th>
+                                <th>
+                                    총고용인원
+                                </th>
+                                <td colspan="2" class="text-right">
+                                    [[_employee.empNum]] 명
+                                </td>
+                                <th>
+                                    취약계층 총인원
+                                </th>
+                                <td class="text-right">
+                                    [[_employee.weakNum]] 명
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    고용현황
+                                </th>
+                                <th>
+                                    고용형태
+                                </th>
+                                <th>
+                                    정규직
+                                </th>
+                                <td class="text-right">
+                                    [[_employee.fullNum]] 명
+                                </td>
+                                <th>
+                                    비정규직
+                                </th>
+                                <td class="text-right">
+                                    [[_employee.partNum]] 명
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    급여수준
+                                </th>
+                                <th>
+                                    월급여평균
+                                </th>
+                                <th>
+                                    임원
+                                </th>
+                                <td class="text-right">
+                                    [[_formatMoney(_employee.cxxSal)]]
+                                </td>
+                                <th>
+                                    임원 외
+                                </th>
+                                <td class="text-right">
+                                    [[_formatMoney(_employee.normSal)]]
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="areaFund">
+                    <h3>최근 3년간 중앙정부, 지자체, 민간단체 등 외부로부터 받은 지원사항</h3>
+                    <px-data-table table-data="{{_fund}}" hide-pagination-control enable-column-resize enable-column-reorder table-rows>
+                        <px-data-table-column label="지원처" name="helper"></px-data-table-column>
+                        <px-data-table-column label="사업명" name="prjNm"></px-data-table-column>
+                        <px-data-table-column label="지원기간" name="helpDt"></px-data-table-column>
+                        <px-data-table-column label="금액" name="helpAmt" type="html"></px-data-table-column>
+                    </px-data-table>
+                </div>
+
+                <h3>재정현황 ([[_formatDate(_financial.clsDt)]] 결산)</h3>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th colspan="3">
+                                    항목
+                                </th>
+                                <th>
+                                    세부내용
+                                </th>
+                                <th>
+                                    금액
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th rowspan="3">
+                                    재무상태
+                                </th>
+                                <th colspan="3">
+                                    자산총계
+                                </th>
+                                <td class="text-right">
+                                    [[_formatMoney(_financial.asstAmt)]]
+                                </td>
+                            </tr>
+                            <tr>
+                                <th colspan="3">
+                                    부채총계
+                                </th>
+                                <td class="text-right">
+                                    [[_formatMoney(_financial.deptAmt)]]
+                                </td>
+                            </tr>
+                            <tr>
+                                <th colspan="3">
+                                    자본총계
+                                </th>
+                                <td class="text-right">
+                                    [[_formatMoney(_financial.capitAmt)]]
+                                </td>
+                            </tr>
+                            <tr>
+                                <th rowspan="9">
+                                    손익계산
+                                </th>
+                                <th rowspan="5">
+                                    매출
+                                </th>
+                                <th rowspan="3">
+                                    매출액
+                                </th>
+                                <th>
+                                    소계
+                                </th>
+                                <td class="text-right">
+                                    [[_formatMoney(_financial.soldAmt)]]
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    민간시장
+                                </th>
+                                <td class="text-right">
+                                    [[_formatMoney(_financial.soldPrivAmt)]]
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    공공 시장
+                                </th>
+                                <td class="text-right">
+                                    [[_formatMoney(_financial.soldPublAmt)]]
+                                </td>
+                            </tr>
+                            <tr>
+                                <th rowspan="2">
+                                    *유통/제조업일 경우
+                                </th>
+                                <th>
+                                    매출원가
+                                </th>
+                                <td class="text-right">
+                                    [[_formatMoney(_financial.soldOrgCost)]]
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    매출 총이익(손실)
+                                </th>
+                                <td class="text-right">
+                                    [[_formatMoney(_financial.soldIncom)]]
+                                </td>
+                            </tr>
+                            <tr>
+                                <th colspan="2">
+                                    비용
+                                </th>
+                                <th>
+                                    판매비와 관리비(영업비용)
+                                </th>
+                                <td class="text-right">
+                                    [[_formatMoney(_financial.salesAmt)]]
+                                </td>
+                            </tr>
+                            <tr>
+                                <th rowspan="2" colspan="2">
+                                    비용
+                                </th>
+                                <th>
+                                    영업이익
+                                </th>
+                                <td class="text-right">
+                                    [[_formatMoney(_financial.salesIncom)]]
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    영업외 수익
+                                </th>
+                                <td class="text-right">
+                                    [[_formatMoney(_financial.extProf)]]
+                                </td>
+                            </tr>
+                            <tr>
+                                <th colspan="3">
+                                    당기순이익
+                                </th>
+                                <td class="text-right">
+                                    [[_formatMoney(_financial.netIncom)]]
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-actions">
+                <a href="/app/general/all">
+                    <paper-button>
+                        <iron-icon icon="menu"></iron-icon>
+                        목록
+                    </paper-button>
+                </a>
+            </div>
+        </paper-card>
+    </template>
+
+    <script src="/scripts/moment.min.js"></script>
+    <script src="/scripts/accounting.min.js"></script>
+    <script>
+        Polymer({
+            is: 'general-info',
+
+            behaviors: [PS.BehaviorPage],
+
+            properties: {
+                _id: {
+                    type: String
+                },
+                route: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    }
+                },
+                _detail: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    }
+                },
+                _employee: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    }
+                },
+                _fund: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _financial: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    }
+                }
+            },
+
+            observers: [
+                '_routeIdChanged(routeData.id)'
+            ],
+
+            _routeIdChanged: function(id) {
+                this._id = id;
+                this.$.protocolGetGeneralInfo.generateRequest();
+                this.$.protocolGetEmployeeInfo.generateRequest();
+                this.$.protocolGetFundInfo.generateRequest();
+                this.$.protocolGetFinancialInfo.generateRequest();
+            },
+
+            _onFundDataLoad: function(e) {
+                var data = e.target.lastResponse;
+                var i;
+
+                for (i = 0; i < data.length; i++) {
+                    data[i].helpDt = moment(data[i].helpStDt).format("YYYY/MM/DD") + " ~ " + moment(data[i].helpEndDt).format("YYYY/MM/DD");
+                    data[i].helpAmt = "<span style='float: right; margin-right: 5px;'>" + this._formatMoney(data[i].helpAmt) + "</span>";
+                }
+
+                this._fund = data;
+                this._closeOverlay();
+            },
+
+            _formatDate: function(date) {
+                return date ? moment(date).format("YYYY/MM/DD") : "-";
+            },
+
+            _formatMoney: function(money) {
+                money = typeof money == 'string' ? accounting.unformat(money) : money;
+                money = money / 10000;
+                return accounting.formatMoney(money, "", 0) + " 만원";
+            }
+        })
+    </script>
+</dom-module>

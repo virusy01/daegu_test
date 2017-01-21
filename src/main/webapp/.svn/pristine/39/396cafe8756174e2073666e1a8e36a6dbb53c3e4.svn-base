@@ -1,0 +1,16 @@
+<dom-module id="common-style">
+    <template>
+        <style>
+            a:link,
+            a:active,
+            a:hover,
+            a:visited {
+                text-decoration: inherit;
+            }
+
+            .hidden {
+                display: none;
+            }
+        </style>
+    </template>
+</dom-module>

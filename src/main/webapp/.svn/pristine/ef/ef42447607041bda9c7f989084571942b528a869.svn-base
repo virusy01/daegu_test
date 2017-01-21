@@ -1,0 +1,100 @@
+<!-- <link rel="import" href="/bower_components/iron-input/iron-input.html" />
+<link rel="import" href="/bower_components/iron-validatable-behavior/iron-validatable-behavior.html" />
+<link rel="import" href="/bower_components/iron-form-element-behavior/iron-form-element-behavior.html">
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" /> -->
+
+<link rel="import" href="../style/bootstrap-style.html" />
+
+<dom-module id="date-input">
+    <template>
+        <style include="bootstrap-style"></style>
+        <div id="container">
+            <input id="dummy" is="iron-input" class="form-control" placeholder="{{placeholder}}" required="{{required}}" readonly />
+            <input id="input" is="iron-input" class="hide" bind-value="{{value}}" />
+            <span class="glyphicon form-control-feedback">
+                <iron-icon id="icon" icon="close" class="hide"></iron-icon>
+            </span>
+        </div>
+    </template>
+
+    <script src="/scripts/moment.js"></script>
+    <script src="/scripts/pikaday.js"></script>
+    <script>
+        Polymer({
+            is: 'date-input',
+
+            behaviors: [Polymer.IronFormElementBehavior, Polymer.IronValidatableBehavior],
+
+            properties: {
+                name: String,
+                type: {
+                    type: String,
+                    observer: '_assignType'
+                },
+                value: {
+                    type: String,
+                    notify: true
+                },
+                bindValue: {
+                    type: String
+                },
+                placeholder: {
+                    type: String
+                },
+                required: {
+                    type: Boolean,
+                    value: false
+                },
+                dateFormat: {
+                    type: String,
+                    value: "YYYY/MM/DD"
+                },
+                _picker: Object,
+                _isAttached: Boolean,
+            },
+
+            observers: [
+                '_setDate(bindValue, _isAttached)'
+            ],
+
+            attached: function() {
+                this._picker = new Pikaday({
+                    field: this.$.dummy,
+                    format: this.dateFormat,
+                    onSelect: function() {
+                        this.$.input.bindValue = this._picker.getDate();
+                    }.bind(this)
+                });
+                this._isAttached = true;
+            },
+
+            _setDate: function(date) {
+                this._picker.setMoment(moment(date));
+            },
+
+            _getValidity: function() {
+                if (this.required) {
+                    this._toggleErrorGraphic(!!this.value ? false : true);
+                    return !!this.value;
+                }
+                return true;
+            },
+
+            _toggleErrorGraphic: function(flag) {
+                if (flag) {
+                    this.$.container.classList.add("has-error");
+                    this.$.container.classList.add("has-feedback");
+                    this.$.icon.classList.remove("hide");
+                } else {
+                    this.$.container.classList.remove("has-error");
+                    this.$.container.classList.remove("has-feedback");
+                    this.$.icon.classList.add("hide");
+                }
+            },
+
+            _invalidChanged: function() {
+                this._toggleErrorGraphic(this.invalid ? true : false);
+            },
+        })
+    </script>
+</dom-module>

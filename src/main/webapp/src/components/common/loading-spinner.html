@@ -1,0 +1,28 @@
+<link rel="import" href="/bower_components/iron-signals/iron-signals.html">
+
+<dom-module id="loading-spinner">
+<template>
+	<iron-signals on-iron-signal-start-spinner="_showSpinner" on-iron-signal-end-spinner="_hideSpinner"></iron-signals>
+
+	<div class="loaderOverlay">
+		<div class="loader"></div>
+	</div>
+</template>
+<script>
+Polymer({
+	is: 'loading-spinner',
+
+	attached: function() {
+		Polymer.dom(this).classList.add('hidden');
+	},
+
+	_showSpinner: function(e) {
+		Polymer.dom(this).classList.remove('hidden');
+	},
+
+	_hideSpinner: function(e) {
+		Polymer.dom(this).classList.add('hidden');
+	},
+});
+</script>
+</dom-module>

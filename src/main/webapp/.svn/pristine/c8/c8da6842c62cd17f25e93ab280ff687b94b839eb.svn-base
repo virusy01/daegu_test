@@ -1,0 +1,165 @@
+<link rel="import" href="../style/c3-chart-style.html" />
+
+<dom-module id="kpi-info-dashboard">
+    <template>
+        <style include="c3-chart-style">
+            :host {
+                @apply(--layout-vertical);
+                margin-top: 40px;
+            }
+
+            #chartContainer {
+                text-align: justify;
+            }
+
+            .stretch {
+                width: 100%;
+                display: inline-block;
+                font-size: 0;
+                line-height: 0
+            }
+
+            .chart {
+                width: 150px;
+                height: 300px;
+                border: 1px solid #eeeeee;
+                display: inline-block;
+                vertical-align: top;
+                zoom: 1;
+            }
+
+            .chartTitle {
+                height: 30px;
+                padding: 5px;
+                text-align: center;
+            }
+        </style>
+
+        <iron-ajax id="protocolGetKpi" url$="/api/corp/{{corpId}}/kpi" method="post" content-type="application/json" on-response="_onKpiDataLoad"></iron-ajax>
+
+        <div id="chartContainer">
+            <!-- <span class="stretch"></span> -->
+        </div>
+    </template>
+
+    <script src="/scripts/d3.min.js"></script>
+    <!-- <script src="/scripts/c3.min.js"></script> -->
+    <script src="/scripts/SimpleBarChart.js"></script>
+    <script>
+        Polymer({
+            is: 'kpi-info-dashboard',
+
+            properties: {
+                corpId: Number,
+                _kpi: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _isAttached: Boolean,
+            },
+
+            observers: [
+                '_properlyAttached(_isAttached, corpId)'
+            ],
+
+            attached: function() {
+                this._isAttached = true;
+            },
+
+            _properlyAttached: function() {
+                this.$.protocolGetKpi.generateRequest();
+            },
+
+            _onKpiDataLoad: function(e) {
+                this._kpi = e.target.lastResponse;
+                var num, chart, chartTitle, chartContent, data, simpleBarChart;
+
+                this.$.chartContainer.innerHTML = "";
+
+                for (num = 0; num < this._kpi.length; num++) {
+                    data = this._kpi[num];
+                    chart = document.createElement("div");
+                    chart.id = "chart" + num;
+                    chart.setAttribute("class", "chart");
+
+                    chartTitle = document.createElement("div");
+                    chartTitle.innerHTML = data.depth1Nm;
+                    chartTitle.setAttribute("class", "chartTitle");
+                    chart.appendChild(chartTitle);
+
+                    chartContent = document.createElement("div");
+                    chartContent.setAttribute("class", "chart" + num);
+                    chart.appendChild(chartContent);
+
+                    this.$.chartContainer.appendChild(chart);
+
+                    simpleBarChart = new SimpleBarChart();
+                    simpleBarChart.options = {
+                        data: [{label:'점수', value:data.score, avg:data.avg, max:10, depth2:data.depth2}, {label:'순위', value:(data.corpCount - data.ranking), max:data.corpCount, depth2:data.depth2 }],
+                        contentHolder: this.$.chartContainer.getElementsByClassName("chart" + num)[0],
+                        labelFunction: function (d, i){
+                            if (i==0){
+                                return d.value + "점";
+                            }else{
+                                return (d.max - d.value) + "위";
+                            }
+                        },
+                        dataTipFunction: function (d, i, tooltip){
+                            var depth2 = d.depth2;
+                            tooltip.innerHTML = "";
+                            for (index in depth2) {
+                                var depth2Item = depth2[index];
+                                tooltip.innerHTML = "<span style='color:#666666;'>" + depth2Item.depth2Nm + " : </span><span style='color:#b2485f;font-weight: bold'>" + depth2Item.score + "<span><br>";
+                            }
+                        },
+                        backgroundTipFunction: function (d, i, tooltip){
+                            tooltip.innerHTML = "";
+                            tooltip.innerHTML = "<span style='color:#666666;'>평균 : </span><span style='color:#222222;font-weight: bold'>" + Math.round(d.avg * 100)/100 + "<span><br>";
+
+                        },
+                        colorFunction: function (d, i){
+                            if (i == 0) {
+                                if (d.value <= 3) {
+                                    return "#f94a76";
+                                }else if (d.value >= 8) {
+                                    return "#00bf88"
+                                }else {
+                                    return "#f4c100";
+                                }
+                            }else{
+                                return "#5da2e6";
+                            }
+                        }
+                    };
+                    simpleBarChart.draw(true);
+                    // c3.generate({
+                    //     bindto: this.$.chartContainer.getElementsByClassName("chart" + i)[0],
+                    //     data: {
+                    //         json: [data],
+                    //         keys: {
+                    //             value: ['score', 'ranking']
+                    //         },
+                    //         names: {
+                    //             score: '점수',
+                    //             ranking: '순위'
+                    //         },
+                    //         type: 'bar'
+                    //     },
+                    //     color: {
+                    //         pattern: ['#e74c3c', '#3498db', '#1f8a70', '#fd7400', '#e8cb0d', '#bedb39', '#2c3e50', '#91aa9d', '#ff8598', '#703030']
+                    //     },
+                    //     axis: {
+                    //         y: {
+                    //             show: false,
+                    //             max: 10
+                    //         }
+                    //     }
+                    // });
+                }
+            },
+
+        })
+    </script>
+</dom-module>

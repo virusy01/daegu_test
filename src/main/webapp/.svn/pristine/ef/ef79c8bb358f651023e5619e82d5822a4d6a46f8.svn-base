@@ -1,0 +1,22 @@
+/**
+ * Created by jwm_000 on 2015-10-09.
+ */
+var SelectBuilder = (function(window, $, undefined){
+    function SelectBuilder(selector, codeField, labelField){
+        this.selector = selector;
+        this.codeField = codeField;
+        this.labelField = labelField;
+
+        this.buildOptions = function(data, promptData){
+            $(selector).children("option").remove();
+            if (promptData){
+                $(selector).append("<option value='" + promptData[codeField] + "' selected>" + promptData[labelField] + "</option>");
+            }
+
+            for (index in data){
+                $(selector).append("<option value='" + data[index][codeField] + "'>" + data[index][labelField] + "</option>");
+            }
+        }
+    }
+    return SelectBuilder;
+})(window, jQuery)

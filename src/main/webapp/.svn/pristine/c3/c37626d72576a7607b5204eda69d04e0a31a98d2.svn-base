@@ -1,0 +1,147 @@
+package com.sck.test;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.IntegrationTest;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.security.test.context.support.WithSecurityContextTestExecutionListener;
+import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
+import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
+import org.springframework.test.context.web.ServletTestExecutionListener;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.sck.Bootstrap;
+import com.sck.model.Menu;
+import com.sck.model.MenuHierarchy;
+import com.sck.model.Role;
+import com.sck.model.RoleMenu;
+import com.sck.modules.common.CommonService;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes={Bootstrap.class})
+@Transactional
+@IntegrationTest
+@WebIntegrationTest("server.port:9999")
+@TestExecutionListeners(listeners={ServletTestExecutionListener.class,
+		DependencyInjectionTestExecutionListener.class,
+		DirtiesContextTestExecutionListener.class,
+		TransactionalTestExecutionListener.class,
+		WithSecurityContextTestExecutionListener.class})
+public class CommonTest {
+
+	@Autowired
+	private CommonService commonService;
+	
+	@Test
+	@WithUserDetails("admin4")
+	public void findCommonCodes()
+	{
+		commonService.findCodes("BIZ_SECT");
+	}
+	
+	@Test
+	@WithUserDetails("admin4")
+	public void findMenus()
+	{
+		MenuHierarchy menus = commonService.findAllMenus();
+		System.out.println(menus);
+	}
+	
+	@Test
+	@WithUserDetails("admin4")
+	public void findMenusByParent()
+	{
+		List<Menu> menus = commonService.findMenusByParent(null);
+		System.out.println(menus);
+	}
+	
+	@Test
+	@WithUserDetails("admin4")
+	public void manageMenu()
+	{
+		Menu p = new Menu();
+		p.setMenuCd("TST00001");
+		p.setMenuNm("테스트메뉴");
+		p.setMenuIco("test");
+		p.setSort(5);
+		p.setUrl("/test");
+		
+		p.setUse(true);
+		
+		int result = commonService.findMenuCd(p.getMenuCd());
+		assertThat(result, is(equalTo(0)));
+		
+		commonService.insertMenu(p);
+		Menu load = commonService.findMenu("TST00001");
+		assertThat(load, is(notNullValue()));
+		
+		p.setMenuNm("테스트메뉴 수정");
+		commonService.updateMenu(p);
+		load = commonService.findMenu("TST00001");
+		assertThat(load.getMenuNm(),equalTo("테스트메뉴 수정"));
+		
+		commonService.deleteMenu("TST00001");
+		load = commonService.findMenu("TST00001");
+		assertThat(load, is(nullValue()));
+		
+	}
+	
+	@Test
+	@WithUserDetails("admin4")
+	public void manageRole()
+	{
+		RoleMenu p = new RoleMenu();
+		p.setRoleCd("TST00001");
+		p.setRoleNm("테스트역할");
+		p.setBasic(false);
+		
+		List<String> menuIds = new ArrayList<String>();
+		menuIds.add("CRP00001");
+		menuIds.add("KPI00001");
+		
+		p.setMenuCd(menuIds);
+		
+		int result = commonService.findRoleCd(p.getRoleCd());
+		assertThat(result, is(equalTo(0)));
+		
+		commonService.insertRole(p);
+		Role load = commonService.findRole("TST00001");
+		assertThat(load, is(notNullValue()));
+		
+		p.setRoleNm("테스트메뉴 수정");
+		commonService.updateRole(p);
+		load = commonService.findRole("TST00001");
+		assertThat(load.getRoleNm(),equalTo("테스트메뉴 수정"));
+		
+		commonService.saveRoleMenu(p);
+		
+		List<MenuHierarchy> menus = commonService.findRoleMenu(load.getRoleCd());
+		assertThat(menus.size(), is(equalTo(2)));
+		
+		commonService.deleteRole("TST00001");
+		load = commonService.findRole("TST00001");
+		assertThat(load, is(nullValue()));
+		
+		
+	}
+	
+	
+	
+	
+	
+}

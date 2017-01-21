@@ -1,0 +1,145 @@
+/**
+ * Created by jwm_000 on 2015-10-06.
+ */
+
+var PieChart = (function (window, d3, undefined){
+
+    var padding = {left: 40, right: 20, top: 40, bottom: 30},
+        innerRadius = 0,
+        outerRadius = 150,
+        valueField = "value",
+        fills = ["#2A7FFF", "#7FAAFF", "#FFAA2A", "#FFD47F", "#7FFF55", "#D4FF2A" , "#D4FFAA", "#AA7FFF", "#D4AAFF", "#FFD4FF",
+                    "#b2485f", "#9b9c9a", "#49ddff", "#306555", "#003366", "#7fbcff", "#ba8d72", "#ba8d72", "#8c7721", "#6db5a1"];
+    var PieChart = function () {
+        this.options = {};
+
+        this.draw = function () {
+
+            var options = this.options;
+
+            options.padding = options.padding || padding;
+            options.fills = options.fills || fills;
+            options.innerRadius = options.innerRadius || innerRadius;
+            options.outerRadius = options.outerRadius || outerRadius;
+            options.valueField = options.valueField || valueField;
+
+            var data = options.data;
+
+            if (!data || data.length < 1){
+                return;
+            }
+
+            var color = d3.scale.ordinal()
+                .range(options.fills);
+
+            var totalValue = 0;
+
+            var values = data.map(function (d){
+                totalValue += parseFloat(d[options.valueField]);
+                return parseFloat(d[options.valueField]);
+            });
+
+            var percents = [];
+            for (valueIndex in values){
+                percents.push(values[valueIndex]/totalValue);
+            }
+
+            var pie = d3.layout.pie();
+            var arc = d3.svg.arc().innerRadius(options.innerRadius).outerRadius(options.outerRadius);
+
+            var data = options.data;
+
+            if (!data || data.length==0){
+                return;
+            }
+
+            var innerWidth = options.outerRadius * 2;
+            var innerHeight = options.outerRadius * 2;
+
+            var svgWidth = innerWidth + options.padding.left + options.padding.right;
+            var svgHeight = innerHeight + options.padding.top + options.padding.bottom;
+
+            var holder = document.getElementById(options.contentHolder || "pieChart");
+            var svg = d3.select(holder).append("svg")
+                .attr("width", svgWidth)
+                .attr("height", svgHeight);
+
+
+            var pieElements = svg.selectAll("g")
+                .data(pie(percents))
+                .enter()
+                .append("g")
+                .attr("transform", "translate(" + svgWidth/2 + ", " + svgHeight/2 + ")");
+
+            var totalDuration = 1000;
+
+
+            pieElements
+                .append("path")
+                .attr("class", "pie")
+                .style("fill", function(d, i){
+                    return color(i);
+                })
+                .transition()
+                .ease("linear")
+                .duration(function(d, i){
+                    return totalDuration / percents.length;
+                })
+                .delay(function (d, i){
+                    return i * (totalDuration / percents.length);
+                })
+                .attrTween("d", function (d, i){
+                    var interpolate = d3.interpolate(
+                        {startAngle: d.startAngle, endAngle: d.startAngle},
+                        {startAngle: d.startAngle, endAngle: d.endAngle}
+                    );
+                    return function(t){
+                        var a = arc(interpolate(t));
+                        //console.log(a);
+                        return a;
+                    };
+                });
+
+            /*var textElements = d3.select("#myGraph")
+                .append("text")
+                .attr("class", "total")
+                .attr("transform", "translate(" + svgWidth/2 + "," + (svgHeight/2+5) + ")")
+                .text("합계:" + d3.sum(dataSet));*/
+
+
+            pieElements
+                .append("text")
+                .attr("class", "pieNum")
+                .attr("transform", function (d, i) {
+                    var angle = d.startAngle + ((d.endAngle - d.startAngle) / 2);
+                    angle = angle * (180 / Math.PI) - 90;
+                    return "translate(" + arc.centroid(d) + ")rotate(" + angle + ")";
+                })
+                .each(function (d, i) {
+                    if (options.labelFunction){
+                        var text = options.labelFunction(data[i], d, i);
+                        var arr = text.split("\n");
+                        if (arr != undefined) {
+                            for (i = 0; i < arr.length; i++) {
+                                d3.select(this).append("tspan")
+                                    .text(arr[i])
+                                    .attr("dy", i ? "1.2em" : 0)
+                                    .attr("x", 0)
+                                    .attr("text-anchor", "middle")
+                                    .attr("class", "tspan" + i);
+                            }
+                        }
+                    }else {
+                        d3.select(this).text( Math.round(d.value * 10000) / 100 + "%");
+                    }
+                })
+                .style("fill-opacity", 0)
+                .transition()
+                .duration(totalDuration)
+                .style("fill-opacity", 1);
+
+        }
+    }
+
+    return PieChart;
+})(window, d3, undefined)

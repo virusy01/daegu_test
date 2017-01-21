@@ -1,0 +1,20 @@
+package com.sck.modules.common;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+
+import com.sck.model.Page;
+import com.sck.model.User;
+
+@Repository
+public interface UserRepository {
+	int countUsers(String userNm);
+	List<User> findUsers(@Param("userNm") String userNm, @Param("page") Page p);
+	User findUser(Integer userSeq);
+	User findUserByUsername(String userId);
+	int insertUser(User u);
+	int updateUser(User u);
+	int deleteUser(Integer userSeq);
+}

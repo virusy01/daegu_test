@@ -1,0 +1,174 @@
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+<link rel="import" href="/bower_components/iron-icons/av-icons.html" />
+
+<link rel="import" href="../style/c3-chart-style.html" />
+
+<dom-module id="kpi-info-dashboard">
+    <template>
+        <style include="c3-chart-style">
+            :host {
+                @apply(--layout-vertical);
+                margin-top: 40px;
+            }
+
+            .legend {
+              display: flex;
+              margin: 0 30px 10px;
+            }
+
+            #chartContainer {
+                text-align: center;
+                font-size: 12px;
+            }
+
+            .chart {
+                width: 160px;
+                height: 300px;
+                border: 1px solid #eeeeee;
+                display: inline-block;
+                vertical-align: top;
+                margin: 10px;
+            }
+
+            .chartTitle {
+                height: 30px;
+                padding: 5px;
+                text-align: center;
+            }
+
+            .axis path,
+            .axis line {
+                fill: none;
+                stroke: black;
+            }
+        </style>
+
+        <iron-ajax id="protocolGetKpi" url$="/api/corp/{{corpId}}/kpi" headers='{"X-Requested-With": "XMLHttpRequest"}' method="post" content-type="application/json" on-response="_onKpiDataLoad" on-error="_onErrorHandler"></iron-ajax>
+
+        <div class="legend">
+            <iron-icon icon="av:fiber-manual-record" style="color:rgb(249, 74, 118);"></iron-icon>심각
+            <iron-icon icon="av:fiber-manual-record" style="color:rgb(244, 193, 0);"></iron-icon>정상
+            <iron-icon icon="av:fiber-manual-record" style="color:rgb(0, 191, 136);"></iron-icon>양호
+        </div>
+
+        <div id="chartContainer">
+        </div>
+    </template>
+
+    <script src="/scripts/d3.min.js"></script>
+    <script src="/scripts/SimpleBarChart.js"></script>
+    <script>
+        Polymer({
+            is: 'kpi-info-dashboard',
+
+            properties: {
+                corpId: Number,
+                _kpi: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _isAttached: Boolean,
+            },
+
+            observers: [
+                '_properlyAttached(_isAttached, corpId)'
+            ],
+
+            attached: function() {
+                this._isAttached = true;
+            },
+
+            _properlyAttached: function() {
+                this.$.protocolGetKpi.generateRequest();
+            },
+
+            _onKpiDataLoad: function(e) {
+                this._kpi = e.target.lastResponse;
+                var num, chart, chartTitle, chartContent, data, simpleBarChart;
+
+                this.$.chartContainer.innerHTML = "";
+
+                for (num = 0; num < this._kpi.length; num++) {
+                    data = this._kpi[num];
+                    chart = document.createElement("div");
+                    chart.id = "chart" + num;
+                    chart.setAttribute("class", "chart");
+
+                    chartTitle = document.createElement("div");
+                    chartTitle.innerHTML = data.depth1Nm;
+                    chartTitle.setAttribute("class", "chartTitle");
+                    chart.appendChild(chartTitle);
+
+                    chartContent = document.createElement("div");
+                    chartContent.setAttribute("class", "chart" + num);
+                    chart.appendChild(chartContent);
+
+                    this.$.chartContainer.appendChild(chart);
+
+                    simpleBarChart = new SimpleBarChart();
+                    simpleBarChart.options = {
+                        data: [{
+                            label: '점수',
+                            value: data.score,
+                            avg: data.avg,
+                            max: 10,
+                            depth2: data.depth2
+                        }, {
+                            label: '순위',
+                            value: (data.corpCount - data.ranking),
+                            max: data.corpCount,
+                            depth2: data.depth2
+                        }],
+                        contentHolder: this.$.chartContainer.getElementsByClassName("chart" + num)[0],
+                        labelFunction: function(d, i) {
+                            if (i == 0) {
+                                return d.value + "점";
+                            } else {
+                                return (d.max - d.value) + "위";
+                            }
+                        },
+                        dataTipFunction: function(d, i, tooltip) {
+                            var depth2 = d.depth2;
+                            var cont = "";
+                            tooltip.innerHTML = "";
+                            for (index in depth2) {
+                                var depth2Item = depth2[index];
+                                if (depth2Item)
+                                    cont += depth2Item.depth2Nm + " : <span style='font-weight: bold'>" + depth2Item.score + "<span><br>";
+                            }
+                            tooltip.innerHTML = cont;
+                        },
+                        backgroundTipFunction: function(d, i, tooltip) {
+                            tooltip.innerHTML = "";
+                            tooltip.innerHTML = "평균 : <span style='font-weight: bold'>" + Math.round(d.avg * 100) / 100 + "<span><br>";
+                        },
+                        colorFunction: function(d, i) {
+                            if (i == 0) {
+                                if (d.value <= 3) {
+                                    return "#f94a76";
+                                } else if (d.value >= 8) {
+                                    return "#00bf88"
+                                } else {
+                                    return "#f4c100";
+                                }
+                            } else {
+                                return "#5da2e6";
+                            }
+                        }
+                    };
+                    simpleBarChart.draw(true);
+                }
+            },
+            _onErrorHandler : function(e)
+            {
+            	var status = e.detail.request.status;
+            	if(status == 403)
+           		{
+           			location.href = "/";
+           		}
+            }
+        })
+    </script>
+</dom-module>

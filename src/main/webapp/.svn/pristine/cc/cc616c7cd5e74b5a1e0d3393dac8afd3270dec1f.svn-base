@@ -1,0 +1,129 @@
+<!-- <link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" /> -->
+
+<!-- <link rel="import" href="../common/normal-input.html" />
+<link rel="import" href="../common/normal-select.html" />
+<link rel="import" href="../common/behavior-page.html" /> -->
+
+<link rel="import" href="../style/common-style.html" />
+<link rel="import" href="../style/bootstrap-style.html" />
+
+<dom-module id="header-search">
+    <template>
+        <style include="common-style"></style>
+        <style include="bootstrap-style">
+            :host {
+                --iron-icon-height: 15px;
+                --iron-icon-width: 15px;
+                --paper-button: {
+                    background-color: #ff6138;
+                    color: white;
+                    height: 34px;
+                }
+            }
+        </style>
+
+        <iron-ajax auto url="/api/common/comp_kind/code/" headers='{"X-Requested-With": "XMLHttpRequest"}' on-response="_prependCompKind" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax auto url="/api/common/corp_type/code/" headers='{"X-Requested-With": "XMLHttpRequest"}' on-response="_prependCorpType" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax auto url="/api/common/biz_sect/code/" headers='{"X-Requested-With": "XMLHttpRequest"}' on-response="_prependBizSect" on-error="_redirectOnError"></iron-ajax>
+
+        <div id="searchForm" class="panel panel-default">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label for="corpType">법인형태</label>
+                    <normal-select id="corpType" items="{{_codes.corpType}}" on-value-changed="_assignCorpType"></normal-select>
+                </div>
+                <div class="form-group">
+                    <label for="compKind">기업분류</label>
+                    <normal-select id="compKind" items="{{_codes.compKind}}" on-value-changed="_assignCompKind"></normal-select>
+                </div>
+                <div class="form-group">
+                    <label for="bizSect">업종분류</label>
+                    <normal-select id="bizSect" items="{{_codes.bizSect}}" on-value-changed="_assignBizSect"></normal-select>
+                </div>
+                <div class="form-group">
+                    <label for="keyword">검색어</label>
+                    <normal-input id="keyword" placeholder="기업명/대표자명/사업자번호"></normal-input>
+                </div>
+                <paper-button class="header" on-tap="_onSearchTap">
+                    <iron-icon icon="search"></iron-icon>
+                    조회
+                </paper-button>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: "header-search",
+
+            behaviors: [PS.BehaviorPage],
+
+            properties: {
+                keyword: {
+                    type: String,
+                    value: ""
+                },
+                compKind: {
+                    type: String,
+                    value: ""
+                },
+                corpType: {
+                    type: String,
+                    value: ""
+                },
+                bizSect: {
+                    type: String,
+                    value: ""
+                },
+                order: {
+                    type: String,
+                    value: ""
+                },
+                _codes: {
+                    type: Object,
+                    value: function() {
+                        return {
+                            compKind: [],
+                            corpType: [],
+                            bizSect: [],
+                        };
+                    }
+                },
+            },
+
+            _onSearchTap: function() {
+                this.keyword = this.$.keyword.value;
+
+                this.fire("search");
+            },
+
+            _prependCompKind: function(e) {
+                this._prependSelectAll(e.target.lastResponse, "_codes.compKind");
+            },
+
+            _prependCorpType: function(e) {
+                this._prependSelectAll(e.target.lastResponse, "_codes.corpType");
+            },
+
+            _prependBizSect: function(e) {
+                this._prependSelectAll(e.target.lastResponse, "_codes.bizSect");
+            },
+
+            _assignCompKind: function(e) {
+                this.compKind = e.target.value;
+            },
+
+            _assignCorpType: function(e) {
+                this.corpType = e.target.value;
+            },
+
+            _assignBizSect: function(e) {
+                this.bizSect = e.target.value;
+            }
+        })
+    </script>
+</dom-module>

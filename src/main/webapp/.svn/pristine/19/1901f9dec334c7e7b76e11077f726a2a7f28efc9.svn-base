@@ -1,0 +1,112 @@
+<!-- <link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/app-route/app-route.html">
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="/bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="/bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html"> -->
+
+<!-- <link rel="import" href="../common/behavior-page.html" /> -->
+<link rel="import" href="kpi-info-dashboard.html" />
+<link rel="import" href="kpi-info-chart.html" />
+<link rel="import" href="kpi-info-grid.html" />
+
+<link rel="import" href="../style/common-style.html" />
+<link rel="import" href="../style/bootstrap-style.html" />
+
+<dom-module id="kpi-info">
+    <template>
+        <style include="common-style"></style>
+        <style include="bootstrap-style">
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+            }
+
+            .page-header {
+                display: flex;
+            }
+
+            .page-header h2 {
+                flex: 3;
+            }
+
+            .page-header paper-button {
+                margin-top: 20px;
+            }
+        </style>
+
+        <iron-ajax auto id="protocolGetInfo" url$="/api/corp/info/{{_id}}" headers='{"X-Requested-With": "XMLHttpRequest"}' method="post" content-type="application/json" last-response="{{_info}}" on-error="_redirectOnError"></iron-ajax>
+        <app-route route="{{route}}" pattern="/:id" data="{{routeData}}"></app-route>
+
+        <paper-card>
+            <div class="card-content">
+                <div class="page-header">
+                    <h2>개별기업 성과지표 <small>[[_info.corpNm]]</small></h2>
+                    <a href="/kpi/all"><paper-button>
+                        <iron-icon icon="toc"></iron-icon>목록
+                    </paper-button></a>
+                </div>
+
+                <paper-tabs selected="{{_tab}}" attr-for-selected="key" fallback-selection="dashboard">
+                    <paper-tab key="dashboard">대시보드</paper-tab>
+                    <paper-tab key="chart">주요 지표별 점수 분포 차트</paper-tab>
+                    <paper-tab key="grid">상세 지표별 점수표</paper-tab>
+                </paper-tabs>
+
+                <iron-pages id="ironPage" role="tab" selected="{{_tab}}" attr-for-selected="name" fallback-selection="dashboard" on-iron-select="_loadChart">
+                    <kpi-info-dashboard name="dashboard" corp-id="{{_id}}"></kpi-info-dashboard>
+                    <kpi-info-chart name="chart" corp-id="{{_id}}"></kpi-info-chart>
+                    <kpi-info-grid name="grid" corp-id="{{_id}}"></kpi-info-grid>
+                </iron-pages>
+            </div>
+        </paper-card>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'kpi-info',
+
+            behaviors: [PS.BehaviorPage],
+
+            properties: {
+                route: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    }
+                },
+                _kpi: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _id: Number,
+                _tab: {
+                    type: String,
+                    value: "dashboard"
+                },
+            },
+
+            observers: [
+                '_routeDataChanged(routeData.id)'
+            ],
+
+            _routeDataChanged: function(id) {
+                this._id = id;
+            },
+
+            _loadChart: function(e) {
+                var page = e.target.selectedItem;
+                page.loadChart = true;
+            },
+
+            refresh: function() {
+                this.$.ironPage.selectedItem.loadChart = true;
+            }
+        })
+    </script>
+</dom-module>

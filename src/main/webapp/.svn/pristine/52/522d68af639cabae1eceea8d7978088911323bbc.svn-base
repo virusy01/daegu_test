@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.13.4/jquery.mask.min.js"></script>
+
+    <script>
+        $(".money").mask("Z000,000,000,000,000,000", {
+            reverse: true,
+            translation: {
+                'Z': {
+                    pattern: /-/, optional: true,
+                    recursive: true
+                }
+            }
+        });
+
+       /* $('.money').mask('Z000,000,000,000,000,000', {
+            reverse: true,
+            translation: {
+                'Z':{
+                    pattern:/-/, optional:true
+                }
+            }
+        });*/
+    </script>
+
+
+</head>
+<body>
+<input id="negative" class="money" value="123456">
+</body>
+</html>

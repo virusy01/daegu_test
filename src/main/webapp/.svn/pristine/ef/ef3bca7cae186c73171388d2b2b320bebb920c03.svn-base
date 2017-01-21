@@ -1,0 +1,206 @@
+package com.sck.model;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class User implements UserDetails{
+	
+	private static final long serialVersionUID = -49192558206567400L;
+	
+	private int userSeq;
+	private String userId;
+	private String userNm;
+	@JsonIgnore
+	private String password;
+	private String email;
+	private String adminYn;
+	private String roleCd;
+	private Date modDt;
+	private Date creDt;
+	
+	private MenuHierarchy menus;
+	
+	@JsonIgnore
+	private Collection<? extends GrantedAuthority> authorities;
+	
+	@JsonIgnore
+	private final boolean accountNonExpired = true;
+	@JsonIgnore
+	private final boolean accountNonLocked = true;
+	@JsonIgnore
+	private final boolean credentialsNonExpired = true;
+	@JsonIgnore
+	private final boolean enabled = true;
+	
+	public Collection<? extends GrantedAuthority> getAuthorities(){
+		return authorities;
+	}
+	
+	public String getUsername(){
+		return userId;
+	}
+	
+	public boolean isAccountNonExpired()
+	{
+		return accountNonExpired;
+	}
+	public boolean isAccountNonLocked()
+	{
+		return accountNonLocked;
+	}
+	public boolean isCredentialsNonExpired()
+	{
+		return credentialsNonExpired;
+	}
+	public boolean isEnabled()
+	{
+		return enabled;
+	}
+	public void eraseCredentials() {
+		password = null;
+	}
+	
+	public int getUserSeq() {
+		return userSeq;
+	}
+	public void setUserSeq(int userSeq) {
+		this.userSeq = userSeq;
+	}
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	public String getUserNm() {
+		return userNm;
+	}
+	public void setUserNm(String userNm) {
+		this.userNm = userNm;
+	}
+	@JsonIgnore
+	public String getPassword() {
+		return password;
+	}
+	@JsonProperty
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public String getAdminYn() {
+		return adminYn;
+	}
+	public void setAdminYn(String adminYn) {
+		this.adminYn = adminYn;
+	}
+	public String getRoleCd()
+	{
+		return roleCd;
+	}
+
+	public void setRoleCd(String roleCd)
+	{
+		this.roleCd = roleCd;
+	}
+
+	public Date getModDt() {
+		return modDt;
+	}
+	public void setModDt(Date modDt) {
+		this.modDt = modDt;
+	}
+	public Date getCreDt() {
+		return creDt;
+	}
+	public void setCreDt(Date creDt) {
+		this.creDt = creDt;
+	}
+	
+	public MenuHierarchy getMenus()
+	{
+		return menus;
+	}
+	
+	public void toAuthority(List<MenuHierarchy> targets)
+	{
+		this.menus = new MenuHierarchy("ROOT");
+		this.menus.setUrl("/");
+		buildHierarchyMenu(this.menus, targets);
+		setFirstChild(this.menus);
+		Collection<GrantedAuthority> roles = new ArrayList<GrantedAuthority>();
+		for(MenuHierarchy m : targets)
+		{
+			roles.add(new MenuRole(m.getMenuCd()));
+		}
+		this.authorities = roles;
+	}
+	
+	private static synchronized void buildHierarchyMenu(MenuHierarchy parentMenu, List<MenuHierarchy> targets)
+	{
+		for(MenuHierarchy t : targets)
+		{
+			if(t.getParentMenuCd() != null && t.getParentMenuCd().equals(parentMenu.getMenuCd()))
+			{
+				if(parentMenu.getChildren() == null)
+				{
+					parentMenu.setChildren(new ArrayList<MenuHierarchy>());
+				}
+				parentMenu.getChildren().add(t);
+				if(parentMenu.getUrl() == null)
+				{
+					parentMenu.setUrl(t.getUrl());
+				}
+				buildHierarchyMenu(t, targets);
+			}
+		}
+	}
+	
+	//상위 메뉴의 URL이 null인경우 첫번째 URL이 있는 메뉴의 URL을 설정해준다.
+	private static synchronized void setFirstChild(MenuHierarchy parentMenu)
+	{
+		List<MenuHierarchy> topChilds = parentMenu.getChildren();
+		if(topChilds == null)
+		{
+			return;
+		}
+		for (MenuHierarchy top : topChilds)
+		{
+			setFirstChild(top);
+			if(parentMenu.getUrl() == null && top.getUrl() != null)
+			{
+				parentMenu.setUrl(top.getUrl());
+				parentMenu.setUrlParam(top.getUrlParam());
+				break;
+			}
+		}
+	}
+	@Override
+	public String toString()
+	{
+		return "User [userSeq=" + userSeq + ", userId=" + userId + ", userNm="
+				+ userNm + ", password=" + password + ", email=" + email
+				+ ", adminYn=" + adminYn + ", roleCd=" + roleCd + ", modDt="
+				+ modDt + ", creDt=" + creDt + ", authorities=" + authorities
+				+ ", accountNonExpired=" + accountNonExpired
+				+ ", accountNonLocked=" + accountNonLocked
+				+ ", credentialsNonExpired=" + credentialsNonExpired
+				+ ", enabled=" + enabled + "]";
+	}
+	
+	
+}

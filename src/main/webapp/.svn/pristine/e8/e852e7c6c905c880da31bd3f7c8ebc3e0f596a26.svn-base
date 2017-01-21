@@ -1,0 +1,203 @@
+<!--
+ * @Desc 포탈 매니저/팔레트 엘리먼트
+ * @Author patrick.sung
+ * @Created 2016-03-28
+ -->
+
+<link rel="import" href="../gp-sprite/gp-sprite.html"/>
+<link rel="import" href="../gp-styles/gp-common-style.html"/>
+<link rel="import" href="gp-portal-manager-style.html"/>
+
+<script src="../../assets/js/TweenLite.min.js"></script>
+<script src="../../assets/js/plugins/CSSPlugin.min.js"></script>
+<script src="../../assets/js/easing/EasePack.min.js"></script>
+
+<dom-module id="gp-portal-manager">
+    <template>
+        <style include="gp-common-style"></style>
+        <style include="gp-portal-manager-style">
+            :host {
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
+                z-index: 1000;
+            }
+
+            .components {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+
+            .scrollable {
+                position: relative;
+            }
+
+            .overflowLimit {
+                overflow-y: hidden;
+            }
+        </style>
+
+        <sc-ajax auto id="protocolLoadWidgetTypes" url="/gate/findComposableWidgetList.do" method="GET"
+                   handle-as="json" on-response="_onWidgetsLoaded"
+                   debounce-duration="300"></sc-ajax>
+
+        <div>
+            <button type=button class="hideBtn"><span class="blind">Button Hide</span></button>
+        </div>
+        <div style="display:none;">
+            <button type=button class="showBtn"><span class="blind">Button Show</span></button>
+        </div>
+        <div class="mgt15"></div>
+        <div class="btn_wrap">
+            <button type=button class="upperBtn" on-tap="_onUpperBtnTap"><span class="blind">Button Upper</span></button>
+        </div>
+        <ul id="sidebar" class="sidebar_wrap overflowLimit">
+
+            <div id="component_list" class="scrollable">
+                <template is="dom-repeat" items="[[widgets]]" as="component">
+                    <div class="sidebar_list">
+                        <gp-sprite on-drag="_onDrag" width="NaN"
+                                   height="NaN"
+                                   info$="[[component]]"
+                                   no-left-top-bound
+                                   no-right-bottom-bound class="components" prevent-selection>
+                            <div class="icon">
+                                <img src="[[component.icon_image]]" class="sidebar_ico">
+                                <span class="name">[[translate(component.label)]]</span>
+                            </div>
+                        </gp-sprite>
+                    </div>
+                </template>
+            </div>
+        </ul>
+        <div class="btn_wrap">
+            <button type=button class="lowerBtn" on-tap="_onlowerBtnTap"><span class="blind">Button Lower</span></button>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'gp-portal-manager',
+
+            properties: {
+                width: {
+                    type: String,
+                    value: '200',
+                    observer: '_widthChanged'
+                },
+                height: {
+                    type: String,
+                    value: '500',
+                    observer: '_heightChanged'
+                },
+                _zIndexIncrement: {
+                    type: Number,
+                    value: 0
+                }
+            },
+
+            attached: function () {
+                this.$.component_list.style.top = '0px';
+            },
+
+            _onUpperBtnTap: function (e) {
+                var y = parseInt(this.$.component_list.style.top, 10);
+
+                if (y - 64 >= -this.$.component_list.offsetHeight)
+                    TweenLite.to(this.$.component_list, 0.2, {top: y - 64, ease: Expo.easeOut});
+            },
+
+            _onlowerBtnTap: function (e) {
+                var y = parseInt(this.$.component_list.style.top, 10);
+
+                if (y + 64 <= 0)
+                    TweenLite.to(this.$.component_list, 0.2, {top: y + 64, ease: Expo.easeOut});
+            },
+
+            _onWidgetsLoaded: function (e) {
+                this.widgets = typeof e.target.lastResponse.baseAttr == "string" ? JSON.parse(e.target.lastResponse.baseAttr) : e.target.lastResponse.baseAttr;
+                this._zIndexIncrement = this.widgets.length;
+            },
+
+            _onDrag: function (e) {
+                if (e.detail.state == 'started') {
+                    this.toggleScrollable(false);
+                    this.morphObject(e);
+
+                    var portal = this.parentNode.querySelector('gp-portal');
+                    portal.toggleGrid(true);
+                } else if (e.detail.state == 'ended') {
+                    this.determineDrop(e);
+                    this.returnObjectToPosition(e);
+                }
+            },
+
+            morphObject: function (e) {
+                var component = e.target;
+                var info = JSON.parse(component.getAttribute('info'));
+
+                component.classList.remove('components');
+                component.classList.add('ghost');
+
+                var portal = this.parentNode.querySelector('gp-portal');
+
+                var scaledWidth = portal.doScaleWidth ? (info.width / portal.gridSize) * portal._gridWidth : info.width;
+                var scaledHeight = portal.doScaleHeight ? (info.height / portal.gridSize) * portal._gridHeight : info.height;
+
+                component.style.width = scaledWidth + 'px';
+                component.style.height = scaledHeight + 'px';
+                component.style.zIndex = this._zIndexIncrement++;
+            },
+
+            returnObjectToPosition: function (e) {
+                e.target.x = e.target.y = 0;
+                e.target.style.width = this.getComputedStyleValue('--component-width');
+                e.target.style.height = this.getComputedStyleValue('--component-height');
+                e.target.classList.remove('ghost');
+                e.target.classList.add('components');
+
+                this.toggleScrollable(true);
+            },
+
+            determineDrop: function (e) {
+                var portal = this.parentNode.querySelector('gp-portal');
+                var info = e.target.info;
+                info.x = e.detail.info.detail.x;
+                info.y = e.detail.info.detail.y;
+
+                if (portal.doScaleWidth)
+                    info.width = parseInt(e.target.style.width);
+
+                if (portal.doScaleHeight)
+                    info.height = parseInt(e.target.style.height);
+
+                if (e.target.hitTestTo(portal)) {
+                    portal.addWidget({
+                        info: e.target.info
+                    });
+                }
+            },
+
+            toggleScrollable: function (allow) {
+                if (allow) {
+                    this.$.sidebar.classList.add('overflowLimit');
+                    this.$.component_list.classList.add('scrollable');
+                } else {
+                    this.$.sidebar.classList.remove('overflowLimit');
+                    this.$.component_list.classList.remove('scrollable');
+                }
+
+            },
+
+            _widthChanged: function (value) {
+                this.style.width = value.indexOf('%') !== -1 ? value : value + 'px';
+            },
+
+            _heightChanged: function (value) {
+                this.style.height = value.indexOf('%') !== -1 ? value : value + 'px';
+            }
+        })
+    </script>
+</dom-module>

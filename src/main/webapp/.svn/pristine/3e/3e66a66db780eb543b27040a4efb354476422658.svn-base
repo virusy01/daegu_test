@@ -1,0 +1,296 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/app-route/app-location.html">
+<link rel="import" href="/bower_components/app-route/app-route.html">
+<link rel="import" href="/bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="/bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="/bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="/bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="/bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="/bower_components/app-layout/app-toolbar/app-toolbar.html">
+
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input.html" />
+<link rel="import" href="/bower_components/paper-fab/paper-fab.html" />
+<link rel="import" href="/bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="/bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="/bower_components/paper-dialog/paper-dialog.html" />
+<link rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html" />
+<link rel="import" href="/bower_components/paper-radio-group/paper-radio-group.html" />
+<link rel="import" href="/bower_components/paper-radio-button/paper-radio-button.html" />
+<link rel="import" href="/bower_components/paper-checkbox/paper-checkbox.html" />
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html" />
+<link rel="import" href="/bower_components/paper-spinner/paper-spinner.html" />
+
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="/bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/iron-image/iron-image.html" />
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+<link rel="import" href="/bower_components/iron-icons/av-icons.html" />
+<link rel="import" href="/bower_components/iron-icons/social-icons.html" />
+<link rel="import" href="/bower_components/iron-form/iron-form.html" />
+<link rel="import" href="/bower_components/iron-meta/iron-meta.html" />
+<link rel="import" href="/bower_components/iron-validatable-behavior/iron-validatable-behavior.html" />
+<link rel="import" href="/bower_components/iron-form-element-behavior/iron-form-element-behavior.html" />
+<link rel="import" href="/bower_components/iron-overlay-behavior/iron-overlay-behavior.html" />
+<link rel="import" href="/bower_components/iron-image/iron-image.html" />
+<link rel="import" href="/bower_components/iron-signals/iron-signals.html" />
+
+<link rel="import" href="/bower_components/neon-animation/animations/fade-in-animation.html" />
+<link rel="import" href="/bower_components/neon-animation/animations/fade-out-animation.html" />
+
+<link rel="import" href="/bower_components/vaadin-icons/vaadin-icons.html" />
+
+<link rel="import" href="common/number-input.html" />
+<link rel="import" href="common/dialog-alert.html" />
+<link rel="import" href="common/date-input.html" />
+<link rel="import" href="common/behavior-page.html" />
+<link rel="import" href="common/loading-overlay.html" />
+<link rel="import" href="common/header-search.html" />
+<link rel="import" href="common/normal-select.html" />
+<link rel="import" href="common/normal-input.html" />
+
+<link rel="import" href="px-data-table/px-data-table.html" />
+<link rel="import" href="px-data-table/px-data-table-column.html" />
+
+<link rel="import" href="style/common-style.html" />
+<link rel="import" href="style/bootstrap-style.html" />
+<link rel="import" href="style/c3-chart-style.html" />
+
+<dom-module id="sck-app">
+
+    <template>
+        <style include="common-style"></style>
+        <style include="bootstrap-style">
+            :host {
+                display: block;
+                --app-primary-color: #4285f4;
+                --app-secondary-color: black;
+                --app-drawer-content-container: {
+                    background-color: #B0BEC5;
+                }
+                --paper-menu-background-color: #B0BEC5;
+                --app-toolbar-font-size: 11px;
+                --paper-item-focused-before: {
+                    opacity: 0;
+                }
+            }
+
+            app-header {
+                background-color: var(--app-primary-color);
+                color: #fff;
+            }
+
+            app-header paper-button {
+                color: white;
+                background-color: inherit;
+                border-color: rgba(255, 255, 255, 0.3);
+            }
+
+            paper-menu {
+                padding: 0;
+            }
+
+            .drawer-list a {
+                display: block;
+                padding: 0 16px;
+                line-height: 40px;
+                text-decoration: none;
+                color: var(--app-secondary-color);
+                border-bottom: 1px solid #869ca7;
+            }
+
+            .drawer-list a.iron-selected {
+                color: black;
+                font-weight: normal !important;
+                background-color: #eee !important;
+            }
+
+            .drawer-list a.iron-selected:after {
+                background: none !important;
+            }
+
+            .drawer-list a.subroute {
+                padding-left: 32px;
+            }
+
+            app-toolbar div[title] {
+                font-size: 15px;
+            }
+
+            app-toolbar div[spacer] {
+                margin-left: 15px !important;
+            }
+
+            app-drawer app-toolbar {
+                background-color: #286de1;
+            }
+
+            paper-menu {
+                font-size: 13px;
+            }
+
+            iron-icon {
+                margin-right: 5px;
+            }
+
+            .submenu paper-item {
+                display: inline;
+            }
+
+            .submenu paper-item:before {
+                padding-left: 20px;
+            }
+
+            .submenu a {
+                padding-left: 30px;
+            }
+
+            paper-submenu paper-menu {
+                padding: 0 !important;
+            }
+
+            @media (max-width: 750px) {
+                .loginInfo {
+                    display: none;
+                }
+            }
+        </style>
+
+        <iron-ajax auto id="protocolGetUserInfo" url="/api/user" headers='{"X-Requested-With": "XMLHttpRequest"}' method="GET" content-type="application/json" last-response="{{_user}}" on-error="_redirectOnError"></iron-ajax>
+
+        <app-location route="{{route}}"></app-location>
+        <app-route route="{{route}}" pattern="/:path" data="{{routeData}}" tail="{{subroute}}"></app-route>
+
+        <app-drawer-layout fullbleed>
+            <app-drawer>
+                <app-toolbar>
+                    <iron-image src="/images/logo.png"></iron-image>
+                </app-toolbar>
+                <iron-selector selected="[[_path]]" attr-for-selected="name" class="drawer-list" role="navigation">
+                    <paper-menu>
+                        <template is="dom-repeat" items="{{_user.menus.children}}" as="mainMenu">
+                            <template is="dom-if" if="{{_notHaveSubmenu(mainMenu)}}">
+                                <a href="[[mainMenu.url]]">
+                                    <paper-item>
+                                        <iron-icon icon="[[mainMenu.menuIco]]"></iron-icon>
+                                        [[mainMenu.menuNm]]
+                                    </paper-item>
+                                </a>
+                            </template>
+                            <template is="dom-if" if="{{_hasSubmenu(mainMenu)}}">
+                                <paper-submenu opened>
+                                    <paper-item class="menu-trigger">
+                                        <a href="[[mainMenu.url]]">
+                                            <iron-icon icon="[[mainMenu.menuIco]]"></iron-icon>
+                                            [[mainMenu.menuNm]]
+                                        </a>
+                                    </paper-item>
+                                    <paper-menu class="menu-content submenu">
+                                        <template is="dom-repeat" items="[[mainMenu.children]]" as="subMenu">
+                                            <a href="[[subMenu.url]]">
+                                                <paper-item>
+                                                    <iron-icon icon="[[subMenu.menuIco]]"></iron-icon>
+                                                    [[subMenu.menuNm]]
+                                                </paper-item>
+                                            </a>
+                                        </template>
+                                    </paper-menu>
+                                </paper-submenu>
+                            </template>
+                        </template>
+                    </paper-menu>
+                </iron-selector>
+            </app-drawer>
+
+            <app-header-layout has-scrolling-region>
+                <app-header condenses reveals fixed effects="waterfall">
+                    <app-toolbar>
+                        <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
+                        <div title>사회적기업 성과관리시스템</div>
+                        <div class="loginInfo">
+                            [[_user.userNm]]님 로그인중입니다
+                        </div>
+                        <div spacer></div>
+                        <paper-button on-tap="_logout">
+                            <iron-icon icon="exit-to-app"></iron-icon>
+                            Logout
+                        </paper-button>
+                    </app-toolbar>
+                </app-header>
+
+                <iron-pages role="main" selected="[[_path]]" attr-for-selected="id" fallback-selection="summary">
+                    <group-general id="general" route="{{subroute}}"></group-general>
+                    <group-kpi id="kpi" route="{{subroute}}"></group-kpi>
+                    <group-summary id="summary" route="{{subroute}}"></group-summary>
+                    <group-corp id="corp" route="{{subroute}}"></group-corp>
+                    <group-user id="user" route="{{subroute}}"></group-user>
+                    <group-menu id="menu" route="{{subroute}}"></group-menu>
+                    <group-role id="role" route="{{subroute}}"></group-role>
+                    <group-dashboard id="dashboard" route="{{subroute}}"></group-dashboard>
+                </iron-pages>
+
+            </app-header-layout>
+
+        </app-drawer-layout>
+
+        <!-- <loading-overlay no-cancel-on-esc-key no-cancel-on-outside-click always-on-top with-backdrop></loading-overlay> -->
+
+    </template>
+
+    <script>
+        Polymer({
+
+            is: 'sck-app',
+
+            behaviors: [PS.BehaviorPage],
+
+            properties: {
+                _path: {
+                    type: String,
+                    observer: '_pageChanged'
+                },
+                id: {
+                    type: String
+                },
+                _user: {
+                    type: Object
+                },
+                _menus: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    }
+                }
+            },
+
+            observers: [
+                '_routePageChanged(routeData.path)'
+            ],
+
+            _routePageChanged: function(path) {
+                this._path = path || 'summary';
+            },
+
+            _pageChanged: function(path) {
+                this.importHref(this.resolveUrl("group-" + path + '.html'), null, null, true);
+            },
+
+            _logout: function() {
+                location.href = "/logout";
+            },
+
+            _notHaveSubmenu: function(menu) {
+                return menu.children && menu.children.length > 0 ? false : true;
+            },
+
+            _hasSubmenu: function(menu) {
+                return menu.children && menu.children.length > 0 ? true : false;
+            },
+        });
+    </script>
+
+</dom-module>

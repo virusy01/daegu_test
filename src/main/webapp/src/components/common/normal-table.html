@@ -1,0 +1,101 @@
+<link rel="import" href="/bower_components/iron-location/iron-location.html">
+
+<dom-module id="normal-table">
+<template>
+	<iron-location id="location"></iron-location>
+
+	<table id="table" class="table table-bordered table-hover">
+		<thead>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+
+	<div class="row">
+		<div class="col-xs-12">
+		</div>
+	</div>
+</template>
+<script>
+Polymer({
+	is: 'normal-table',
+
+	properties: {
+		data: {
+			type: Array,
+			value: function() {
+				return [];
+			}
+		},
+		headerLabels: {
+			type: Object,
+			value: function() {
+				return {};
+			}
+		},
+		linkUrl: String,
+		_isAttached: {
+			type: Boolean,
+			value: false
+		},
+	},
+
+	observers: [
+		'_drawTable(_isAttached, data, headerLabels)'
+	],
+
+	attached: function() {
+		this._isAttached = true;
+	},
+
+	_drawTable: function() {
+		this._drawHeader();
+		this._drawBody();
+	},
+
+	_drawHeader: function() {
+		var head = this.$.table.querySelector('thead');
+		var tr, th, td;
+
+		Polymer.dom(head).innerHTML = '';
+
+		tr = document.createElement('tr');
+		Polymer.dom(head).appendChild(tr);
+
+		for (var key in this.headerLabels) {
+			th = document.createElement('th');
+
+			Polymer.dom(th).innerHTML = this.headerLabels[key];
+			Polymer.dom(tr).appendChild(th);
+		}
+	},
+
+	_drawBody: function() {
+		var body = this.$.table.querySelector('tbody');
+		var tr, td;
+
+		for (var row in this.data) {
+			tr = document.createElement('tr');
+			tr.setAttribute('class', 'cursor-pointer');
+			tr.setAttribute('data-id', this.data[row]['CORP_SEQ']);
+			this.listen(tr, 'tap', '_gotoURL');
+
+			for (var key in this.headerLabels) {
+				td = document.createElement('td');
+				
+				Polymer.dom(td).innerHTML = this.data[row][key];
+				Polymer.dom(tr).appendChild(td);
+			}
+			Polymer.dom(body).appendChild(tr);
+		}
+	},
+
+	_gotoURL: function(e) {
+		var id = e.currentTarget.getAttribute('data-id');
+
+		this.$.location.path = this.linkUrl + id;
+		
+	},
+});
+</script>
+</dom-module>

@@ -1,0 +1,135 @@
+<?php
+session_start();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>광명시 사회적기업 성과관리시스템</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="./bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- MetisMenu CSS -->
+    <link href="./bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="./dist/css/sb-admin-2.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="./bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- jQuery -->
+    <script src="./bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="./js/jquery.cookie.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="./bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="./bower_components/metisMenu/dist/metisMenu.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="./dist/js/sb-admin-2.js"></script>
+
+
+    <script>
+        function login(){
+            var form  = document.form;
+            var param = $(form).serialize();
+            var options = {
+                cache: true,
+                url:"./php/login.php",
+                data: param,
+                type: "post",
+                dataType: "json",
+                success: function (result) {
+                    if (result.result == "OK") {
+                        if ($("input:checkbox[name='remember']").is(":checked")){
+                            $.cookie("userId", $("#userId").val(), {expires:9999});
+                        }
+                        else{
+                            $.removeCookie('userId');
+                        }
+                        window.location.href = "pages/corp_sum_view.php";
+                    } else {
+                        $("#loginResult").text("ID 혹은 패스워드가 정확하지 않습니다.");
+                    }
+                }
+            };
+
+            $.ajax(options);
+        }
+
+        $(document).ready(function () {
+            if ($.cookie("userId")){
+                $("input:checkbox[name='remember']").attr("checked", true);
+                $("#userId").val($.cookie("userId"));
+            }
+            else{
+                $("input:checkbox[name='remember']").attr("checked", false);
+            }
+        });
+
+    </script>
+
+</head>
+
+<body>
+<div class="login_title" style="padding: 20px 20px 60px 20px">
+    <img src="./images/login_logo.png"/></br>
+    <span style="color: #ffffff; font-size: 16px;">광명시 사회적기업 성과관리시스템</span>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <div class="panel01 panel-chart">
+                <div class="panel01-heading">
+                    LOGIN
+                </div>
+                <div class="panel01-body">
+                    <form role="form" name="form" onsubmit="return false;">
+                        <fieldset>
+                            <div class="form-group">
+                                <input id="userId" class="form-control" placeholder="아이디" name="id" type="email" autofocus onkeyup="if (event.keyCode == 13) {login();}">
+                            </div>
+                            <div class="form-group">
+                                <input class="form-control" placeholder="비밀번호" name="password" type="password" value="" onkeyup="if (event.keyCode == 13) {login();}">
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input name="remember" type="checkbox" value="Remember Me">ID 저장
+                                </label>
+                            </div>
+                            <!-- Change this to a button or input when using this as a form -->
+                            <div>
+                                <a href="javascript:;" class="btn btn-lg btn-success btn-block" onclick="login()">ID 저장</a>
+                            </div>
+                            <div style="padding: 10px 10px 10px; color: #FF7F55;">
+                                <span id="loginResult"></span>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>

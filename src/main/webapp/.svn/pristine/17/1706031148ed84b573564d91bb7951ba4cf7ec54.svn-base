@@ -1,0 +1,143 @@
+/**
+ * Created by jwm_000 on 2015-10-11.
+ */
+var Pagenator = (function (window, $, undefined){
+
+    var pageAnchorCount = 10;
+    var pageRowCount = 10;
+    var currentPageNo = 1;
+
+    var onStyle = {
+        "color":"#3a4989",
+        "font-weight":"bold",
+        "padding":"0 8px"
+    };
+
+    var offStyle = {
+        "color":"#333",
+        "font-weight":"normal",
+        "padding":"0 8px"
+    }
+
+    function Pagenator(){
+        this.options = {};
+
+        this.initialized = false;
+
+        this.initialize = function (){
+            this.initialized = true;
+            var options = this.options;
+            $("#" + options.anchorPrevGroupId).on("click", $.proxy(gotoPrevPageGroup, this))
+            $("#" + options.anchorNextGroupId).on("click", $.proxy(gotoNextPageGroup, this));
+        }
+
+        this.draw = function() {
+            var options = this.options;
+            var totalRowCount = options.totalRowCount;
+            if (!options.pageAnchorCount) {
+                options.pageAnchorCount = pageAnchorCount;
+            }
+            var pageAnchorCount = options.pageAnchorCount;
+
+            if (!options.pageRowCount) {
+                options.pageRowCount = pageRowCount;
+            }
+            var pageRowCount = options.pageRowCount;
+
+            if (!options.currentPageNo) {
+                options.currentPageNo = currentPageNo;
+            }
+            var currentPageNo = options.currentPageNo;
+
+            var anchorGroupId = options.anchorGroupId;
+            var anchorPrevGroupId = options.anchorPrevGroupId;
+            var anchorNextGroupId = options.anchorNextGroupId;
+
+            if (!this.initialized){
+                this.initialize();
+            }
+
+            var pageCnt = Math.ceil(totalRowCount / pageRowCount);
+
+            // 현재 페이지가 10 이하이면 '<<' 안보이게
+            if (currentPageNo <= pageAnchorCount) {
+                $("#" + anchorPrevGroupId).css("display", "none");
+                if (pageRowCount == 0) {
+                    $("#" + anchorNextGroupId).css("display", "none");
+                }
+            }
+            else {
+                $("#" + anchorPrevGroupId).css("display", "");
+            }
+
+            // 현재 페이지가 Math.ceil((totalRowCnt / pageRowCnt) / 10) * 10) 보다 작으면 '>>' 안보이게 ==> 마지막 페이지 그룹
+            if (currentPageNo > Math.floor((pageCnt - 1) / pageAnchorCount) * pageAnchorCount && currentPageNo <= Math.ceil(pageCnt / pageAnchorCount) * pageAnchorCount) {
+                $("#" + anchorNextGroupId).css("display", "none");
+            }
+            else {
+                $("#" + anchorNextGroupId).css("display", "");
+            }
+
+
+            var i;
+            var anchorGroup = $("#" + anchorGroupId);
+            anchorGroup.children("a").remove();
+
+            var startPage = Math.floor((currentPageNo - 1) / pageAnchorCount) * pageAnchorCount + 1;
+
+            for (i = startPage; i < startPage + pageAnchorCount && i <= pageCnt; i++) {
+                anchorGroup.append("<a href='javascript:;'>" + i + "</a>");
+                var anchors = anchorGroup.children();
+                var pageAnchor = $(anchors[anchors.size() - 1]);
+
+                if (i == currentPageNo) {
+                    pageAnchor.css(onStyle);
+                } else {
+                    pageAnchor.css(offStyle);
+                }
+                pageAnchor.on("click", $.proxy(gotoPage, this));
+            }
+        };
+
+        function gotoPage(event){
+            var a = event.currentTarget;
+            var clickedPage = $(a).text();
+
+            if (clickedPage == this.options.currentPageNo){
+                return;
+            }
+
+            $("#" + this.options.anchorGroupId).children("a").css(offStyle);
+            $(a).css(onStyle);
+            this.options.currentPageNo = $(a).text();
+
+            if (this.options.onPageClick){
+                this.options.onPageClick(clickedPage);
+            }
+        }
+
+        function gotoPrevPageGroup(event){
+            var prevPageGroupStart = Math.floor((this.options.currentPageNo-1 - this.options.pageAnchorCount) / this.options.pageAnchorCount) * this.options.pageAnchorCount + 1;
+            this.options.currentPageNo = prevPageGroupStart + this.options.pageAnchorCount -1;
+
+            if (this.options.onPageClick){
+                this.options.onPageClick(prevPageGroupStart);
+            }
+
+            this.draw();
+        }
+
+        function gotoNextPageGroup(event){
+            var nextPageGroupStart = Math.floor((this.options.currentPageNo-1 + this.options.pageAnchorCount) / this.options.pageAnchorCount) * this.options.pageAnchorCount + 1;
+            this.options.currentPageNo = nextPageGroupStart;
+
+            if (this.options.onPageClick){
+                this.options.onPageClick(nextPageGroupStart);
+            }
+
+            this.draw();
+        }
+    }
+
+    return Pagenator;
+})(window, jQuery, undefined);

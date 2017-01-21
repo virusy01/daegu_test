@@ -1,0 +1,110 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/vaadin-grid/vaadin-grid.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/vaadin-combo-box/vaadin-combo-box.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+<link rel="import" href="/bower_components/paper-fab/paper-fab.html" />
+
+<link rel="import" href="/elements/common/header-search.html" />
+
+<dom-module id="biz-list">
+    <template>
+        <style>
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+                --paper-button: {
+                    background-color: #ff6138;
+                    color: white;
+                }
+            }
+        </style>
+
+        <iron-ajax id="protocolGetBiz" url="/api/corp/info/find/" method="post" content-type="application/json" last-response="{{_bizList}}"></iron-ajax>
+
+        <h1>기업 및 성과지표 등록</h1>
+
+        <header-search id="searchForm" on-search="_search"></header-search>
+
+        <paper-card elevation="1">
+            <div class="card-content">
+                <vaadin-grid id="tableBiz" items="{{_bizList}}" on-selected-items-changed="_onGridSelect">
+                    <table>
+                        <colgroup>
+                            <col name="corpNm" />
+                            <col name="ceoNm" />
+                            <col name="bizNo" sortable />
+                            <col name="corpTypeNm" />
+                            <col name="compKindNm" />
+                            <col name="bizSectNm" />
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>
+                                    기업명
+                                </th>
+                                <th>
+                                    대표자명
+                                </th>
+                                <th>
+                                    사업자번호
+                                </th>
+                                <th>
+                                    법인형태
+                                </th>
+                                <th>
+                                    기업분류
+                                </th>
+                                <th>
+                                    사업 업종
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </vaadin-grid>
+            </div>
+        </paper-card>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: "biz-list",
+
+            properties: {
+                _bizList: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                }
+            },
+
+            ready: function() {
+                this._search();
+            },
+
+            _search: function() {
+                this.$.protocolGetBiz.body = {
+                    corpType: this.$.searchForm.corpType,
+                    compKind: this.$.searchForm.compKind,
+                    bizSect: this.$.searchForm.bizSect,
+                    corpNm: this.$.searchForm.keyword
+                };
+
+                this.$.protocolGetBiz.generateRequest();
+            },
+
+            _onGridSelect: function(e) {
+                if (e.currentTarget.selection.size > 0) {
+                    var selectedIndex = e.currentTarget.selection.selected();
+                    var data = this._bizList[selectedIndex];
+                    location.href = "/biz-detail/" + data.corpSeq;
+                }
+            },
+        })
+    </script>
+</dom-module>

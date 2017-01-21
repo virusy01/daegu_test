@@ -1,0 +1,759 @@
+<?php
+require(dirname(__FILE__) . "/session_check.php");
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>광명시 사회적기업 성과관리시스템</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- MetisMenu CSS -->
+    <link href="../bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
+    <link href="../dist/css/parsley.css" rel="stylesheet">
+
+
+    <!-- Custom Fonts -->
+    <link href="../bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <style>
+
+        .barNum {
+            font-size: 9pt;
+            text-anchor: middle;
+        }
+
+        .axis text {
+            font-family: sans-serif;
+            font-size: 11px;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: black;
+        }
+
+        .category {
+            font-size: 12pt;
+            text-anchor: middle;
+        }
+
+        .tip {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            z-index: 9999;
+            visibility: hidden;
+            border: 1px solid #666666;
+            background-color: #FFFFD4;
+            overflow: hidden;
+            padding: 8px;
+            text-align: left;
+            font-size: 9pt;
+            color: #111111;
+            border-radius: 4px;
+        }
+
+        .nav-tabs2 {
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .nav-tabs2 > li {
+            float: left;
+            margin-bottom: -1px;
+        }
+
+        .nav-tabs2 > li > a {
+            margin-right: 0px;
+            line-height: 1.42857143;
+            border: 0px solid transparent;
+            border-radius: 0px 0px 0 0;
+            background-color: transparent;
+            font-size: 13px;
+            color: #5c5c5c;
+        }
+
+        .nav-tabs2 > li > a:hover {
+            border-color: #eee #eee #ddd;
+            background-color: #eee;
+            border: 0px solid #ddd;
+        }
+
+        .nav-tabs2 > li > a:focus {
+            color: #555;
+            cursor: default;
+            background-color: #fff;
+            border: 0px solid #ddd;
+            border-bottom-color: transparent;
+        }
+
+        .nav-tabs2 > li.active > a,
+        .nav-tabs2 > li.active > a:hover,
+        .nav-tabs2 > li.active > a:focus {
+            color: #fff;
+            cursor: default;
+            background-color: #46b8da;
+            border: 0px solid #ddd;
+            border-bottom-color: transparent;
+            font-size: 13px;
+            font-family: 'NanumBarunGothicBold', sans-serif;
+        }
+
+
+    </style>
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../js/jquery-1.11.1.min.js"></script>
+    <script src="../js/jquery.form.min.js"></script>
+    <script src="../js/jsrender.min.js"></script>
+    <script src="../js/accounting.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../dist/js/sb-admin-2.js"></script>
+    <script src="../js/parsley.min.js"></script>
+    <script src="../js/i18n/ko.js"></script>
+    <script src="../js/jquery.mask.min.js"></script>
+    <script src="../js/jquery.inputmask.bundle.js"></script>
+
+    <script src="./common_js/SelectBuilder.js"></script>
+    <script src="../js/Pagenator.js"></script>
+    <script src="my_js/corp_info_add.js"></script>
+
+</head>
+
+<body>
+
+
+<div id="wrapper">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="corp_sum_view.php"><img src="../images/logo.png"/></a>
+
+            <p class="top_title">광명시 사회적기업 성과관리시스템</p>
+        </div>
+        <!-- /.navbar-header -->
+        <a href="javascript:window.location.href='../php/logout.php';">
+            <button type="button" class="btn btn-outline btn-primary btn-xs"><i class="fa fa-power-off fa-fw"></i>
+                LOGOUT
+            </button>
+        </a>
+
+        <div class="top_admin"><?=$_SESSION['USER_NM']?>님 로그인중입니다.</div>
+
+
+        <div class="navbar-default sidebar" role="navigation">
+            <div class="sidebar-nav navbar-collapse">
+                <ul class="nav" id="side-menu">
+                    <li>
+                        <a href="javascript:;" onclick="window.location.href='corp_info_view.php'"><i
+                                class="fa fa-book fa-fw"></i> 기업일반정보 조회</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" onclick="window.location.href='corp_kpi_view.php'"><i
+                                class="fa fa-bar-chart-o fa-fw"></i> 개별기업 성과지표 조회</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" onclick="window.location.href='corp_sum_view.php'"><i
+                                class="fa fa-file-text fa-fw"></i> 전체 성과지표 조회</a>
+                    </li>
+                    <li class="active">
+                        <a href="javascript:;"><i class="fa fa-file-text fa-fw"></i>관리자<span
+                                class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level">
+                            <li>
+                                <a href="javascript:;" class="active">기업 및 성과지표 등록</a>
+                            </li>
+                            <li>
+                                <a href="javascript:;" onclick="window.location.href='users_view.php'">사용자 등록</a>
+                            </li>
+
+                        </ul>
+                        <!-- /.nav-second-level -->
+                    </li>
+                </ul>
+            </div>
+            <!-- /.sidebar-collapse -->
+        </div>
+        <!-- /.navbar-static-side -->
+    </nav>
+
+    <!-- Page Content -->
+    <div id="page-wrapper">
+        <div id="corpList" class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3 class="page-header">기업 및 성과지표 등록</h3>
+                </div>
+                <div class="col-lg-12">
+                    <div class="panel02 panel-grid">
+                        <div class="panel02-heading">
+                            조회
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel02-body">
+                            <form name="commonForm">
+                                <input type="hidden" name="corpSeq" value="0"/>
+                                <input type="hidden" name="pageRowCount"/>
+                                <input type="hidden" name="pageNo"/>
+
+                                <div class="panel_search panel-search">
+                                    <div class="panel_search-body" style="height:auto">
+                                        <div class="search_box">
+                                            <div class="form-group">
+                                                <label>기업명/대표자명/사업자번호</label>
+                                                <input class="form-control01"
+                                                       placeholder="기업명, 대표자명, 사업자번호 중 한가지를 입력하세요." name="corpNm">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label>기업분류</label>
+                                                <select id="selCompKind" name="compKind" class="form-control01">
+
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="search_box_right">
+
+                                            <div class="form-group">
+                                                <label>법인형태</label>
+                                                <select id="selCorpType" name="corpType" class="form-control01">
+
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>업종분류</label>
+                                                <select id="selBizSect" name="bizSect" class="form-control01">
+
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <button id="btnSearch" type="button" class="btn btn-primary">&nbsp;&nbsp;<i
+                                                class="fa fa-search fa-fw"></i> 조회&nbsp;&nbsp;&nbsp;</button>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="search_box_right" style="text-align: right; margin-bottom: 8px">
+                                <button id="btnCorpAdd" type="button" class="btn btn-outline btn-info"
+                                        style="margin-bottom: 8px">&nbsp;기업 일반정보 등록&nbsp;</button>
+                            </div>
+
+                            <div class="dataTable_wrapper">
+                                <table id="grid" class="table table-striped table-bordered table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>기업명</th>
+                                        <th>대표자명</th>
+                                        <th>법인형태</th>
+                                        <th>기업분류</th>
+                                        <th>사업업종</th>
+                                        <th>성과 및 부가정보 등록</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- Pagenation -->
+                            <div id="pagenum" class="pagenum">
+                                <a id="prevPageGroup" href="javascript:;" class="n" style="display:none"><<</a>
+                                    <span id="pageIndex">
+
+                                    </span>
+                                <a id="nextPageGroup" href="javascript:;" class="n" style="display:none">>></a>
+                            </div>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container-fluid -->
+        <div id="corpDetail" class="container-fluid" style="display:none;">
+
+            <div class="row">
+                <div class="col-lg-12">
+
+                    <h3 id="corpDetailHeader" class="page-header">기업현황 – ㈜나비프로젝트</h3>
+
+                    <div style="text-align: right">
+                        <a id="btnGoBack2" href="javascript:;" class="btn btn-outline btn-info"
+                           style="margin-right: 10px"><i class="fa fa-long-arrow-left fa-fw"></i>&nbsp;뒤로가기</a>
+                        <button id="btnCorpSave" type="button" class="btn btn-primary" style="margin-bottom: 15px; margin-right:10px">
+                            &nbsp;저장&nbsp;</button>
+                        <button id="btnCorpDel" type="button" class="btn btn-primary" style="margin-bottom: 15px; display:none;">
+                            &nbsp;삭제&nbsp;</button>
+                    </div>
+                </div>
+
+                <div class="col-lg-12">
+                    <div class="panel002 panel-grid">
+
+                        <!-- /.panel-heading -->
+                        <form name="detailForm" onsubmit="return false;">
+                            <input type="hidden" name="corpSeq">
+
+                            <div class="panel002-body">
+                                <div class="table-responsive">
+                                    <h4>일반사항</h4>
+                                    <table id="tblCorpInfo" class="table table-bordered">
+
+                                        <tbody>
+                                        <tr>
+                                            <td style="text-align:center; background-color:#f1f1f1;width:12%">기업명</td>
+                                            <td style="text-align:left"><input class="form-control01" type="text"
+                                                                               data-parsley-required
+                                                                               name="corpNm" value="{{:CORP_NM}}"></td>
+                                            <td style="text-align:center; background-color:#f1f1f1;width:12%">사업개시일</td>
+                                            <td style="text-align:left;"><input class="form-control01 date" type="text"
+                                                                                data-parsley-trigger="keyup"
+                                                                                data-parsley-date
+                                                                                data-parsley-required
+                                                                                name="bizDt" value="{{:BIZ_DT}}"></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align:center; background-color:#f1f1f1;;width:12%">대표자</td>
+                                            <td style="text-align:left"><input class="form-control01" type="text"
+                                                                               data-parsley-required
+                                                                               name="ceoNm" value="{{:CEO_NM}}"></td>
+                                            <td style="text-align:center; background-color:#f1f1f1;width:12%">사업자번호</td>
+                                            <td style="text-align:left;"><input class="form-control01 biz_no" type="text"
+                                                                                name="bizNo" value="{{:BIZ_NO}}"></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align:center; background-color:#f1f1f1;width:12%">법인형태</td>
+                                            <td style="text-align:left">
+                                                <div style="float:left; width:40%">
+                                                    <select id="selCorpType2" name="corpType" class="form-control01">
+                                                    </select>
+                                                </div>
+                                                <div id="txtCorpType2" style="float:left; display: none; margin-left: 10px">
+                                                    직접 입력 : <input type="text" name="corpType2" class="form-control01" style="width: 140px">
+                                                </div>
+                                            </td>
+                                            <td style="text-align:center; background-color:#f1f1f1;width:12%">기업분류</td>
+                                            <td style="text-align:left"><select id="selCompKind2" name="compKind"
+                                                                                class="form-control01">
+                                                </select></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align:center; background-color:#f1f1f1">사업업종</td>
+                                            <td colspan="5" style="text-align:left">
+                                                <div style="float:left; width:40%" >
+                                                    <select id="selBizSect2" name="bizSect" class="form-control01">
+                                                    </select>
+                                                </div>
+                                                <div id="txtBizSect2" style="float:left; display: none; margin-left: 10px">
+                                                    직접 입력 : <input type="text" name="bizSect2" class="form-control01" style="width:200px">
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <div id="ifSoc" style="display: none;">
+                                        <h4>사회적기업일 경우</h4>
+                                        <table id="tblSocInfo" class="table table-bordered">
+                                            <tbody>
+                                            <tr>
+                                                <td style="text-align:center; background-color:#f1f1f1;width:13%">사회적기업 유형
+                                                </td>
+                                                <td style="text-align:left"><select id="selSocType2" name="socType"
+                                                                                    class="form-control01">
+                                                    </select></td>
+                                                <td style="text-align:center; background-color:#f1f1f1;width:12%">인증만료일</td>
+                                                <td style="text-align:left"><input class="form-control01 date" type="text"
+                                                                                   name="socCertEndDt"
+                                                                                   data-parsley-date
+                                                                                   value="{{:SOC_CERT_END_DT}}"></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <!-- /.panel-body -->
+                </div>
+            </div>
+
+        </div>
+
+        <div id="corpDetail2" class="container-fluid" style="display:none;">
+            <div class="row">
+                <div class="col-lg-12">
+
+                    <h3 id="corpDetail2Header" class="page-header">성과 및 기타정보 등록</h3>
+                    <div style="text-align: right">
+                        <a id="btnGoBack3" href="javascript:;" class="btn btn-outline btn-info"><i class="fa fa-long-arrow-left fa-fw"></i>&nbsp;뒤로가기</a>
+                    </div>
+                    <div style="background-color:#fff">
+                        <ul id="navTabCorp" class="nav nav-tabs2">
+                            <li class="active"><a data-page="kpi" href="#">성과지표</a></li>
+                            <li><a href="#" data-page="finance">재정현황</a></li>
+                            <li><a href="#" data-page="help">외부지원사항</a></li>
+                            <li><a href="#" data-page="employee">고용현황</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 성과 지표 -->
+                <div id="kpi" class="col-lg-12">
+                    <div class="panel02 panel-grid">
+
+                        <form name="frmDepth2" onsubmit="return false;"  data-parsley-validate="">
+                            <input type="hidden" name="corpSeq">
+                            <!-- /.panel-heading -->
+                            <div class="panel002-body">
+                                <div class="table-responsive">
+                                    <div>
+                                        <div style="float: left; width:auto;overflow: hidden; width:300px">
+                                            <h4>상세 지표별 점수</h4>
+                                        </div>
+                                        <div style="float:right;">
+                                            <button id="btnCorpKpiSave" type="button" class="btn btn-primary" style="margin-bottom: 15px">&nbsp;저장&nbsp;</button>
+                                        </div>
+                                    </div>
+                                    <table id="depth2Grid" class="table table-striped table-bordered table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>성과지표</th>
+                                            <th>세부 성과지표</th>
+                                            <th>배점</th>
+                                            <th>점수</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 재정현황 -->
+                <div id="finance" class="col-lg-12" style="display:none;">
+                    <div class="panel002 panel-grid">
+
+                        <!-- /.panel-heading -->
+                        <form name="frmFinance" onsubmit="return false;">
+                            <input type="hidden" name="corpSeq">
+
+                            <div class="panel002-body">
+                                <div class="table-responsive">
+                                    <div>
+                                        <div style="float: left; width:auto;overflow: hidden; width:300px">
+                                            <h4>재정현황</h4>
+                                        </div>
+                                        <div style="float:right;">
+                                            <button id="btnAddRowFinance" type="button" class="btn btn-outline btn-info" style="margin-right: 10px">&nbsp;행추가&nbsp;</button>
+                                            <button id="btnFinanceSave" type="button" class="btn btn-primary" style="margin-bottom: 15px">
+                                                &nbsp;저장&nbsp;</button>
+                                        </div>
+                                    </div>
+                                    <table class="table table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <th width="94px" rowspan="4" style="text-align:center; background-color:#A5A5A5">결산일</th>
+                                            <th colspan="3" style="text-align:center; background-color:#A5A5A5">재무상태</th>
+                                            <th colspan="8" style="text-align:center; background-color:#A5A5A5">손익계산</th>
+                                            <th rowspan="4" style="text-align:center; background-color:#A5A5A5"></th>
+                                        </tr>
+                                        <tr>
+                                            <th rowspan="3" style="text-align:center; background-color:#f1f1f1">자산총계</th>
+                                            <th rowspan="3" style="text-align:center; background-color:#f1f1f1">부채총계</th>
+                                            <th rowspan="3" style="text-align:center; background-color:#f1f1f1">자본총계</th>
+                                            <th colspan="4" style="text-align:center; background-color:#B4B4B4">매출</th>
+
+                                            <th rowspan="2" style="text-align:center; background-color:#D2D2D2">비용</th>
+                                            <th rowspan="2" colspan="2" style="text-align:center; background-color:#D2D2D2">수익</th>
+                                            <th rowspan="3" style="text-align:center; background-color:#f1f1f1">당기순이익</th>
+                                        </tr>
+
+                                        <tr>
+                                            <th colspan="2" style="text-align:center; background-color:#D2D2D2">매출액</th>
+                                            <th colspan="2" style="text-align:center; background-color:#D2D2D2">*유통/제조업만 기재</th>
+                                        </tr>
+                                        <tr>
+                                            <th style="text-align:center; background-color:#f1f1f1">민간시장</th>
+                                            <th style="text-align:center; background-color:#f1f1f1">공공시장</th>
+                                            <th style="text-align:center; background-color:#f1f1f1">매출원가</th>
+                                            <th style="text-align:center; background-color:#f1f1f1">매출총이익(손실)</th>
+                                            <th style="text-align:center; background-color:#f1f1f1">판매비와 관리비<br>(영업비용)</th>
+                                            <th style="text-align:center; background-color:#f1f1f1">영업이익</th>
+                                            <th style="text-align:center; background-color:#f1f1f1">영업외 수익</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="tblFinance">
+                                        <tr>
+                                            <td width="110"><input type="hidden" name="finnSeq[]" value="{{:FINN_SEQ}}"><input class="form-control01 date"
+                                                                                                                              style="text-align:center" type="text"
+                                                                                                                              data-parsley-date
+                                                                                                                              name="clsDt[]" value="{{:CLS_DT}}"></td>
+                                            <td><input class="form-control01 number-field"
+                                                       style="text-align:right" type="text"
+                                                       name="asstAmt[]" value="{{:ASST_AMT}}">
+                                            </td>
+                                            <td><input class="form-control01 number-field"
+                                                       style="text-align:right" type="text"
+                                                       name="deptAmt[]" value="{{:DEPT_AMT}}">
+                                            <td><input class="form-control01 number-field"
+                                                       style="text-align:right" type="text"
+                                                       name="capitAmt[]" value="{{:CAPIT_AMT}}">
+                                            </td>
+                                            <td><input class="form-control01 number-field"
+                                                       style="text-align:right" type="text"
+                                                       name="soldPrivAmt[]"
+                                                       value="{{:SOLD_PRIV_AMT}}"></td>
+                                            <td><input class="form-control01 number-field"
+                                                       style="text-align:right" type="text"
+                                                       name="soldPublAmt[]"
+                                                       value="{{:SOLD_PUBL_AMT}}"></td>
+                                            <td><input class="form-control01 number-field"
+                                                       style="text-align:right" type="text"
+                                                       name="soldOrgCost[]"
+                                                       value="{{:SOLD_ORG_COST}}"></td>
+                                            <td><input class="form-control01 number-field"
+                                                       style="text-align:right" type="text"
+                                                       name="soldIncom[]"
+                                                       value="{{:SOLD_INCOM}}"></td>
+                                            <td><input class="form-control01 number-field"
+                                                       style="text-align:right" type="text"
+                                                       name="salesAmt[]" value="{{:SALES_AMT}}">
+                                            </td>
+                                            <td><input class="form-control01 number-field"
+                                                       style="text-align:right" type="text"
+                                                       name="salesIncom[]"
+                                                       value="{{:SALES_INCOM}}"></td>
+                                            <td><input class="form-control01 number-field"
+                                                       style="text-align:right" type="text"
+                                                       name="extProf[]" value="{{:EXT_PROF}}">
+                                            </td>
+                                            <td><input class="form-control01"
+                                                       style="text-align:right" type="text"
+                                                       name="netIncom[]" value="{{:NET_INCOM}}">
+                                            </td>
+                                            <td><a href="javascript:;" class="btn btn-info"
+                                                   style="font-size: 11px; margin-bottom: 0px;background-color:#969696;border-color:#666;padding:3px 6px"
+                                                   onclick="corpInfoAdd.delRowFinance(this)" data-finnseq="{{:FINN_SEQ}}">삭제</a>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- /.panel-body -->
+                    </div>
+                </div>
+                <!-- 외부 지원사항 -->
+                <div id="help" class="col-lg-12" style="display:none;">
+                    <div class="panel002 panel-grid">
+
+                        <!-- /.panel-heading -->
+                        <form name="frmHelp" onsubmit="return false;">
+                            <input type="hidden" name="corpSeq">
+
+                            <div class="panel002-body">
+                                <div class="table-responsive">
+
+                                    <div>
+                                        <div style="float: left; width:auto;overflow: hidden; width:500px">
+                                            <h4>최근 3년간 중앙정부, 지자체, 민간단체 등 외부로부터 받은 지원사항</h4>
+                                        </div>
+                                        <div style="float:right;">
+                                            <button id="btnAddRowHelp" type="button" class="btn btn-outline btn-info" style="margin-right: 10px">&nbsp;행추가&nbsp;</button>
+                                            <button id="btnHelpSave" type="button" class="btn btn-primary" style="margin-bottom: 15px">
+                                                &nbsp;저장&nbsp;</button>
+                                        </div>
+                                    </div>
+                                    <table class="table table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <th style="text-align:center; background-color:#f1f1f1">지원처</th>
+                                            <th style="text-align:center; background-color:#f1f1f1">사업명</th>
+                                            <th style="text-align:center; background-color:#f1f1f1">지원기간</th>
+                                            <th style="text-align:center; background-color:#f1f1f1">금액</th>
+                                            <th style="text-align:center; background-color:#f1f1f1"></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="tblHelp">
+                                        <tr>
+                                            <td style="text-align:center"><input type="hidden" name="helpSeq[]" value="{{:HELP_SEQ}}"><input class="form-control01" type="text"
+                                                                                                                                             name="helper[]"
+                                                                                                                                             value="{{:HELPER}}"></td>
+                                            <td style="text-align:center"><input class="form-control01" type="text"
+                                                                                 name="prjNm[]"
+                                                                                 value="{{:PRJ_NM}}"></td>
+                                            <td style="text-align:center"><input class="form-control01 date"
+                                                                                 style="text-align:center;width:40%" type="text"
+                                                                                 name="helpStDt[]"
+                                                                                 data-parsley-date
+                                                                                 data-parsley-required
+                                                                                 value="{{:HELP_ST_DT}}"> ~ <input
+                                                    class="form-control01 date" style="text-align:center;width:40%" type="text"
+                                                    data-parsley-date
+                                                    data-parsley-required
+                                                    name="helpEndDt[]" value="{{:HELP_END_DT}}"></td>
+                                            <td style="text-align:right"><input class="form-control01 money"
+                                                                                style="text-align:right" type="text"
+                                                                                data-parsley-required
+                                                                                name="helpAmt[]" value="{{:HELP_AMT}}">
+                                            </td>
+                                            <td><a href="javascript:;" class="btn btn-info"
+                                                   style="font-size: 11px; margin-bottom: 0px;background-color:#969696;border-color:#666;padding:3px 6px"
+                                                   onclick="corpInfoAdd.delRowHelp(this)" data-helpseq="{{:HELP_SEQ}}">삭제</a>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- /.panel-body -->
+                    </div>
+                </div>
+                <!-- / 외부지원 사항 -->
+
+                <!-- 고용인원 -->
+                <div id="employee" class="col-lg-12" style="display:none;">
+                    <div class="panel002 panel-grid">
+
+                        <!-- /.panel-heading -->
+                        <form name="frmEmployee" onsubmit="return false;">
+                            <input type="hidden" name="corpSeq">
+
+                            <div class="panel002-body">
+                                <div class="table-responsive">
+
+                                    <div>
+                                        <div style="float: left; width:auto;overflow: hidden; width:500px">
+                                            <h4>고용현황</h4>
+                                        </div>
+                                        <div style="float:right;">
+                                            <button id="btnAddRowEmployee" type="button" class="btn btn-outline btn-info" style="margin-right: 10px">&nbsp;행추가&nbsp;</button>
+                                            <button id="btnEmployeeSave" type="button" class="btn btn-primary" style="margin-bottom: 15px">
+                                                &nbsp;저장&nbsp;</button>
+                                        </div>
+                                    </div>
+                                    <table class="table table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <th rowspan="2" style="text-align:center; background-color:#f1f1f1">기준일</th>
+                                            <th colspan="2" style="text-align:center; background-color:#f1f1f1">고용인원</th>
+                                            <th colspan="2" style="text-align:center; background-color:#f1f1f1">고용현황/고용형태</th>
+                                            <th colspan="2" style="text-align:center; background-color:#f1f1f1">급여수준(월평균급여 : 원)</th>
+                                            <th rowspan="2" style="text-align:center; background-color:#f1f1f1"></th>
+                                        </tr>
+                                        <tr>
+                                            <th style="text-align:center; background-color:#f1f1f1">총고용인원</th>
+                                            <th style="text-align:center; background-color:#f1f1f1">취약계층 총인원</th>
+                                            <th style="text-align:center; background-color:#f1f1f1">정규직</th>
+                                            <th style="text-align:center; background-color:#f1f1f1">비정규직</th>
+                                            <th style="text-align:center; background-color:#f1f1f1">임원</th>
+                                            <th style="text-align:center; background-color:#f1f1f1">임원외</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="tblEmployee">
+                                        <tr>
+                                            <td><input type="hidden" name="empSeq[]" value="{{:EMP_SEQ}}">
+                                                <input class="form-control01 date"
+                                                        style="text-align:center" type="text"
+                                                        data-parsley-required
+                                                        data-parsley-date
+                                                        name="clsDt[]" value="{{:CLS_DT}}"></td>
+                                            <td><input class="form-control01 integer"
+                                                       style="text-align:right" type="text"
+                                                       data-parsley-required
+                                                       name="empNum[]" value="{{:EMP_NUM}}"></td>
+                                            <td><input class="form-control01 integer"
+                                                        style="text-align:right" type="text"
+                                                       data-parsley-required
+                                                        name="weakNum[]" value="{{:WEAK_NUM}}"></td>
+                                            <td><input class="form-control01 integer"
+                                                        style="text-align:right" type="text"
+                                                       data-parsley-required
+                                                        name="fullNum[]" value="{{:FULL_NUM}}"></td>
+                                            <td><input class="form-control01 integer"
+                                                        style="text-align:right" type="text"
+                                                       data-parsley-required
+                                                        name="partNum[]" value="{{:PART_NUM}}"></td>
+                                            <td><input class="form-control01 money"
+                                                        style="text-align:right" type="text"
+                                                       data-parsley-required
+                                                        name="cxxSal[]" value="{{:CXX_SAL}}"></td>
+                                            <td><input class="form-control01 money"
+                                                        style="text-align:right" type="text"
+                                                       data-parsley-required
+                                                        name="normSal[]" value="{{:NORM_SAL}}"></td>
+                                            <td><a href="javascript:;" class="btn btn-info"
+                                                   style="font-size: 11px; margin-bottom: 0px;background-color:#969696;border-color:#666;padding:3px 6px"
+                                                   onclick="corpInfoAdd.delRowEmployee(this)" data-empseq="{{:EMP_SEQ}}">삭제</a>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- /.panel-body -->
+                    </div>
+                </div>
+                <!-- / 고용인원 -->
+            </div>
+        </div>
+        <!-- /.container-fluid -->
+
+    </div>
+    <!-- /#page-wrapper -->
+
+</div>
+<!-- /#wrapper -->
+
+<!-- jQuery -->
+
+</body>
+
+</html>

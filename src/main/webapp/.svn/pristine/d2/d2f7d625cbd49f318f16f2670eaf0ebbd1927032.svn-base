@@ -1,0 +1,219 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/app-route/app-location.html">
+<link rel="import" href="/bower_components/app-route/app-route.html">
+<link rel="import" href="/bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="/bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="/bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="/bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="/bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="/bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="/bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="/bower_components/paper-menu/paper-submenu.html">
+<link rel="import" href="/bower_components/iron-image/iron-image.html" />
+<link rel="import" href="/bower_components/iron-icons/social-icons.html" />
+<link rel="import" href="/bower_components/vaadin-icons/vaadin-icons.html" />
+<link rel="import" href="my-icons.html">
+
+<link rel="import" href="style/common-style.html" />
+
+<dom-module id="my-app">
+
+    <template>
+
+        <style include="common-style">
+            :host {
+                display: block;
+                --app-primary-color: #4285f4;
+                --app-secondary-color: black;
+                --app-drawer-content-container: {
+                    background-color: #B0BEC5;
+                }
+                --paper-menu-background-color: #B0BEC5;
+                --app-toolbar-font-size: 11px;
+                --iron-icon-width: 15px;
+                --iron-icon-height: 15px;
+            }
+
+            app-header {
+                background-color: var(--app-primary-color);
+                color: #fff;
+            }
+
+            app-header paper-icon-button {
+                --paper-icon-button-ink-color: white;
+            }
+
+            .drawer-list {
+                margin: 0 20px;
+            }
+
+            .drawer-list a {
+                display: block;
+                padding: 0 16px;
+                line-height: 40px;
+                text-decoration: none;
+                color: var(--app-secondary-color);
+            }
+
+            .drawer-list a.iron-selected {
+                color: black;
+                font-weight: bold;
+            }
+
+            .drawer-list a.subroute {
+                padding-left: 32px;
+            }
+
+            app-toolbar> div[title] {
+                font-size: 15px;
+            }
+
+            app-toolbar> div[spacer] {
+                margin-left: 15px !important;
+            }
+
+            app-drawer> app-toolbar {
+                background-color: #286de1;
+            }
+
+            paper-menu {
+                font-size: 13px;
+            }
+
+            iron-icon {
+                margin-right: 5px;
+            }
+
+            .submenu paper-item {
+                display: inline-block;
+                margin-left: 20px;
+            }
+        </style>
+
+        <iron-ajax id="protocolGetUserInfo" url="/api/user" method="get" content-type="application/json" last-response="{{_user}}" auto></iron-ajax>
+
+        <app-location route="{{route}}"></app-location>
+        <app-route route="{{route}}" pattern="/:path" data="{{routeData}}" tail="{{subroute}}"></app-route>
+
+        <app-drawer-layout fullbleed>
+
+            <!-- Drawer content -->
+            <app-drawer>
+                <app-toolbar>
+                    <iron-image src="/images/logo.png"></iron-image>
+                </app-toolbar>
+                <iron-selector selected="[[_path]]" attr-for-selected="name" class="drawer-list" role="navigation">
+                    <paper-menu>
+                        <paper-item name="general-info">
+                            <a name="general" href="/general/all">
+                                <iron-icon icon="vaadin-icons:archive"></iron-icon>기업일반정보 조회</a>
+                        </paper-item>
+                        <paper-item>
+                            <a name="kpi" href="/kpi/all">
+                                <iron-icon icon="vaadin-icons:chart"></iron-icon>개별기업 성과지표 조회</a>
+                        </paper-item>
+                        <paper-item>
+                            <a name="summary" href="/summary">
+                                <iron-icon icon="vaadin-icons:clipboard"></iron-icon>전체 성과지표 조회</a>
+                        </paper-item>
+                        <paper-submenu opened>
+                            <paper-item class="menu-trigger">
+                                <a href="#">
+                                    <iron-icon icon="vaadin-icons:cog"></iron-icon>관리자</a>
+                            </paper-item>
+                            <paper-menu class="menu-content submenu">
+                                <paper-item>
+                                    <a name="corp" href="/corp/all">
+                                        <iron-icon icon="social:group-add"></iron-icon>기업 및 성과지표 등록</a>
+                                </paper-item>
+                                <paper-item name="user">
+                                    <a name="user" href="/user/all">
+                                        <iron-icon icon="social:person-add"></iron-icon>사용자 등록</a>
+                                </paper-item>
+                            </paper-menu>
+                        </paper-submenu>
+                    </paper-menu>
+                </iron-selector>
+            </app-drawer>
+
+            <!-- Main content -->
+            <app-header-layout has-scrolling-region>
+
+                <app-header condenses reveals effects="waterfall">
+                    <app-toolbar>
+                        <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
+                        <div title>사회적기업 성과관리시스템</div>
+                        [[_user.userNm]]님 로그인중입니다
+                        <div spacer></div>
+                        <paper-button on-tap="_logout">Logout</paper-button>
+                    </app-toolbar>
+                </app-header>
+
+                <iron-pages role="main" selected="[[_path]]" attr-for-selected="id">
+                    <group-general id="general" route="{{subroute}}"></group-general>
+                    <group-kpi id="kpi" route="{{subroute}}"></group-kpi>
+                    <group-summary id="summary" route="{{subroute}}"></group-summary>
+                    <group-corp id="corp" route="{{subroute}}"></group-corp>
+                    <group-user id="user" route="{{subroute}}"></group-user>
+                </iron-pages>
+
+            </app-header-layout>
+
+        </app-drawer-layout>
+
+    </template>
+
+    <script>
+        Polymer({
+
+            is: 'my-app',
+
+            properties: {
+                _path: {
+                    type: String,
+                    observer: '_pageChanged'
+                },
+
+                id: {
+                    type: String
+                },
+                _user: {
+                    type: Object
+                },
+                _htmlNames: {
+                  type: Object,
+                  value: function() {
+                    return {
+                      general: 'group-general',
+                      kpi: 'group-kpi',
+                      summary: 'group-summary',
+                      user: 'group-user',
+                      corp: 'group-corp'
+                    }
+                  }
+                }
+            },
+
+            observers: [
+                '_routePageChanged(routeData.path)'
+            ],
+
+            _routePageChanged: function(path) {
+                this._path = path || 'summary';
+            },
+
+            _pageChanged: function(path) {
+                this.importHref(this.resolveUrl(this._htmlNames[path] + '.html'), null, null, true);
+            },
+
+            _logout: function() {
+                location.href = "/logout";
+            }
+        });
+    </script>
+
+</dom-module>

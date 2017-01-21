@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!-- colored log for console, idea -->
+            <pattern>%d{MM-dd HH:mm:ss.SSS} %cyan([%30.30logger{30}]) %highlight([%-5level]) %msg%n</pattern>
+            <!-- monochrome log for eclipse -->
+            <!--<pattern>%d{MM-dd HH:mm:ss.SSS} [%30.30logger{30}][%-5level] %msg%n</pattern>-->
+        </encoder>
+    </appender>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>lunch.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>lunch-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>30MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{MM-dd HH:mm:ss.SSS} [%30.30logger{30}][%-5level] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- lunch.* -->
+    <logger name="lunch" level="debug">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <!-- log4jdbc -->
+    <logger name="jdbc.audit" level="error"/>
+    <logger name="jdbc.connection" level="error"/>
+    <logger name="jdbc.sqltiming" level="error"/>
+    <logger name="jdbc.resultset" level="error"/>
+    <logger name="jdbc.sqlonly" level="debug">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <!-- spring -->
+    <logger name="org.springframework" level="info">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <root level="info">
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>

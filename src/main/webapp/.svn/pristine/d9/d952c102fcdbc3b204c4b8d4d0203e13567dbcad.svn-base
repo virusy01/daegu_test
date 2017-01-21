@@ -1,0 +1,398 @@
+<!-- <link rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html" /> -->
+
+<!-- <link rel="import" href="../common/dialog-alert.html" />
+<link rel="import" href="../common/behavior-page.html" />
+<link rel="import" href="../common/normal-input.html" />
+<link rel="import" href="../common/date-input.html" />
+<link rel="import" href="../common/number-input.html" /> -->
+
+<dom-module id="corp-detail-finance">
+    <template>
+        <style include="common-style"></style>
+        <style include="bootstrap-style">
+            :host {
+                --paper-toolbar-height: 50px;
+            }
+        </style>
+
+        <iron-ajax id="protocolGetCorpFinance" url$="/api/corp/finance/{{corpId}}/last10years" headers='{"X-Requested-With": "XMLHttpRequest"}' method="GET" content-type="application/json" last-response="{{_corpDetail}}" on-response="_insertFinanceData" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax id="protocolSaveCorpFinance" url="/api/corp/finance" headers='{"X-Requested-With": "XMLHttpRequest"}' method="POST" content-type="application/json" on-response="_formResponse" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax id="protocolDeleteCorpFinance" url$="/api/corp/finance/{{_finnSeq}}" headers='{"X-Requested-With": "XMLHttpRequest"}' method="DELETE" content-type="application/json" on-response="_formResponse" on-error="_redirectOnError"></iron-ajax>
+
+        <paper-toolbar class="toolbar-head">
+            <span class="title">재정현황</span>
+            <paper-button on-tap="_addRow">행추가</paper-button>
+            <paper-button on-tap="_save">저장</paper-button>
+        </paper-toolbar>
+
+        <form id="formCorpFinance" is="iron-form">
+            <div class="table-responsive">
+                <table id="tableCorpFinance" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th rowspan="4">
+                                결산일
+                            </th>
+                            <th colspan="3">
+                                재무상태
+                            </th>
+                            <th colspan="8">
+                                손익계산
+                            </th>
+                            <th rowspan="4">
+                                -
+                            </th>
+                        </tr>
+                        <tr>
+                            <th rowspan="3">
+                                자산총계
+                            </th>
+                            <th rowspan="3">
+                                부채총계
+                            </th>
+                            <th rowspan="3">
+                                자본총계
+                            </th>
+                            <th colspan="4">
+                                매출
+                            </th>
+                            <th rowspan="2">
+                                비용
+                            </th>
+                            <th rowspan="2" colspan="2">
+                                수익
+                            </th>
+                            <th rowspan="3">
+                                당기순이익
+                            </th>
+                        </tr>
+                        <tr>
+                            <th colspan="2">
+                                매출액
+                            </th>
+                            <th colspan="2">
+                                *유통/제조업만 기재
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                민간시장
+                            </th>
+                            <th>
+                                공공시장
+                            </th>
+                            <th>
+                                매출원가
+                            </th>
+                            <th>
+                                매출총이익(손실)
+                            </th>
+                            <th>
+                                판매비와 관리비(영업비용)
+                            </th>
+                            <th>
+                                영업이익
+                            </th>
+                            <th>
+                                영업외 수익
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </form>
+
+        <dialog-alert id="alert" on-confirm-ok="_onConfirmOk"></dialog-alert>
+
+    </template>
+
+    <!-- <script src="/scripts/accounting.min.js"></script>
+    <script src="/scripts/moment.min.js"></script> -->
+    <script>
+        Polymer({
+            is: 'corp-detail-finance',
+
+            behaviors: [PS.BehaviorPage],
+
+            properties: {
+                refresh: Boolean,
+                corpId: Number,
+                _isAttached: Boolean,
+                _corpDetail: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    }
+                },
+                _finnSeq: String,
+            },
+
+            observers: [
+                '_search(corpId, _isAttached, refresh)'
+            ],
+
+            ready: function() {
+                this.scopeSubtree(this.$.formCorpFinance.querySelector("tbody"), true);
+            },
+
+            attached: function() {
+                this._isAttached = true;
+            },
+
+            _search: function() {
+                this.refresh = undefined;
+                this.$.protocolGetCorpFinance.generateRequest();
+            },
+
+            _insertFinanceData: function(e) {
+                var table = this.$.tableCorpFinance.querySelector("tbody");
+                var data = e.target.lastResponse;
+                var i;
+
+                table.innerHTML = "";
+
+                for (i = 0; i < data.length; i++) {
+                    this._appendRow(
+                        data[i].clsDt,
+                        data[i].asstAmt,
+                        data[i].deptAmt,
+                        data[i].capitAmt,
+                        data[i].soldPrivAmt,
+                        data[i].soldPublAmt,
+                        data[i].soldOrgCost,
+                        data[i].soldIncom,
+                        data[i].salesAmt,
+                        data[i].salesIncom,
+                        data[i].extProf,
+                        data[i].netIncom,
+                        data[i].finnSeq
+                    )
+                }
+                this._closeOverlay();
+            },
+
+            _save: function() {
+                if (this.$.formCorpFinance.validate()) {
+                    var data = this.$.formCorpFinance.serialize();
+                    var parsedData = [];
+                    var length = Array.isArray(data.clsDt) ? data.clsDt.length : 1;
+
+                    for (var i = 0; i < length; i++) {
+                        parsedData.push({
+                            clsDt: Array.isArray(data.clsDt) ? data.clsDt[i] : data.clsDt,
+                            asstAmt: accounting.unformat(Array.isArray(data.asstAmt) ? data.asstAmt[i] : data.asstAmt),
+                            deptAmt: accounting.unformat(Array.isArray(data.deptAmt) ? data.deptAmt[i] : data.deptAmt),
+                            capitAmt: accounting.unformat(Array.isArray(data.capitAmt) ? data.capitAmt[i] : data.capitAmt),
+                            soldPrivAmt: accounting.unformat(Array.isArray(data.soldPrivAmt) ? data.soldPrivAmt[i] : data.soldPrivAmt),
+                            soldPublAmt: accounting.unformat(Array.isArray(data.soldPublAmt) ? data.soldPublAmt[i] : data.soldPublAmt),
+                            soldOrgCost: accounting.unformat(Array.isArray(data.soldOrgCost) ? data.soldOrgCost[i] : data.soldOrgCost),
+                            soldIncom: accounting.unformat(Array.isArray(data.soldIncom) ? data.soldIncom[i] : data.soldIncom),
+                            salesAmt: accounting.unformat(Array.isArray(data.salesAmt) ? data.salesAmt[i] : data.salesAmt),
+                            salesIncom: accounting.unformat(Array.isArray(data.salesIncom) ? data.salesIncom[i] : data.salesIncom),
+                            extProf: accounting.unformat(Array.isArray(data.extProf) ? data.extProf[i] : data.extProf),
+                            netIncom: accounting.unformat(Array.isArray(data.netIncom) ? data.netIncom[i] : data.netIncom),
+                            finnSeq: accounting.unformat(Array.isArray(data.finnSeq) ? data.finnSeq[i] : data.finnSeq),
+                            corpSeq: this.corpId
+                        });
+                    }
+
+                    this.$.protocolSaveCorpFinance.body = parsedData;
+                    this.$.protocolSaveCorpFinance.generateRequest();
+                }
+            },
+
+            _formResponse: function(e) {
+                this.$.alert.type = "alert";
+
+                switch (e.detail.status) {
+                    case 200:
+                        this.$.alert.msg = "정상적으로 반영되었습니다.";
+                        this.$.alert.dialog.open();
+                        this._search();
+                        break;
+                    default:
+                        this.$.alert.msg = "오류가 발생했습니다.";
+                        this.$.alert.dialog.open();
+                        break;
+                }
+            },
+
+            _addRow: function() {
+                this._appendRow();
+            },
+
+            _appendRow: function(clsDt, asstAmt, deptAmt, capitAmt, soldPrivAmt, soldPublAmt, soldOrgCost, soldIncom, salesAmt, salesIncom, extProf, netIncom, finnSeq) {
+                var table = this.$.tableCorpFinance.querySelector("tbody");
+                var tr, td, input, inputContainer, button, hidden;
+
+                tr = document.createElement("tr");
+
+                td = document.createElement("td");
+                td.setAttribute("class", "text-center");
+                input = document.createElement("date-input");
+                input.setAttribute("name", "clsDt");
+                input.setAttribute("required", true);
+                input.setAttribute("bind-value", clsDt ? clsDt : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                td.setAttribute("class", "text-right");
+                input = document.createElement("number-input");
+                input.setAttribute("name", "asstAmt");
+                input.setAttribute("allow-negative", true);
+                input.setAttribute("text-align", "right");
+                input.setAttribute("required", true);
+                input.setAttribute("value", asstAmt ? asstAmt : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                td.setAttribute("class", "text-right");
+                input = document.createElement("number-input");
+                input.setAttribute("name", "deptAmt");
+                input.setAttribute("allow-negative", true);
+                input.setAttribute("text-align", "right");
+                input.setAttribute("required", true);
+                input.setAttribute("value", deptAmt ? deptAmt : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                td.setAttribute("class", "text-right");
+                input = document.createElement("number-input");
+                input.setAttribute("name", "capitAmt");
+                input.setAttribute("allow-negative", true);
+                input.setAttribute("required", true);
+                input.setAttribute("text-align", "right");
+                input.setAttribute("value", capitAmt ? capitAmt : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                td.setAttribute("class", "text-right");
+                input = document.createElement("number-input");
+                input.setAttribute("name", "soldPrivAmt");
+                input.setAttribute("allow-negative", true);
+                input.setAttribute("required", true);
+                input.setAttribute("text-align", "right");
+                input.setAttribute("value", soldPrivAmt ? soldPrivAmt : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                td.setAttribute("class", "text-right");
+                input = document.createElement("number-input");
+                input.setAttribute("name", "soldPublAmt");
+                input.setAttribute("allow-negative", true);
+                input.setAttribute("text-align", "right");
+                input.setAttribute("required", true);
+                input.setAttribute("value", soldPublAmt ? soldPublAmt : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                td.setAttribute("class", "text-right");
+                input = document.createElement("number-input");
+                input.setAttribute("name", "soldOrgCost");
+                input.setAttribute("allow-negative", true);
+                input.setAttribute("text-align", "right");
+                input.setAttribute("required", true);
+                input.setAttribute("value", soldOrgCost ? soldOrgCost : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                td.setAttribute("class", "text-right");
+                input = document.createElement("number-input");
+                input.setAttribute("name", "soldIncom");
+                input.setAttribute("allow-negative", true);
+                input.setAttribute("text-align", "right");
+                input.setAttribute("required", true);
+                input.setAttribute("value", soldIncom ? soldIncom : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                td.setAttribute("class", "text-right");
+                input = document.createElement("number-input");
+                input.setAttribute("name", "salesAmt");
+                input.setAttribute("allow-negative", true);
+                input.setAttribute("text-align", "right");
+                input.setAttribute("required", true);
+                input.setAttribute("value", salesAmt ? salesAmt : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                td.setAttribute("class", "text-right");
+                input = document.createElement("number-input");
+                input.setAttribute("name", "salesIncom");
+                input.setAttribute("allow-negative", true);
+                input.setAttribute("text-align", "right");
+                input.setAttribute("required", true);
+                input.setAttribute("value", salesIncom ? salesIncom : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                td.setAttribute("class", "text-right");
+                input = document.createElement("number-input");
+                input.setAttribute("name", "extProf");
+                input.setAttribute("allow-negative", true);
+                input.setAttribute("text-align", "right");
+                input.setAttribute("required", true);
+                input.setAttribute("value", extProf ? extProf : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                td.setAttribute("class", "text-right");
+                input = document.createElement("number-input");
+                input.setAttribute("name", "netIncom");
+                input.setAttribute("allow-negative", true);
+                input.setAttribute("text-align", "right");
+                input.setAttribute("required", true);
+                input.setAttribute("value", netIncom ? netIncom : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                td.setAttribute("class", "text-center");
+                button = document.createElement("paper-button");
+                button.addEventListener("tap", this._deleteRow.bind(this));
+                button.innerHTML = "삭제";
+                td.appendChild(button);
+
+                hidden = document.createElement("input");
+                hidden.setAttribute("name", "finnSeq");
+                hidden.setAttribute("value", finnSeq ? finnSeq : "");
+                hidden.setAttribute("class", "finnSeq");
+                hidden.setAttribute("style", "display: none;")
+                td.appendChild(hidden);
+                tr.appendChild(td);
+
+                if (finnSeq)
+                    table.appendChild(tr);
+                else
+                    table.insertBefore(tr, table.firstChild);
+            },
+
+            _deleteRow: function(e) {
+                var tr = e.target.parentElement.parentElement;
+                var finnSeq = tr.getElementsByClassName("finnSeq")[0].value;
+
+                if (!finnSeq) {
+                    Polymer.dom(tr.parentElement).removeChild(tr);
+                } else {
+                    this._finnSeq = finnSeq;
+                    this.$.protocolDeleteCorpFinance.generateRequest();
+                }
+            },
+
+        })
+    </script>
+</dom-module>

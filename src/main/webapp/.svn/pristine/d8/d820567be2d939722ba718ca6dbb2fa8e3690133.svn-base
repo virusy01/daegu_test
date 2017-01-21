@@ -1,0 +1,122 @@
+<!-- <link rel="import" href="/bower_components/iron-input/iron-input.html" />
+<link rel="import" href="/bower_components/iron-validatable-behavior/iron-validatable-behavior.html" />
+<link rel="import" href="/bower_components/iron-form-element-behavior/iron-form-element-behavior.html" />
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" /> -->
+
+<link rel="import" href="../style/bootstrap-style.html" />
+
+<dom-module id="number-input">
+    <template>
+        <style include="bootstrap-style"></style>
+
+        <div id="container">
+            <input id="input" is="iron-input" class="form-control" bind-value="{{value}}" required="{{required}}" />
+            <span class="glyphicon form-control-feedback">
+                <iron-icon id="icon" icon="close" class="hide"></iron-icon>
+            </span>
+        </div>
+    </template>
+
+    <script src="js/JavaScriptUtil.js"></script>
+    <script src="js/Parsers.js"></script>
+    <script src="js/InputMask.js"></script>
+    <script>
+        Polymer({
+            is: 'number-input',
+
+            behaviors: [Polymer.IronValidatableBehavior, Polymer.IronFormElementBehavior],
+
+            properties: {
+                textAlign: {
+                    type: String,
+                    value: 'left'
+                },
+                value: {
+                    type: String,
+                    notify: true
+                },
+                thousandsSeparator: {
+                    type: String,
+                    value: ','
+                },
+                decimalPlaces: {
+                    type: Number,
+                    value: 0
+                },
+                decimalSeparator: {
+                    type: String,
+                    value: '.'
+                },
+                required: {
+                    type: Boolean,
+                    value: false
+                },
+                allowNegative: {
+                    type: Boolean,
+                    value: false
+                },
+                _maskObj: String,
+                name: {
+                    type: String,
+                    notify: true
+                },
+            },
+
+            ready: function() {
+                if (this.thousandsSeparator && this.thousandsSeparator.toLowerCase() == 'space')
+                    this.thousandsSeparator = ' ';
+            },
+
+            attached: function() {
+                var parser = new NumberParser(this.decimalPlaces, this.decimalSeparator, this.thousandsSeparator, true);
+
+                if (this._maskObj) {
+                    this._maskObj.parser.decimalDigits = this.decimalPlaces;
+                    this._maskObj.parser.decimalSeparator = this.decimalSeparator;
+                    this._maskObj.parser.groupSeparator = this.thousandsSeparator;
+                    this.value = this._maskObj.parser.format(accounting.unformat(this.value));
+                } else {
+                    this._maskObj = new NumberMask(parser, this.$.input);
+                    this._maskObj.leftToRight = true;
+                    this._maskObj.allowNegative = this.allowNegative;
+                    this._maskObj.update();
+                }
+
+                if (this.textAlign)
+                    this.alignText();
+            },
+
+            alignText: function() {
+                this.$.input.setAttribute('style', 'text-align:' + this.textAlign);
+            },
+
+            _getValidity: function() {
+                if (this.required) {
+                    this._toggleErrorGraphic(!!this.value ? false : true);
+                    return !!this.value;
+                }
+                return true;
+            },
+
+            _toggleErrorGraphic: function(flag) {
+                if (flag) {
+                    this.$.container.classList.add("has-error");
+                    this.$.container.classList.add("has-feedback");
+                    this.$.icon.classList.remove("hide");
+                } else {
+                    this.$.container.classList.remove("has-error");
+                    this.$.container.classList.remove("has-feedback");
+                    this.$.icon.classList.add("hide");
+                }
+            },
+
+            _invalidChanged: function() {
+                this._toggleErrorGraphic(this.invalid ? true : false);
+            },
+
+            get number() {
+                return this._maskObj ? this._maskObj.getAsNumber() : this.bindValue;
+            }
+        })
+    </script>
+</dom-module>

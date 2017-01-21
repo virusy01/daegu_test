@@ -1,0 +1,372 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+<link rel="import" href="/bower_components/iron-form/iron-form.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/paper-checkbox/paper-checkbox.html" />
+<link rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html" />
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html" />
+<link rel="import" href="/bower_components/paper-radio-button/paper-radio-button.html" />
+
+<link rel="import" href="../style/common-style.html" />
+<link rel="import" href="../style/bootstrap-style.html" />
+<link rel="import" href="../common/behavior-page.html" />
+<link rel="import" href="../common/normal-input.html" />
+<link rel="import" href="../common/normal-select.html" />
+<link rel="import" href="../common/dialog-alert.html" />
+
+<dom-module id="role-list">
+    <template>
+        <style include="common-style"></style>
+        <style include="bootstrap-style">
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+                --paper-checkbox-label-spacing: 0;
+                --paper-toolbar-content: {
+                    padding: 0;
+                }
+            }
+
+            paper-toolbar {
+                border: 0;
+                background-color: white;
+                color: #333;
+            }
+        </style>
+
+        <iron-ajax id="protocolGetRoles" url="/api/common/roles" headers='{"X-Requested-With": "XMLHttpRequest"}' method="GET" last-response="{{_roles}}" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax id="protocolGetMenus" url="/api/common/menus" headers='{"X-Requested-With": "XMLHttpRequest"}' method="GET" content-type="application/json" last-response="{{_menuList}}" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax id="protocolGetRoleMenus" url$="/api/common/role/{{_currentRole.roleCd}}/menus" headers='{"X-Requested-With": "XMLHttpRequest"}' method="GET" content-type="application/json" last-response="{{_roleMenuList}}" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax id="protocolSaveRole" url$="/api/common/role/{{_currentRole.roleCd}}" headers='{"X-Requested-With": "XMLHttpRequest"}' content-type="application/json" on-response="_formResponseWithRoleRefresh" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax id="protocolDeleteRole" url$="/api/common/role/{{_currentRole.roleCd}}" method="DELETE" headers='{"X-Requested-With": "XMLHttpRequest"}' content-type="application/json" on-response="_formResponseWithRoleRefresh" on-error="_redirectOnError"></iron-ajax>
+
+        <paper-card elevation="1">
+            <div class="card-content">
+                <div class="page-header">
+                    <h2>역할 관리</h2>
+                </div>
+
+                <paper-toolbar>
+                    <normal-select items="{{_roles}}" value="{{_selectedRole}}" name-from="roleNm" value-from="roleCd" on-selected-index-changed="_changeCurrentRole"></normal-select>
+                    <span class="title"></span>
+                    <paper-button on-tap="_createRole">신규 역할 추가</paper-button>
+                    <paper-button on-tap="_delete">삭제</paper-button>
+                    <paper-button on-tap="_save">저장</paper-button>
+                </paper-toolbar>
+
+                <form id="formRole" is="iron-form">
+                    <div class="table-responsive">
+                        <table id="roleTable" class="table table-bordered">
+                            <tr>
+                                <th>
+                                    역할코드
+                                </th>
+                                <td>
+                                    <normal-input id="roleCd" name="roleCd" value="[[_currentRole.roleCd]]" required></normal-input>
+                                </td>
+                                <th>
+                                    역할명
+                                </th>
+                                <td>
+                                    <normal-input name="roleNm" value="[[_currentRole.roleNm]]" required></normal-input>
+                                </td>
+                                <th>
+                                    기본값
+                                </th>
+                                <td class="text-center">
+                                    <paper-checkbox name="basic" checked$="[[_isChecked(_currentRole.basic)]]"></paper-checkbox>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <paper-toolbar>
+                        <span class="title">가능 메뉴</span>
+                    </paper-toolbar>
+
+                    <div class="table-responsive">
+                        <table id="menuTable" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        부여
+                                    </th>
+                                    <th>
+                                        상위 메뉴
+                                    </th>
+                                    <th>
+                                        메뉴명
+                                    </th>
+                                    <th>
+                                        URL
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+
+            </div>
+        </paper-card>
+
+        <dialog-alert id="alert" on-confirm-ok="_onConfirmOk"></dialog-alert>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: "role-list",
+
+            behaviors: [PS.BehaviorPage],
+
+            properties: {
+                _menuList: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _roles: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _currentRole: Object,
+                _roleMenuList: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _selectedRole: String,
+            },
+
+            observers: [
+                '_insertMenus(_menuList, _roleMenuList)'
+            ],
+
+            attached: function() {
+                this._search();
+            },
+
+            _search: function() {
+                this.$.protocolGetRoles.generateRequest();
+            },
+
+            _insertMenus: function() {
+                var table = this.$.menuTable.querySelector("tbody");
+                var data = this._menuList.children ? this._menuList.children : [];
+                var i, j, subData;
+
+                this._refreshMenus();
+
+                for (i = 0; i < data.length; i++) {
+                    this._appendRow(
+                        table,
+                        data[i].menuCd,
+                        data[i].menuIco,
+                        data[i].menuNm,
+                        data[i].url,
+                        data[i].sort,
+                        data[i].use,
+                        "-",
+                        this._isAllowed(data[i].menuCd)
+                    );
+
+                    if (data[i].children && data[i].children.length > 0) {
+                        for (j = 0; j < data[i].children.length; j++) {
+                            subData = data[i].children[j];
+                            this._appendRow(
+                                table,
+                                subData.menuCd,
+                                subData.menuIco,
+                                subData.menuNm,
+                                subData.url,
+                                subData.sort,
+                                subData.use,
+                                data[i].menuNm,
+                                this._isAllowed(subData.menuCd)
+                            )
+                        }
+                    }
+                }
+                this._closeOverlay();
+            },
+
+            _isAllowed: function(menuCd) {
+                var i;
+
+                for (i = 0; i < this._roleMenuList.length; i++) {
+                    if (this._roleMenuList[i].menuCd == menuCd)
+                        return true;
+                }
+
+                return false;
+            },
+
+            _appendRow: function(table, menuCd, menuIco, menuNm, url, sort, use, parentMenuNm, allowed) {
+                var tr, td, input, button, hidden;
+
+                tr = document.createElement("tr");
+
+                td = document.createElement("td");
+                td.setAttribute("class", "text-center");
+                input = document.createElement("paper-checkbox");
+                input.setAttribute("name", "doAllow");
+                this.listen(input, "change", "_triggerAllow");
+                if (allowed)
+                    input.setAttribute("checked", true);
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                hidden = document.createElement("normal-input");
+                hidden.setAttribute("name", "allow");
+                hidden.setAttribute("class", "hide allow");
+                hidden.setAttribute("value", allowed ? true : false);
+                td.appendChild(hidden);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                input = document.createElement("normal-input");
+                input.setAttribute("name", "parentMenuNm");
+                input.setAttribute("readonly", true);
+                input.setAttribute("value", parentMenuNm ? parentMenuNm : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                input = document.createElement("normal-input");
+                input.setAttribute("name", "menuNm");
+                input.setAttribute("readonly", true);
+                input.setAttribute("class", "menuNm");
+                input.setAttribute("value", menuNm ? menuNm : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                input = document.createElement("normal-input");
+                input.setAttribute("name", "url");
+                input.setAttribute("readonly", true);
+                input.setAttribute("value", url ? url : "");
+                td.appendChild(input);
+
+                hidden = document.createElement("normal-input");
+                hidden.setAttribute("name", "menuCd");
+                hidden.setAttribute("class", "hide menuCd");
+                hidden.setAttribute("value", menuCd ? menuCd : "");
+                td.appendChild(hidden);
+                tr.appendChild(td);
+
+                table.appendChild(tr);
+            },
+
+            _triggerAllow: function(e) {
+                var tr = e.target.parentNode.parentNode;
+                var use = tr.getElementsByClassName("allow")[0];
+
+                use.setAttribute("value", e.target.checked);
+            },
+
+            _formResponse: function(e) {
+                this._showFormResponse(e.detail.status);
+            },
+
+            _formResponseWithRoleRefresh: function(e) {
+                this._showFormResponse(e.detail.status, function() {
+                    this.$.protocolGetRoles.generateRequest();
+                }.bind(this));
+            },
+
+            _refreshMenus: function() {
+                var table = this.$.menuTable.querySelector("tbody");
+                table.innerHTML = "";
+            },
+
+            _showFormResponse(status, callback) {
+                this.$.alert.type = "alert";
+
+                switch (status) {
+                    case 200:
+                        this.$.alert.msg = "정상적으로 반영되었습니다.";
+                        this.$.alert.dialog.open();
+                        if (typeof callback == "function")
+                            callback();
+                        break;
+                    default:
+                        this.$.alert.msg = "오류가 발생했습니다.";
+                        this.$.alert.dialog.open();
+                        break;
+                }
+            },
+
+            _changeCurrentRole: function(e) {
+                var index = e.target.selectedIndex;
+
+                this.$.roleCd.setAttribute("readonly", true);
+
+                this._currentRole = this._roles[index];
+                this.$.protocolGetMenus.generateRequest();
+                this.$.protocolGetRoleMenus.generateRequest();
+            },
+
+            _isChecked: function(flag) {
+                return flag ? true : false;
+            },
+
+            _save: function() {
+                if (this.$.formRole.validate()) {
+                    var data = this.$.formRole.serialize();
+                    var body = {};
+                    var menuCds = [];
+
+                    body.roleCd = data.roleCd;
+                    body.roleNm = data.roleNm;
+                    body.basic = data.basic == "on" ? true : false;
+
+                    if (Array.isArray(data.allow)) {
+                        for (var i = 0; i < data.allow.length; i++) {
+                            if (data.allow[i] == "true")
+                                menuCds.push(data.menuCd[i]);
+                        }
+                    }else {
+                        menuCds.push(data.menuCd);
+                    }
+
+                    body.menuCd = menuCds;
+
+                    this._selectedRole = body.roleCd;
+
+                    this.$.protocolSaveRole.method = this._currentRole.roleCd ? "POST" : "PUT";
+                    this.$.protocolSaveRole.body = body;
+                    this.$.protocolSaveRole.generateRequest();
+                }
+            },
+
+            _createRole: function() {
+                this.$.roleCd.removeAttribute("readonly");
+                this._currentRole = {};
+                this._roleMenuList = [];
+            },
+
+            _delete: function() {
+                if (this._currentRole.roleCd) {
+                    this.$.alert.type = "confirm";
+                    this.$.alert.msg = "삭제하시겠습니까?";
+                    this.$.alert.dialog.open();
+                }
+            },
+
+            _onConfirmOk: function() {
+                this._selectedRole = "";
+                this._roleMenuList = [];
+                this.$.protocolDeleteRole.generateRequest();
+            },
+        })
+    </script>
+</dom-module>

@@ -1,0 +1,69 @@
+package com.sck.modules.common;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+import com.sck.model.Page;
+import com.sck.model.PageList;
+import com.sck.model.User;
+
+@Service
+public class UserService implements UserDetailsService{
+	
+	@Autowired
+	private UserRepository repository;
+	
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
+	{
+		if ((username == null) || username.isEmpty()) throw new IllegalArgumentException();
+		
+		User u = repository.findUserByUsername(username);
+		if(u == null)
+		{
+			throw new UsernameNotFoundException("notfound");
+		}
+		return u;
+	}
+	
+	public PageList findUsers(int page, String userNm)
+	{
+		if(page == 0)
+		{
+			page = 1;
+		}
+		
+		Page p = new Page(repository.countUsers(userNm), page);
+		List<User> list = repository.findUsers(userNm, p);
+		PageList result = new PageList(p, list);
+		return result;
+	}
+	
+	public List<User> findUsers(String userNm)
+	{
+		return repository.findUsers(userNm, null);
+	}
+	
+	public User findUser(Integer userSeq)
+	{
+		return repository.findUser(userSeq);
+	}
+	
+	public int saveUser(User u)
+	{
+		int r = 0;
+		if(u.getUserSeq() > 0)
+		{
+			r = repository.updateUser(u);
+		}
+		else
+		{
+			r = repository.insertUser(u);
+		}
+		return r;
+	}
+}

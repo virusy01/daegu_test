@@ -1,0 +1,211 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/vaadin-grid/vaadin-grid.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/vaadin-combo-box/vaadin-combo-box.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+<link rel="import" href="/bower_components/paper-fab/paper-fab.html" />
+
+<dom-module id="general-info">
+
+    <template>
+
+        <style>
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+                --paper-button: {
+                    background-color: #ff6138;
+                    color: white;
+                }
+                --iron-icon-height: 15px;
+                --iron-icon-width: 15px;
+            }
+
+            .card-actions {
+                @apply(--layout-horizontal);
+                @apply(--layout-center-justified);
+            }
+
+            #searchForm {
+                margin-bottom: 20px;
+            }
+
+            #searchForm vaadin-combo-box {
+                width: 200px;
+                display: inline-block;
+                margin-right: 10px;
+                vertical-align: bottom;
+            }
+
+            #searchForm paper-input {
+                width: 200px;
+                margin-right: 10px;
+                vertical-align: bottom;
+                display: inline-block;
+            }
+
+            paper-button iron-icon {
+                margin-right: 5px;
+            }
+        </style>
+
+        <iron-ajax id="protocolGetBiz" url="/api/corp/info/find/" method="post" content-type="application/json" last-response="{{_bizList}}"></iron-ajax>
+        <iron-ajax auto url="/api/common/comp_kind/code/" last-response="{{_codes.compKind}}"></iron-ajax>
+        <iron-ajax auto url="/api/common/corp_type/code/" last-response="{{_codes.corpType}}"></iron-ajax>
+        <iron-ajax auto url="/api/common/biz_sect/code/" last-response="{{_codes.bizSect}}"></iron-ajax>
+
+        <h1>기업 일반정보 조회</h1>
+
+        <div id="searchForm">
+            <vaadin-combo-box id="compKind" label="기업분류" items="{{_codes.compKind}}" item-label-path="cdNm" item-value-path="cd" on-value-changed="_onCompKindChanged"></vaadin-combo-box>
+            <vaadin-combo-box id="corpType" label="법인형태" items="{{_codes.corpType}}" item-label-path="cdNm" item-value-path="cd" on-value-changed="_onCorpTypeChanged"></vaadin-combo-box>
+            <vaadin-combo-box id="bizSect" label="업종분류" items="{{_codes.bizSect}}" item-label-path="cdNm" item-value-path="cd" on-value-changed="_onBizSectChanged"></vaadin-combo-box>
+            <paper-input id="keyword" label="기업명/대표자명/사업자번호"></paper-input>
+            <paper-button on-tap="_search" raised>
+                <iron-icon icon="search"></iron-icon>
+                조회
+            </paper-button>
+        </div>
+
+        <paper-card elevation="1">
+            <div class="card-content">
+                <vaadin-grid id="tableBiz" items="{{_bizList}}" on-selected-items-changed="_onGridSelect">
+                    <table>
+                        <colgroup>
+                            <col name="corpNm" />
+                            <col name="ceoNm" />
+                            <col name="bizNo" />
+                            <col name="corpTypeNm" />
+                            <col name="compKindNm" />
+                            <col name="bizSectNm" />
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>
+                                    기업명
+                                </th>
+                                <th>
+                                    대표자명
+                                </th>
+                                <th>
+                                    사업자번호
+                                </th>
+                                <th>
+                                    법인형태
+                                </th>
+                                <th>
+                                    기업분류
+                                </th>
+                                <th>
+                                    사업 업종
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </vaadin-grid>
+            </div>
+        </paper-card>
+
+    </template>
+
+    <script>
+        Polymer({
+
+            is: 'general-info',
+
+            properties: {
+                page: {
+                    type: String,
+                    reflectToAttribute: true
+                },
+                _keyword: {
+                    type: String,
+                    value: ""
+                },
+                _corpType: {
+                    type: String,
+                    value: ""
+                },
+                _bizSect: {
+                    type: String,
+                    value: ""
+                },
+                _order: {
+                    type: String,
+                    value: ""
+                },
+                _grpCode: {
+                    type: String,
+                    value: ""
+                },
+                _codes: {
+                    type: Object,
+                    value: function() {
+                        return {
+                            compKind: [],
+                            corpType: [],
+                            bizSect: [],
+                        };
+                    }
+                },
+                _bizList: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                }
+            },
+
+            ready: function() {
+                this._search();
+            },
+
+            _search: function() {
+                this._keyword = this.$.keyword.value;
+
+                this.$.protocolGetBiz.body = {
+                    corpType: this._corpType,
+                    compKind: this._compKind,
+                    bizSect: this._bizSect,
+                    corpNm: this._keyword
+                };
+
+                this.$.protocolGetBiz.generateRequest();
+            },
+
+            _onCompKindChanged: function(e) {
+                this._compKind = e.detail.value;
+            },
+
+            _onCorpTypeChanged: function(e) {
+                this._corpType = e.detail.value;
+            },
+
+            _onBizSectChanged: function(e) {
+                this._bizSect = e.detail.value;
+            },
+
+            _onGridSelect: function(e) {
+              if (e.currentTarget.selection.size > 0) {
+                var selectedIndex = e.currentTarget.selection.selected();
+                var data = this._bizList[selectedIndex];
+                location.href = "/biz-detail/" + data.corpSeq;
+              }
+            },
+        });
+    </script>
+
+</dom-module>

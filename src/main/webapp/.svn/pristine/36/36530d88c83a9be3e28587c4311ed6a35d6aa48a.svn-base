@@ -1,0 +1,35 @@
+<?php
+/**
+ * Created by IntelliJ IDEA.
+ * User: jwm_000
+ * Date: 2015-10-09
+ * Time: 오후 10:00
+ */
+
+session_start();
+
+header("Content-Type: application/json; charset=UTF-8");
+ini_set("output_buffering", 0);
+
+$connection = mysqli_connect("localhost", "kpi", "kpi123", "KPI");
+if (!$connection)
+{
+    printf("Connect failed: ".mysqli_connect_error());
+    exit();
+}
+
+function toArray($result){
+    $rows = array();
+    while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)){
+        $rows[] = $row;
+    }
+    return $rows;
+}
+
+function toObject($result){
+    $row = mysqli_fetch_array($result, MYSQLI_ASSOC);
+    if (!$row){
+        $row = json_decode ("{}");
+    }
+    return $row;
+}

@@ -1,0 +1,174 @@
+package com.sck.model;
+
+import java.util.Date;
+
+public class CorpFinance
+{
+	private Integer corpSeq;
+	private Integer finnSeq;
+	private Date clsDt;
+	private Integer asstAmt;
+	private Integer deptAmt;
+	private Integer capitAmt;
+	private Integer soldAmt;
+	private Integer soldPrivAmt;
+	private Integer soldPublAmt;
+	private Integer soldOrgCost;
+	private Integer soldIncom;
+	private Integer salesAmt;
+	private Integer salesIncom;
+	private Integer extProf;
+	private Integer netIncom;
+	private Date creDt;
+	private Date modDt;
+	public Integer getCorpSeq()
+	{
+		return corpSeq;
+	}
+	public void setCorpSeq(Integer corpSeq)
+	{
+		this.corpSeq = corpSeq;
+	}
+	public Integer getFinnSeq()
+	{
+		return finnSeq;
+	}
+	public void setFinnSeq(Integer finnSeq)
+	{
+		this.finnSeq = finnSeq;
+	}
+	public Date getClsDt()
+	{
+		return clsDt;
+	}
+	public void setClsDt(Date clsDt)
+	{
+		this.clsDt = clsDt;
+	}
+	public Integer getAsstAmt()
+	{
+		return asstAmt;
+	}
+	public void setAsstAmt(Integer asstAmt)
+	{
+		this.asstAmt = asstAmt;
+	}
+	public Integer getDeptAmt()
+	{
+		return deptAmt;
+	}
+	public void setDeptAmt(Integer deptAmt)
+	{
+		this.deptAmt = deptAmt;
+	}
+	public Integer getCapitAmt()
+	{
+		return capitAmt;
+	}
+	public void setCapitAmt(Integer capitAmt)
+	{
+		this.capitAmt = capitAmt;
+	}
+	public Integer getSoldAmt()
+	{
+		return soldAmt;
+	}
+	public void setSoldAmt(Integer soldAmt)
+	{
+		this.soldAmt = soldAmt;
+	}
+	public Integer getSoldPrivAmt()
+	{
+		return soldPrivAmt;
+	}
+	public void setSoldPrivAmt(Integer soldPrivAmt)
+	{
+		this.soldPrivAmt = soldPrivAmt;
+	}
+	public Integer getSoldPublAmt()
+	{
+		return soldPublAmt;
+	}
+	public void setSoldPublAmt(Integer soldPublAmt)
+	{
+		this.soldPublAmt = soldPublAmt;
+	}
+	public Integer getSoldOrgCost()
+	{
+		return soldOrgCost;
+	}
+	public void setSoldOrgCost(Integer soldOrgCost)
+	{
+		this.soldOrgCost = soldOrgCost;
+	}
+	public Integer getSoldIncom()
+	{
+		return soldIncom;
+	}
+	public void setSoldIncom(Integer soldIncom)
+	{
+		this.soldIncom = soldIncom;
+	}
+	public Integer getSalesAmt()
+	{
+		return salesAmt;
+	}
+	public void setSalesAmt(Integer salesAmt)
+	{
+		this.salesAmt = salesAmt;
+	}
+	public Integer getSalesIncom()
+	{
+		return salesIncom;
+	}
+	public void setSalesIncom(Integer salesIncom)
+	{
+		this.salesIncom = salesIncom;
+	}
+	public Integer getExtProf()
+	{
+		return extProf;
+	}
+	public void setExtProf(Integer extProf)
+	{
+		this.extProf = extProf;
+	}
+	public Integer getNetIncom()
+	{
+		return netIncom;
+	}
+	public void setNetIncom(Integer netIncom)
+	{
+		this.netIncom = netIncom;
+	}
+	public Date getCreDt()
+	{
+		return creDt;
+	}
+	public void setCreDt(Date creDt)
+	{
+		this.creDt = creDt;
+	}
+	public Date getModDt()
+	{
+		return modDt;
+	}
+	public void setModDt(Date modDt)
+	{
+		this.modDt = modDt;
+	}
+	@Override
+	public String toString()
+	{
+		return "CorpFinance [corpSeq=" + corpSeq + ", finnSeq=" + finnSeq
+				+ ", clsDt=" + clsDt + ", asstAmt=" + asstAmt + ", deptAmt="
+				+ deptAmt + ", capitAmt=" + capitAmt + ", soldAmt=" + soldAmt
+				+ ", soldPrivAmt=" + soldPrivAmt + ", soldPublAmt="
+				+ soldPublAmt + ", soldOrgCost=" + soldOrgCost + ", soldIncom="
+				+ soldIncom + ", salesAmt=" + salesAmt + ", salesIncom="
+				+ salesIncom + ", extProf=" + extProf + ", netIncom=" + netIncom
+				+ ", creDt=" + creDt + ", modDt=" + modDt + "]";
+	}
+	
+	
+}

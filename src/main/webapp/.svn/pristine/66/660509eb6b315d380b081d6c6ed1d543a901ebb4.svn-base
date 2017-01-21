@@ -1,0 +1,61 @@
+<dom-module id="corp-detail-kpi">
+    <template>
+        <style include="common-style"></style>
+
+        <iron-ajax id="protocolGetCorpKpi" url$="/api/corp/{{corpId}}/kpi" method="GET" content-type="application/json" last-response="{{_corpDetail}}"></iron-ajax>
+
+        <h3>상세 지표별 점수</h3>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        성과지표
+                    </th>
+                    <th>
+                        세부 성과지표
+                    </th>
+                    <th>
+                        배점
+                    </th>
+                    <th>
+                        점수
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'corp-detail-kpi',
+
+            properties: {
+                corpId: Number,
+                _isAttached: Boolean,
+                _corpDetail: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    }
+                }
+            },
+
+            observers: [
+                '_search(corpId, _isAttached)'
+            ],
+
+            attached: function() {
+                this._isAttached = true;
+            },
+
+            _search: function() {
+                this.$.protocolGetCorpKpi.generateRequest();
+            }
+
+        })
+    </script>
+</dom-module>

@@ -1,0 +1,14 @@
+<dom-module id="kpi-info-grid">
+    <template>
+        <style>
+        </style>
+
+        grid
+    </template>
+
+    <script>
+        Polymer({
+            is: 'kpi-info-grid'
+        })
+    </script>
+</dom-module>

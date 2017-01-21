@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+
+    <script src="../js/jquery-1.11.1.min.js"></script>
+    <script src="../js/jquery.form.min.js"></script>
+
+    <script src="../js/d3.min.js"></script>
+    <script src="../js/Pagenator.js"></script>
+    <script>
+        $(document).ready(function () {
+            pagenator = new Pagenator();
+            pagenator.options = {
+                totalRowCount: 60,
+                pageAnchorCount: 5,
+                pageRowCount: 10,
+                currentPageNo: 1,
+                anchorGroupId: "pageIndex",
+                anchorPrevGroupId: "prevPageGroup",
+                anchorNextGroupId: "nextPageGroup"
+            };
+            pagenator.draw();
+        });
+    </script>
+</head>
+<body>
+<div id="pagenum" class="pagenum">
+    <a id="prevPageGroup" href="javascript:;" class="n"><<</a>
+        <span id="pageIndex">
+
+        </span>
+    <a id="nextPageGroup" href="javascript:;" class="n">>></a>
+</div>
+
+</body>
+</html>

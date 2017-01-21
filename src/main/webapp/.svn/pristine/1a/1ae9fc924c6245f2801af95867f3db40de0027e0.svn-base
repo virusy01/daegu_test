@@ -1,0 +1,56 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/iron-input/iron-input.html" />
+
+<dom-module id="input-business-number">
+    <template>
+        <style>
+            :host {
+                display: inline-block;
+            }
+
+            input[is="iron-input"] {
+                font: inherit;
+                outline: none;
+                box-shadow: none;
+                border: none;
+                width: auto;
+                text-align: center;
+            }
+
+            .container {
+                @apply(--layout-horizontal);
+            }
+        </style>
+
+        <div class="container">
+            <input is="iron-input" maxlength="3" bind-value="{{_bn1}}" allowed-pattern="[0-9]" /> -
+            <input is="iron-input" maxlength="2" bind-value="{{_bn2}}" allowed-pattern="[0-9]" /> -
+            <input is="iron-input" maxlength="5" bind-value="{{_bn3}}" allowed-pattern="[0-9]" />
+        </div>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'input-business-number',
+
+            properties: {
+                value: {
+                    type: String,
+                    notify: true
+                },
+                _bn1: String,
+                _bn2: String,
+                _bn3: String,
+            },
+
+            observers: [
+                '_computeValue(_bn1, _bn2, _bn3)'
+            ],
+
+            _computeValue: function(bn1, bn2, bn3) {
+                this.value = bn1.trim() + "-" + bn2.trim() + "-" + bn3.trim();
+            }
+        })
+    </script>
+</dom-module>

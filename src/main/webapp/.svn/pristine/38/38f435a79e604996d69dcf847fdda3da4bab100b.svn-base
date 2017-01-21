@@ -1,0 +1,222 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+
+<link rel="import" href="../common/behavior-page.html" />
+<link rel="import" href="../common/normal-select.html" />
+<link rel="import" href="../style/c3-chart-style.html" />
+<link rel="import" href="../style/bootstrap-style.html" />
+<link rel="import" href="../style/common-style.html" />
+
+<dom-module id="summary-rank-by-chart">
+    <template>
+        <style include="bootstrap-style"></style>
+        <style include="common-style"></style>
+        <style include="c3-chart-style">
+            #searchForm {
+                margin: 20px 0;
+            }
+
+            .panel-body {
+                padding: 15px 15px 0 15px;
+            }
+        </style>
+
+        <iron-ajax auto url="/api/common/kpi_depth_1/code/" headers='{"X-Requested-With": "XMLHttpRequest"}' last-response="{{_codes.kpiType}}" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax id="protocolGetKpiSum" url="/api/corp/kpis" headers='{"X-Requested-With": "XMLHttpRequest"}' content-type="application/json" on-response="_drawChart" on-error="_redirectOnError"></iron-ajax>
+
+        <div id="searchForm" class="panel panel-default">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label for="kpiType">주요 지표</label>
+                    <normal-select id="kpiType" items="{{_codes.kpiType}}" on-value-changed="_assignKpiType"></normal-select>
+                </div>
+            </div>
+        </div>
+
+        <div id="chart"></div>
+
+    </template>
+
+    <script src="/scripts/d3.min.js"></script>
+    <script src="/scripts/c3.min.js"></script>
+    <script>
+        Polymer({
+            is: 'summary-rank-by-chart',
+
+            behaviors: [PS.BehaviorPage],
+
+            properties: {
+                loadChart: Boolean,
+                _codes: {
+                    type: Object,
+                    value: function() {
+                        return {
+                            kpiType: []
+                        };
+                    }
+                },
+                _data: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _kpiType: {
+                    type: String,
+                    value: "01"
+                },
+            },
+
+            observers: [
+                '_fetchData(loadChart, _isAttached)'
+            ],
+
+            ready: function() {
+                this.scopeSubtree(this.$.chart, true);
+            },
+
+            attached: function() {
+                this._isAttached = true;
+            },
+
+            _fetchData: function() {
+                this.$.protocolGetKpiSum.params = {
+                    compKind: '',
+                    corpType: '',
+                    bizSect: '',
+                    evalYear: '2015'
+                };
+
+                this.$.protocolGetKpiSum.generateRequest();
+            },
+
+            _drawChart: function(e) {
+                this._data = e.target.lastResponse;
+                this._doDraw();
+            },
+
+            _doDraw: function() {
+                this._data = this._orderDataBy(this._kpiType);
+
+                var subdepthData = this._extractSubData(this._data);
+                var data = this._data;
+                var chartHeight = (this._data.length * 50)+100;
+
+                c3.generate({
+                    bindto: this.$.chart,
+                    padding: {
+                        left: 150
+                    },
+                    size: {
+                        height: chartHeight
+                    },
+                    data: {
+                        json: this._data,
+                        keys: {
+                            x: 'corpNm',
+                            value: ['depth1' + this._kpiType]
+                        },
+                        type: 'bar',
+                        groups: [
+                            ['depth1' + this._kpiType]
+                        ],
+                        names: {
+                            depth101: '사회적 가치 창출',
+                            depth102: '경제적 가치 창출',
+                            depth103: '사회적자본 활용',
+                            depth104: '제품/서비스 품질관리',
+                            depth105: '제품/서비스 차별화 체계',
+                            depth106: '판로 확대 체계',
+                            depth107: '지배구조 체계',
+                            depth108: '조직몰입도',
+                            depth109: '사업역량',
+                            depth110: '구성원 인사관리'
+                        },
+                        order: 'desc'
+                    },
+                    color: {
+                        pattern: ['#f46464', '#e74c3c', '#1f8a70', '#00a388', '#ffb03b', '#e8cb0d', '#ffe11a', '#ff8598', '#ffc0a9', '#f2836b']
+                    },
+                    axis: {
+                        rotated: true,
+                        x: {
+                            type: 'category'
+                        }
+                    },
+                    tooltip: {
+                        grouped: false,
+                        contents: function(d, defaultTitleFormat, defaultValueFormat, color) {
+                            var subIndex = parseInt(d[0].id.substr(6, 2)) - 1;
+                            var data = subdepthData[d[0].index][subIndex];
+                            var i;
+                            var color = color(d[0]);
+
+                            var tooltipContent = "";
+                            var scoreSum = 0;
+                            for (i = 0; i < data.length; i++) {
+                                tooltipContent += data[i].depth2Nm + " : " + data[i].score + "<br />";
+                                scoreSum += data[i].score;
+                            }
+
+                            var tooltip = "<div class='chart-tooltip' style='border: 1px solid " + color + ";'><div class='chart-tooltip-header' style='background-color: " + color + "; border-bottom: 1px solid " + color + ";'>" + data[0]
+                                .depth1Nm + " (" + scoreSum + ")</div><div class='chart-tooltip-content'>";
+                            tooltip += tooltipContent;
+                            tooltip += "</div></div>";
+                            return tooltip;
+                        }.bind(subdepthData)
+                    },
+                    legend: {
+                        show: false
+                    },
+                    onrendered: function() {
+                        this._closeOverlay();
+                    }.bind(this)
+                });
+            },
+
+            _extractSubData: function(data) {
+                var i;
+                var subdata = [];
+
+                for (i = 0; i < data.length; i++) {
+                    var depth2Pkg = [];
+                    var depth2PkgIndex = 0;
+
+                    var depth2 = data[i].depth2;
+                    var previousIndex = null;
+
+                    for (var j = 0; j < depth2.length; j++) {
+                        if (!previousIndex) {
+                            depth2Pkg[depth2PkgIndex] = [];
+                            depth2Pkg[depth2PkgIndex].push(depth2[j]);
+                            previousIndex = depth2[j].depth1;
+                        } else if (previousIndex != depth2[j].depth1) {
+                            depth2PkgIndex++;
+                            depth2Pkg[depth2PkgIndex] = [];
+                            depth2Pkg[depth2PkgIndex].push(depth2[j]);
+                            previousIndex = depth2[j].depth1;
+                        } else {
+                            depth2Pkg[depth2PkgIndex].push(depth2[j]);
+                            previousIndex = depth2[j].depth1;
+                        }
+                    }
+                    subdata.push(depth2Pkg);
+                }
+                return subdata;
+            },
+
+            _orderDataBy: function(type) {
+                return this._data.sort(function(a, b) {
+                    return b['depth1' + type] - a['depth1' + type];
+                }.bind(type));
+            },
+
+            _assignKpiType: function(e) {
+                this._kpiType = e.target.value;
+                if (this._isAttached)
+                    this._doDraw();
+            },
+        })
+    </script>
+</dom-module>

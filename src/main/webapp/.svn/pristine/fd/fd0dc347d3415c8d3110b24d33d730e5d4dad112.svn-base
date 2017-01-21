@@ -1,0 +1,810 @@
+/**
+ * Created by jwm_000 on 2015-10-09.
+ */
+
+;
+var corpInfoAdd = (function (window, $, undefined) {
+    var pagenator;
+    var corpList;
+
+    $(document).ready(function () {
+
+        $("#navTabCorp > li > a").on("click", toggleTab_corp);
+
+        $("#btnSearch").on("click", getCorpCount);
+        $("#btnGoBack").on("click", function () {
+            togglePage(1)
+        });
+        $("#btnGoBack2").on("click", function () {
+            togglePage(1)
+        });
+        $("#btnGoBack3").on("click", function () {
+            togglePage(1)
+        });
+
+        $("#btnCorpAdd").on("click", showCorpInfo);
+
+        $("#btnCorpSave").on("click", addCorpInfo);
+        $("#btnCorpDel").on("click", delCorpInfo);
+
+        $("#btnAddKpi").on("click", showCorpKpi);
+
+        $("#btnAddRowHelp").on("click", addRowHelp);
+        $("#btnAddRowFinance").on("click", addRowFinance);
+        $("#btnAddRowEmployee").on("click", addRowEmployee);
+
+        $("#btnFinanceSave").on("click", saveFinance);
+        $("#btnHelpSave").on("click", saveHelp);
+        $("#btnCorpKpiSave").on("click", saveCorpKpi);
+        $("#btnEmployeeSave").on("click", saveEmployee);
+
+        mask();
+
+        window.Parsley
+            .addValidator('date', {
+                requirementType: 'string',
+                validateString: function (value, requirement) {
+                    var valid = true;
+
+                    if (value.length != 10){
+                        return false;
+                    }
+
+                    var date = value.replace(/-/g, '');
+
+                    var year  = parseInt(date.substring(0, 4),10);
+                    var month = parseInt(date.substring(4, 6),10);
+                    var day   = parseInt(date.substring(6, 8),10);
+
+                    if((month < 1) || (month > 12)) valid = false;
+                    else if((day < 1) || (day > 31)) valid = false;
+                    else if(((month == 4) || (month == 6) || (month == 9) || (month == 11)) && (day > 30)) valid = false;
+                    else if((month == 2) && (((year % 400) == 0) || ((year % 4) == 0)) && ((year % 100) != 0) && (day > 29)) valid = false;
+                    else if((month == 2) && ((year % 100) == 0) && (day > 29)) valid = false;
+
+                    return valid;
+
+                },
+                messages: {
+                    ko: '올바른 날짜가 아닙니다.',
+                }
+            });
+
+        corpInfoAdd.initialize();
+    })
+    ;
+
+    function mask() {
+        /* Mask */
+        $('.date').mask('0000-00-00', {placeholder: "0000-00-00"});
+        $('.time').mask('00:00:00');
+        $('.date_time').mask('0000-00-00 00:00:00');
+        $('.cep').mask('00000-000');
+        $('.biz_no').mask('000-00-00000');
+        $('.phone').mask('0000-0000');
+        $('.phone_with_ddd').mask('(00) 0000-0000');
+        $('.phone_us').mask('(000) 000-0000');
+        $('.mixed').mask('AAA 000-S0S');
+        $('.cpf').mask('000.000.000-00', {reverse: true});
+        $('.money').mask('Z000,000,000,000,000,000', {
+            reverse: true,
+            translation: {
+                'Z':{
+                    pattern:/-/, optional:true
+                }
+            }
+        });
+        $('.money2').mask("#,##0.00", {reverse: true});
+        $('.integer').mask("000000000000000000", {reverse: true});
+        $('.ip_address').mask('0ZZ.0ZZ.0ZZ.0ZZ', {
+            translation: {
+                'Z': {
+                    pattern: /[0-9]/, optional: true
+                }
+            }
+        });
+        $('.ip_address').mask('099.099.099.099');
+        $('.percent').mask('##0,00%', {reverse: true});
+        $('.clear-if-not-match').mask("00/00/0000", {clearIfNotMatch: true});
+        $('.placeholder').mask("00/00/0000", {placeholder: "__/__/____"});
+        $('.fallback').mask("00r00r0000", {
+            translation: {
+                'r': {
+                    pattern: /[\/]/,
+                    fallback: '/'
+                },
+                placeholder: "__/__/____"
+            }
+        });
+        $('.selectonfocus').mask("00/00/0000", {selectOnFocus: true});
+
+        $(".number-field").inputmask("decimal", { radixPoint: ".",
+            autoGroup: true,
+            groupSeparator: ",",
+            groupSize: 3});
+
+        Inputmask.extendAliases({
+            'decimal': {
+                allowPlus: false,
+                allowMinus: true
+            }
+        });
+    }
+
+    function initialize() {
+        var options1 = {
+            cache: true,
+            data: {grpCd: "CORP_TYPE"},
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                var promptData = {CD: '', CD_NM: "전체"};
+                var selectBuilder = new SelectBuilder($("#selCorpType"), "CD", "CD_NM");
+                selectBuilder.buildOptions(result, promptData);
+
+                selectBuilder = new SelectBuilder($("#selCorpType2"), "CD", "CD_NM");
+                selectBuilder.buildOptions(result);
+            }
+        };
+
+        var options2 = {
+            cache: true,
+            data: {grpCd: "COMP_KIND"},
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                var promptData = {CD: '', CD_NM: "전체"};
+                var selectBuilder = new SelectBuilder($("#selCompKind"), "CD", "CD_NM");
+                selectBuilder.buildOptions(result, promptData);
+
+                selectBuilder = new SelectBuilder($("#selCompKind2"), "CD", "CD_NM");
+                selectBuilder.buildOptions(result);
+            }
+        };
+
+        var options3 = {
+            cache: true,
+            data: {grpCd: "BIZ_SECT"},
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                var promptData = {CD: '', CD_NM: "전체"};
+                var selectBuilder = new SelectBuilder($("#selBizSect"), "CD", "CD_NM");
+                selectBuilder.buildOptions(result, promptData);
+
+                selectBuilder = new SelectBuilder($("#selBizSect2"), "CD", "CD_NM");
+                selectBuilder.buildOptions(result);
+            }
+        };
+
+        var options4 = {
+            cache: true,
+            data: {grpCd: "SOC_TYPE"},
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                var selectBuilder = new SelectBuilder($("#selSocType2"), "CD", "CD_NM");
+                selectBuilder.buildOptions(result);
+            }
+        };
+
+
+        var promises = [
+            $.ajax("../php/code.php", options1),
+            $.ajax("../php/code.php", options2),
+            $.ajax("../php/code.php", options3),
+            $.ajax("../php/code.php", options4)];
+
+        $.when(promises).then(getCorpCount);
+    }
+
+    function getCorpCount() {
+        var form = document.commonForm;
+
+        var options = {
+            cache: false,
+            url: "../php/corp_info_count.php",
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                $("#detailGridCorpCount").text("(" + result.ROW_COUNT + ")");
+                drawPagenation(result);
+                searchCorp();
+            }
+        };
+
+        $(form).ajaxSubmit(options);
+    }
+
+    function searchCorp() {
+        var form = document.commonForm;
+
+        var options = {
+            cache: false,
+            url: "../php/corp_info.php?orderBy=CORP_NM",
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                drawRows(result);
+            }
+        };
+
+        $(form).ajaxSubmit(options);
+    }
+
+    function drawRows(result) {
+        $("#grid > tbody").children("tr").remove();
+
+        if (result.length < 1) {
+            $("#grid > tbody").append("<tr><td colspan='6'>조회된 데이터가 없습니다.</td></tr>");
+        } else {
+            for (var index in result) {
+                var item = result[index];
+                $("#grid > tbody").append("<tr><td><a href='javascript:;' onclick='corpInfoAdd.showCorpDetail(this)' data-corpseq='" + item.CORP_SEQ + "' data-corpnm='" + item.CORP_NM + "'>" + item.CORP_NM + "</a></td><td>"
+                    + item.CEO_NM + "</td><td>" +
+                    item.CORP_TYPE_NM + "</td><td>" + item.COMP_KIND_NM + "</td><td>" + item.BIZ_SECT_NM +
+                    "</td><td><a href='javascript:;' class='btn btn-info' style='font-size: 11px; margin-bottom: 0px;background-color:#969696;border-color:#666;padding:3px 6px' onclick='corpInfoAdd.showCorpKpi(this)' data-corpseq='" + item.CORP_SEQ + "' data-corpnm='" + item.CORP_NM + "'>성과 및 기타정보 등록</a></td>");
+            }
+        }
+    }
+
+    function togglePage(pageNo) {
+        if (pageNo == 1) {
+            $("#corpList").css("display", "");
+            $("#corpDetail").css("display", "none");
+            $("#corpDetail2").css("display", "none");
+        } else if (pageNo == 2) {
+            $("#corpList").css("display", "none");
+            $("#corpDetail").css("display", "");
+            $("#corpDetail2").css("display", "none");
+            $("#selCorpType2").change(showExtraInput);
+            $("#selBizSect2").change(showExtraInput);
+        } else if (pageNo == 3) {
+            $("#corpList").css("display", "none");
+            $("#corpDetail").css("display", "none");
+            $("#corpDetail2").css("display", "");
+        } else {
+            //nothing
+        }
+    }
+
+    function toggleTab_corp(event) {
+        $("#navTabCorp > li").attr("class", "");
+        var $a = $(event.currentTarget)
+        $($a.parent()).attr("class", "active");
+
+        if ($a.attr("data-page") == "kpi") {
+            $("#kpi").css("display", "");
+            $("#finance").css("display", "none");
+            $("#help").css("display", "none");
+            $("#employee").css("display", "none");
+            //corpInfoAdd.showCorpKpi();
+        } else if ($a.attr("data-page") == "finance") {
+            $("#kpi").css("display", "none");
+            $("#finance").css("display", "");
+            $("#help").css("display", "none");
+            $("#employee").css("display", "none");
+            mask();
+            //corpInfoAdd.showFinance();
+        } else if ($a.attr("data-page") == "help") {
+            $("#kpi").css("display", "none");
+            $("#finance").css("display", "none");
+            $("#help").css("display", "");
+            $("#employee").css("display", "none");
+            //corpInfoAdd.showHelp();
+        } else {
+            $("#kpi").css("display", "none");
+            $("#finance").css("display", "none");
+            $("#help").css("display", "none");
+            $("#employee").css("display", "");
+            //corpInfoAdd.showEmployee();
+        }
+    }
+
+    function showCorpDetail(anchor) {
+        var $anchor = $(anchor);
+        var corpSeq = $anchor.attr("data-corpseq");
+        //alert(corpSeq);
+
+        $("#corpDetailHeader").text("기업현황 수정- " + $anchor.attr("data-corpnm"));
+        $("#btnCorpDel").css("display", "");
+
+        var form = document.detailForm;
+        $("input[type='hidden'][name='corpSeq']").val(corpSeq);
+
+        var options = {
+            cache: false,
+            url: "../php/corp_detail_info.php",
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                var tmpl = $.templates("#tblCorpInfo");
+                var html = tmpl.render(result);
+                $("#tblCorpInfo").children().remove()
+                $("#tblCorpInfo").append(html);
+
+                tmpl = $.templates("#tblSocInfo");
+                html = tmpl.render(result);
+                $("#tblSocInfo").children().remove()
+                $("#tblSocInfo").append(html);
+
+                tmpl = $.templates("#tblEmpInfo");
+                html = tmpl.render(result);
+                $("#tblEmpInfo").children().remove()
+                $("#tblEmpInfo").append(html);
+
+                $("#selCorpType2").val(result.CORP_TYPE);
+                $("#selCompKind2").val(result.COMP_KIND);
+
+                if (result.COMP_KIND === "01" || result.COMP_KIND === "02"){
+                    $("#ifSoc").css("display", "");
+                } else {
+                    $("#ifSoc").css("display", "none");
+                }
+
+                $("#selBizSect2").val(result.BIZ_SECT);
+                $("#selSocType2").val(result.SOC_TYPE);
+
+                togglePage(2);
+            }
+        };
+
+        $("#selCompKind2").on("change", function(){
+            var compKind = $("#selCompKind2 option:selected").val();
+            if (compKind === "01" || compKind === "02"){
+                $("#ifSoc").css("display", "");
+            } else {
+                $("#ifSoc").css("display", "none");
+            }
+        });
+
+        $(form).ajaxSubmit(options);
+    }
+
+    function showCorpInfo() {
+        var corpSeq = -1;
+
+        $("#corpDetailHeader").text("기업현황 등록");
+
+        var form = document.detailForm;
+        $("input[type='hidden'][name='corpSeq']").val(corpSeq);
+
+        var result = {};
+
+        var tmpl = $.templates("#tblCorpInfo");
+        var html = tmpl.render(result);
+        $("#tblCorpInfo").children().remove()
+        $("#tblCorpInfo").append(html);
+
+        tmpl = $.templates("#tblSocInfo");
+        html = tmpl.render(result);
+        $("#tblSocInfo").children().remove()
+        $("#tblSocInfo").append(html);
+
+        tmpl = $.templates("#tblEmpInfo");
+        html = tmpl.render(result);
+        $("#tblEmpInfo").children().remove()
+        $("#tblEmpInfo").append(html);
+
+        $("#selCompKind2").on("change", function(){
+            var compKind = $("#selCompKind2 option:selected").val();
+            if (compKind === "01" || compKind === "02"){
+                $("#ifSoc").css("display", "");
+            } else {
+                $("#ifSoc").css("display", "none");
+            }
+        });
+
+        togglePage(2);
+        //mask();
+    }
+
+
+    function addCorpInfo() {
+        var form = document.detailForm;
+        var param = $(form).serialize();
+        var options = {
+            cache: false,
+            url: "../php/corp_info_save.php",
+            data: param,
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                getCorpCount();
+                //togglePage(1);
+            }
+        };
+
+        if ($(form).parsley().validate()) {
+            $(form).ajaxSubmit(options);
+        }
+    }
+
+    function delCorpInfo(){
+        var form = document.detailForm;
+        var param = $(form).serialize();
+        var options = {
+            cache: false,
+            url: "../php/corp_info_del.php",
+            data: param,
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                getCorpCount();
+                //togglePage(1);
+            }
+        };
+
+        $(form).ajaxSubmit(options);
+    }
+
+    // 기타 코드 선택 시 직접 입력
+    function showExtraInput(event){
+        if (event.currentTarget == $("#selCorpType2")[0]){
+            if ($("#selCorpType2 option:selected").val() === "06") {
+                $("#txtCorpType2").css("display", "");
+            }
+            else {
+                $("#txtCorpType2").css("display", "none");
+            }
+
+        }
+
+        if (event.currentTarget == $("#selBizSect2")[0]) {
+            if ($("#selBizSect2 option:selected").val() === "16") {
+                $("#txtBizSect2").css("display", "");
+            }
+            else {
+                $("#txtBizSect2").css("display", "none");
+            }
+        }
+    }
+
+    function showCorpKpi(anchor) {
+        var corpSeq = $(anchor).attr("data-corpseq");
+
+        $("#corpDetail2Header").text("성과 및 기타정보 등록 - " + $(anchor).attr("data-corpnm"));
+
+        var form = document.frmDepth2;
+        $(form).find("input[type='hidden'][name='corpSeq']").val(corpSeq);
+
+        var options = {
+            cache: false,
+            url: "../php/corp_kpi_detail.php",
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                drawCorpKpiDetailGrid(result);
+                togglePage(3);
+            }
+        };
+
+        $(form).ajaxSubmit(options);
+
+        form = document.frmFinance;
+        $(form).find("input[type='hidden'][name='corpSeq']").val(corpSeq);
+        form = document.frmHelp;
+        $(form).find("input[type='hidden'][name='corpSeq']").val(corpSeq);
+        form = document.frmEmployee;
+        $(form).find("input[type='hidden'][name='corpSeq']").val(corpSeq);
+
+        showFinance();
+        showHelp();
+        showEmployee();
+    }
+
+    function saveCorpKpi() {
+        var form = document.frmDepth2;
+        var options = {
+            cache: false,
+            url: "../php/corp_kpi_save.php",
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                alert("저장되었습니다!")
+                //togglePage(1);
+            }
+        };
+        if ($(form).parsley().validate()) {
+            $(form).ajaxSubmit(options);
+        }
+    }
+
+    function showHelp() {
+
+        var form = document.frmHelp;
+        var options = {
+            cache: false,
+            url: "../php/corp_detail_help.php",
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                var tmpl = $.templates("#tblHelp");
+                var html = tmpl.render(result);
+                $("#tblHelp").children().remove()
+                $("#tblHelp").append(html);
+            }
+        };
+
+        $(form).ajaxSubmit(options);
+    }
+
+    function addRowHelp() {
+        $("#tblHelp").prepend("<tr>" +
+            "<td style='text-align:center'><input type='hidden' name='helpSeq[]' value='-1'><input class='form-control01' type='text' name='helper[]' value=''></td>" +
+            "<td style='text-align:center'><input class='form-control01' type='text' name='prjNm[]' value=''></td>" +
+            "<td style='text-align:center'><input class='form-control01 date' style='text-align:center;width:40%' type='text' name='helpStDt[]' value=''>" +
+            "~ <input class='form-control01 date' style='text-align:center;width:40%' type='text' name='helpEndDt[]' value=''></td>" +
+            "<td style='text-align:right'><input class='form-control01' data-parsley-required style='text-align:right' type='text' name='helpAmt[]' value=''></td>" +
+            "<td><a href='javascript:;' class='btn btn-info' style='font-size: 11px; margin-bottom: 0px;background-color:#969696;border-color:#666;padding:3px 6px' onclick='corpInfoAdd.delRowHelp(this)' data-helpseq='-1'>삭제</a></td></tr>");
+
+        mask();
+    }
+
+    function delRowHelp(btn) {
+        if ($(btn).attr("data-helpseq") == -1){
+            // tr
+            $(btn).parent().parent().remove();
+        } else {
+            var param = {helpSeq: $(btn).attr("data-helpseq")};
+            var options = {
+                cache: false,
+                url: "../php/corp_help_del.php",
+                data: param,
+                type: "post",
+                dataType: "json",
+                success: function (result) {
+                    $(btn).parent().parent().remove();
+                    alert("삭제되었습니다");
+                }
+            };
+
+            $.ajax(options);
+        }
+    }
+
+    function saveHelp() {
+        var form = document.frmHelp;
+
+        var options = {
+            cache: false,
+            url: "../php/corp_help_save.php",
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                alert("저장되었습니다!.")
+                //togglePage(1);
+            }
+        };
+        if ($(form).parsley().validate()) {
+            $(form).ajaxSubmit(options);
+        }
+    }
+
+    function showFinance() {
+        var form = document.frmFinance;
+
+        var options = {
+            cache: false,
+            url: "../php/corp_detail_finance.php",
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                var tmpl = $.templates("#tblFinance");
+                var html = tmpl.render(result);
+                $("#tblFinance").children().remove();
+                $("#tblFinance").append(html);
+                mask();
+            }
+        };
+
+        $(form).ajaxSubmit(options);
+    }
+
+    function addRowFinance() {
+        $("#tblFinance").prepend("<tr>" +
+            "<td><input type='hidden' name='finnSeq[]' value='-1'><input class='form-control01 date' type='text' name='clsDt[]' data-parsley-required data-parsley-date value=''></td>" +
+            "<td><input class='form-control01 number-field' style='text-align:right' type='text' name='asstAmt[]'></td>" +
+            "<td><input class='form-control01 number-field' style='text-align:right' type='text' name='deptAmt[]' value=''></td>" +
+            "<td><input class='form-control01 number-field' style='text-align:right' type='text' name='capitAmt[]' value=''></td>" +
+            "<td><input class='form-control01 number-field' style='text-align:right' type='text' name='soldPrivAmt[]' value=''></td>" +
+            "<td><input class='form-control01 number-field' style='text-align:right' type='text' name='soldPublAmt[]' value=''></td>" +
+            "<td><input class='form-control01 number-field' style='text-align:right' type='text' name='soldOrgCost[]' value=''></td>" +
+            "<td><input class='form-control01 number-field' style='text-align:right' type='text' name='soldIncom[]' value=''></td>" +
+            "<td><input class='form-control01 number-field' style='text-align:right' type='text' name='salesAmt[]' value=''></td>" +
+            "<td><input class='form-control01 number-field' style='text-align:right' type='text' name='salesIncom[]' value=''></td>" +
+            "<td><input class='form-control01 number-field' style='text-align:right' type='text' name='extProf[]' value=''></td>" +
+            "<td><input class='form-control01 number-field' style='text-align:right' type='text' name='netIncom[]' value=''></td>" +
+            "<td><a href='javascript:;' class='btn btn-info' style='font-size: 11px; margin-bottom: 0px;background-color:#969696;border-color:#666;padding:3px 6px' onclick='corpInfoAdd.delRowFinance(this)' data-finnseq='-1'>삭제</a></td></tr>");
+
+        mask();
+    }
+
+    function delRowFinance(btn) {
+        if ($(btn).attr("data-finnseq") == -1){
+            // tr
+            $(btn).parent().parent().remove();
+        } else {
+            var param = {finnSeq: $(btn).attr("data-finnseq")};
+            var options = {
+                cache: false,
+                url: "../php/corp_finance_del.php",
+                data: param,
+                type: "post",
+                dataType: "json",
+                success: function (result) {
+                    $(btn).parent().parent().remove();
+                    alert("삭제되었습니다");
+                }
+            };
+
+            $.ajax(options);
+        }
+    }
+
+    function saveFinance() {
+        var form = document.frmFinance;
+
+        var options = {
+            cache: false,
+            url: "../php/corp_finance_save.php",
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                alert("저장되었습니다!.");
+                //togglePage(1);
+            }
+        };
+        if ($(form).parsley().validate()) {
+            $(form).ajaxSubmit(options);
+        }
+    }
+
+    function showEmployee() {
+        var form = document.frmEmployee;
+
+        var options = {
+            cache: false,
+            url: "../php/corp_detail_employee.php",
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                var tmpl = $.templates("#tblEmployee");
+                var html = tmpl.render(result);
+                $("#tblEmployee").children().remove();
+                $("#tblEmployee").append(html);
+            }
+        };
+
+        $(form).ajaxSubmit(options);
+    }
+
+    function addRowEmployee() {
+        $("#tblEmployee").prepend("<tr>" +
+            "<td><input type='hidden' name='empSeq[]' value='-1'><input class='form-control01 date' style='text-align:center' type='text' name='clsDt[]' data-parsley-required data-parsley-date value=''></td>" +
+            "<td><input class='form-control01 integer' style='text-align:right' data-parsley-required type='text' name='empNum[]' value=''></td>" +
+            "<td><input class='form-control01 integer' style='text-align:right' data-parsley-required type='text' name='weakNum[]' value=''></td>" +
+            "<td><input class='form-control01 integer' style='text-align:right' data-parsley-required type='text' name='fullNum[]' value=''></td>" +
+            "<td><input class='form-control01 integer' style='text-align:right' data-parsley-required type='text' name='partNum[]' value=''></td>" +
+            "<td><input class='form-control01 money' style='text-align:right' data-parsley-required type='text' name='cxxSal[]' value=''></td>" +
+            "<td><input class='form-control01 money' style='text-align:right' data-parsley-required type='text' name='normSal[]' value=''></td> + " +
+            "<td><a href='javascript:;' class='btn btn-info' style='font-size: 11px; margin-bottom: 0px;background-color:#969696;border-color:#666;padding:3px 6px' onclick='corpInfoAdd.delRowEmployee(this)' data-empseq='-1'>삭제</a></td></tr>");
+
+        mask();
+    }
+
+    function delRowEmployee(btn) {
+        if ($(btn).attr("data-empseq") == -1){
+            // tr
+            $(btn).parent().parent().remove();
+        } else {
+            var param = {empSeq: $(btn).attr("data-empseq")};
+            var options = {
+                cache: false,
+                url: "../php/corp_employee_del.php",
+                data: param,
+                type: "post",
+                dataType: "json",
+                success: function (result) {
+                    $(btn).parent().parent().remove();
+                    alert("삭제되었습니다");
+                }
+            };
+
+            $.ajax(options);
+        }
+    }
+
+
+    function saveEmployee() {
+        var form = document.frmEmployee;
+
+        var options = {
+            cache: false,
+            url: "../php/corp_employee_save.php",
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                alert("저장되었습니다!.");
+                //togglePage(1);
+            }
+        };
+        if ($(form).parsley().validate()) {
+            $(form).ajaxSubmit(options);
+        }
+    }
+
+    function drawCorpKpiDetailGrid(result) {
+        $("#depth2Grid > tbody").children().remove();
+
+        for (var i in result) {
+            var depth1 = result[i];
+            var depth2 = depth1.DEPTH_2;
+
+            var tr = "<tr>";
+
+            for (var j in depth2) {
+                if (j == 0) {
+                    tr += "<td rowspan='" + depth2.length + "'>" + depth1.DEPTH_1_NM + "</td>";
+                    tr += "<td>" + depth2[j].DEPTH_2_NM + "</td>";
+                    tr += "<td>" + depth2[j].MAX_SCORE + "</td>";
+                    tr += "<td><input type='hidden' name='depth1[]' value='" + depth1.DEPTH_1 + "'><input type='hidden' name='depth2[]' value='" + depth2[j].DEPTH_2 + "'><input class='form-control01' style='text-align:right' type='text' name='score[]' value='" + depth2[j].SCORE + "' data-parsley-min='0' data-parsley-max='" + depth2[j].MAX_SCORE + "'></td>";
+                    break;
+                }
+            }
+
+            for (var j in depth2) {
+                if (j != 0) {
+                    tr += "<tr><td>" + depth2[j].DEPTH_2_NM + "</td>";
+                    tr += "<td>" + depth2[j].MAX_SCORE + "</td>";
+                    tr += "<td><input type='hidden' name='depth1[]' value='" + depth1.DEPTH_1 + "'><input type='hidden' name='depth2[]' value='" + depth2[j].DEPTH_2 + "'><input class='form-control01' style='text-align:right' type='text' name='score[]' value='" + depth2[j].SCORE + "' data-parsley-min='0' data-parsley-max='" + depth2[j].MAX_SCORE + "'></td>";
+                }
+            }
+
+            $("#depth2Grid > tbody").append(tr);
+
+        }
+    }
+
+    function drawPagenation(result) {
+        if (!pagenator) {
+            pagenator = new Pagenator();
+        }
+        pagenator.options = {
+            totalRowCount: result.ROW_COUNT,
+            pageAnchorCount: 10,
+            pageRowCount: 10,
+            currentPageNo: 1,
+            anchorGroupId: "pageIndex",
+            anchorPrevGroupId: "prevPageGroup",
+            anchorNextGroupId: "nextPageGroup",
+            onPageClick: function (pageNo) {
+                $("input[type='hidden'][name='pageNo']").val(pageNo);
+                searchCorp();
+            }
+        };
+
+        $("input[type='hidden'][name='pageRowCount']").val(pagenator.options.pageRowCount);
+        $("input[type='hidden'][name='pageNo']").val(pagenator.options.currentPageNo);
+        pagenator.draw();
+    }
+
+    return {
+        initialize: initialize,
+        showCorpDetail: showCorpDetail,
+        searchCorp: searchCorp,
+        showCorpKpi: showCorpKpi,
+        showHelp: showHelp,
+        showFinance: showFinance,
+        showEmployee: showEmployee,
+        delRowFinance:delRowFinance,
+        delRowHelp:delRowHelp,
+        delRowEmployee:delRowEmployee
+    };
+
+})
+(window, jQuery, undefined);
+
+function corpInfoDetailCtrl($scope) {
+    $scope.corpInfo = corpInfo;
+}

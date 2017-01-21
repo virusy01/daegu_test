@@ -1,0 +1,67 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/app-route/app-route.html">
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+
+<dom-module id="group-corp">
+    <template>
+        <style></style>
+
+        <app-route route="{{route}}" pattern="/:subpage" data="{{routeData}}" tail="{{subroute}}"></app-route>
+
+        <iron-pages role="submain" selected="[[subpage]]" attr-for-selected="id" on-iron-select="_notifySelection">
+            <corp-list id="all"></corp-list>
+            <corp-create id="create"></corp-create>
+            <corp-info id="info" route="{{subroute}}"></corp-info>
+            <corp-detail id="detail" route="{{subroute}}"></corp-detail>
+        </iron-pages>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'group-corp',
+
+            properties: {
+                route: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    }
+                },
+                subpage: {
+                    type: String,
+                    observer: '_subPageChanged'
+                },
+                _htmlNames: {
+                  type: Object,
+                  value: function() {
+                    return {
+                      all: 'corp-list',
+                      create: 'corp-create',
+                      info: 'corp-info',
+                      detail: 'corp-detail'
+                    }
+                  }
+                }
+            },
+
+            observers: [
+                '_subRoutePageChanged(routeData.subpage)'
+            ],
+
+            _subRoutePageChanged: function(path) {
+                this.subpage = path || 'all';
+            },
+
+            _subPageChanged: function(subpage) {
+                this.importHref(this.resolveUrl('corp/' + this._htmlNames[subpage] + '.html'), null, null, true);
+            },
+
+            _notifySelection: function(e) {
+              var selectedItem = e.detail.item;
+
+              if (typeof selectedItem.refresh === 'function')
+                selectedItem.refresh();
+            }
+        })
+    </script>
+</dom-module>

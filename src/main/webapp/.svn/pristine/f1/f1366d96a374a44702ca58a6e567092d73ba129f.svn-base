@@ -1,0 +1,29 @@
+<link rel="import" href="/bower_components/paper-input/paper-input.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input-container.html" />
+<link rel="import" href="/bower_components/iron-input/iron-input.html" />
+
+<dom-module id="number-input">
+    <template>
+        <style></style>
+
+        <input is="iron-input" class="input" bind-value="{{value}}"></input>
+    </template>
+
+    <script>
+        Polymer({
+            is: "number-input",
+
+            properties: {
+                name: String,
+                value: {
+                    type: String,
+                    notify: true
+                },
+                _maskObj: String,
+            },
+
+            attached: function() {
+            }
+        })
+    </script>
+</dom-module>

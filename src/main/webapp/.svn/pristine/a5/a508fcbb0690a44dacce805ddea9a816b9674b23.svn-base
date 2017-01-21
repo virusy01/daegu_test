@@ -1,0 +1,18 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+
+<dom-module id="summary-dist-by-chart">
+    <template>
+        <style>
+        </style>
+
+        dist by chart
+    </template>
+
+    <script>
+        Polymer({
+            is: 'summary-dist-by-chart'
+        })
+    </script>
+</dom-module>

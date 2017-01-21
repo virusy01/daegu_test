@@ -1,0 +1,12 @@
+package com.sck.modules.common;
+
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
+import com.sck.model.Code;
+
+@Repository
+public interface CommonRepository {
+	List<Code> findCodes(String grpCd);
+}

@@ -1,0 +1,358 @@
+<link rel="import" href="/bower_components/iron-form/iron-form.html">
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/src/components/common/normal-input.html">
+<link rel="import" href="/src/components/common/number-input.html">
+<link rel="import" href="/src/components/behaviors/behavior-grid.html">
+<link rel="import" href="/src/components/behaviors/behavior-loader.html">
+
+<dom-module id="report-contribution">
+<template>
+	<div class="horizontal-margin-20"></div>
+
+	<iron-ajax id="getData" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
+			   url="/api/corp/monthly-report/donation"
+      		      on-request="_startLoader"
+		      on-response="_assignData">
+	</iron-ajax>
+
+	<iron-ajax id="getSalary" headers='{"X-Requested-With": "XMLHttpRequest"}'
+	    url="/api/corp/monthly-report/salary" last-response="{{_salary}}">
+	</iron-ajax>
+
+
+	<iron-ajax id="setSalary" headers='{"X-Requested-With": "XMLHttpRequest"}' method="POST"
+									   content-type="application/json"
+    		url="/api/corp/monthly-report/salary">
+	</iron-ajax>
+
+	<form id="gridForm" is="iron-form"
+	      content-type="application/json"
+	      method="post"
+	      action="/api/corp/monthly-report/donation"
+       	      on-iron-form-presubmit="_parseDataBeforeSubmit"
+	      on-iron-form-response="_submitResponse"
+	      class="form-horizontal">
+
+	<div class="row">
+		<div class="col-xs-4">
+		<table class="table table-bordered">
+			<tbody>
+				<tr>
+					<th>월 평균입금</th>
+					<td><number-input id="pay" name="pay" value="{{_salary.SALARY_AVG}}" transparent readonly></number-input></td>
+				</tr>
+			</tbody>
+		</table>
+		</div>
+		<div class="col-xs-8 text-right">
+			<template is="dom-if" if="{{adminMode}}">
+				<button type="button" on-tap="_downloadExcel" class="btn btn-sm btn-default">엑셀 다운로드</button>
+			</template>
+			<template is="dom-if" if="{{!adminMode}}">
+			<button type="button" on-tap="_resetData" class="btn btn-sm btn-default">되돌리기</button>
+			<button type="button" on-tap="_submitForm" class="btn btn-sm btn-primary">저장</button>
+			</template>
+		</div>
+	</div>
+
+	<div id="alert" class="alert alert-dismissible hide" role="alert"></div>
+
+	<div class="horizontal-margin-20"></div>
+
+	<table id="tableExpense" class="table table-bordered">
+		<thead>
+			<tr>
+				<th>사회적공헌</th>
+				<th colspan='2'>사회공헌 참여 내용</th>
+				<th colspan='3'>사회공헌 참여 시간 환산 금액</th>
+				<th>사회공헌 금액</th>
+			</tr>
+			<tr>
+				<th>월</th>
+				<th>활동명</th>
+				<th>공헌대상</th>
+				<th>인원</th>
+				<th>총시간</th>
+				<th>환산금액</th>
+				<th>금액</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+		<tfoot>
+		</tfoot>
+	</table>
+</form>
+</template>
+<script>
+Polymer({
+	is: 'report-contribution',
+
+	behaviors: [Lunch.GridBehavior, Lunch.LoaderBehavior],
+
+	properties: {
+		year: Number,
+		adminMode: {
+			type: Boolean,
+			value: false
+		},
+		apiTrigger: {
+			type: Boolean,
+			value: false
+		},
+		_corpSeq: {
+			type: Number,
+			value: function() {
+				return parseInt(sessionStorage.corpSeq);
+			}
+		},
+		_data: {
+			type: Array,
+			value: function() {
+				return [];
+			}
+		},
+		_guide: {
+			type: Array,
+			value: function() {
+				return [
+					'NAME',
+					'TARGET',
+					'REQ_PERSON',
+					'REQ_TIME',
+					'REQ_AMT',
+					'TOTAL_AMT',
+				];
+			}
+		},
+		_salary: Object,
+	},
+
+	observers: [
+		'requestData(apiTrigger, _corpSeq, year)'
+	],
+
+	created: function() {
+		this._adminAPIURL = '/api/hq/monthly-report/donation';
+		this._hideSum = true;
+	},
+
+	_clearData: function() {
+		Polymer.dom(this.$.tableExpense.querySelector('tbody')).innerHTML = '';
+		Polymer.dom(this.$.tableExpense.querySelector('tfoot')).innerHTML = '';
+	},
+
+	requestData: function() {
+		this._clearData();
+		if (!this.adminMode) {
+			this.$.getData.params = {
+				CORP_SEQ: this._corpSeq,
+				YEAR: this.year
+			};
+
+			this.$.getSalary.params = {
+				CORP_SEQ: this._corpSeq,
+				YEAR: this.year
+			};
+
+			this.$.getData.generateRequest();
+			this.$.getSalary.generateRequest();
+		}else {
+			this._loadOverallAPI();
+			
+			this.$.getSalary.params = {
+				YEAR: this.year
+			};
+			this.$.getSalary.generateRequest();
+		}
+	},
+
+	_assignData: function(e) {
+		this._data = e.target.lastResponse;
+
+		if (this._data) {
+			this._assignDataToTable('expense', this.$.tableExpense, this._data, this._guide);
+			this._stopLoader();
+		}
+	},
+
+	_assignDataToTable: function(prefix, table, data, guide, showTotal, showSum) {
+		showTotal = showTotal ? showTotal : true;
+		showSum = showSum ? showSum : true;
+		var body = table.querySelector('tbody');
+		var tr, th, td, value;
+		var input;
+		var total = {};
+
+		Polymer.dom(body).innerHTML = '';
+
+		for (var i = 0; i < 12; i++) {
+			tr = document.createElement('tr');
+			th = document.createElement('th');
+			Polymer.dom(th).innerHTML = data[i].MONTH;
+
+			Polymer.dom(body).appendChild(tr);
+			Polymer.dom(tr).appendChild(th);
+
+			for (var attribute in guide) {
+				td = document.createElement('td');
+				Polymer.dom(tr).appendChild(td);
+
+				value = data[i][guide[attribute]];
+
+				switch (guide[attribute]) {
+					case 'NAME':
+					case 'TARGET':
+			  			input = document.createElement('normal-input');
+						input.setAttribute('transparent', true);
+						input.setAttribute('id', prefix + '_' + guide[attribute] + i);
+						input.setAttribute('name', prefix + '_' + guide[attribute]);
+						input.setAttribute('value', value);
+
+						Polymer.dom(td).appendChild(input);
+						break;
+					default:
+						input = document.createElement('number-input');
+						input.setAttribute('transparent', true);
+						input.setAttribute('id', prefix + '_' + guide[attribute] + i);
+						input.setAttribute('name', prefix + '_' + guide[attribute]);
+						input.setAttribute('value', value);
+
+						if (guide[attribute] == 'REQ_AMT') {
+							input.setAttribute('readonly', true);
+						}else {
+
+							this.listen(input, 'value-changed', '_recalculateTotal');
+						}
+						Polymer.dom(td).appendChild(input);
+
+						if (!total[guide[attribute]])
+							total[guide[attribute]] = 0;
+
+						total[guide[attribute]] += value;
+
+						break;
+				}
+				if (this.adminMode) input.setAttribute('readonly', true);
+			}
+
+		}
+
+		this._drawFooter(prefix, table, total, showTotal, showSum);
+	},
+
+	_drawFooter: function(prefix, table, total) {
+
+		var foot = table.querySelector('tfoot');
+		Polymer.dom(foot).innerHTML = '';
+
+		if (!this._hideTotal) {
+			// total
+			tr = document.createElement('tr');
+			th = document.createElement('th');
+			Polymer.dom(th).innerHTML = '합계';
+			Polymer.dom(tr).appendChild(th);
+			Polymer.dom(foot).appendChild(tr);
+
+			for (var t in this._guide) {
+				attribute = this._guide[t];
+				td = document.createElement('td');
+				td.setAttribute('id', 'total_' + prefix + '_' + attribute);
+				if (attribute != 'NAME' && attribute != 'TARGET')
+					td.innerHTML = accounting.formatNumber(total[attribute]);
+
+				Polymer.dom(tr).appendChild(td);
+			}
+		}
+	},
+
+	_recalculateTotal: function(e) {
+		var name = e.currentTarget.name;
+		var prefix = name.split('_')[0];
+		var columnName = name.split('_').slice(1, 10).join('_');
+		var total = 0, sum;
+		var calculatedTotal = 0;
+		var calculated, time, calculateValue;
+		var pay = this.$.pay.number;
+
+		for (var i = 0; i < 12; i++) {
+			total += this.$$("#"+name+i).number;
+
+			if (columnName == 'REQ_TIME') {
+				time = this.$$("#expense_REQ_TIME" + i).number;
+				calculated = this.$$("#expense_REQ_AMT" + i);
+				calculatedValue = Math.round(pay * time / 209);
+				calculated.value = calculatedValue;
+				calculatedTotal += calculatedValue;
+			}
+		}
+
+		// set total
+		if (!this._hideTotal)
+			this.$$('#total_' + name).innerHTML = accounting.formatNumber(total);
+
+		if (columnName == 'REQ_TIME')
+			this.$$('#total_' + prefix + '_' + 'REQ_AMT').innerHTML = accounting.formatNumber(calculatedTotal);
+
+	},
+
+	_calculateAmount: function(e) {
+		if (this.$$('#total_expense_REQ_AMT')) {
+			var calculatedTotal = 0;
+			var calculated, time, calculateValue;
+			var pay = this.$.pay.number;
+
+			for (var i = 0; i < 12; i++) {
+				time = this.$$("#expense_REQ_TIME" + i).number;
+				calculated = this.$$("#expense_REQ_AMT" + i);
+				calculatedValue = Math.round(pay * time / 209);
+				calculated.value = calculatedValue;
+				calculatedTotal += calculatedValue;
+			}
+
+			this.$$('#total_expense_REQ_AMT').innerHTML = accounting.formatNumber(calculatedTotal);
+		}
+	},
+
+	_parseDataBeforeSubmit: function(e) {
+		var data = this.$.gridForm.serialize();
+		var parsedData = [];
+
+		for (var i = 0; i < 12; i++) {
+			for (var key in data) {
+				var keySplit = key.split('_');
+				var category = keySplit[0];
+				var insertKey = keySplit.splice(1, keySplit.length).join('_');
+				var insertValue;
+
+				if (insertKey == 'NAME' || insertKey == 'TARGET')
+					insertValue = data[key][i];
+				else
+					insertValue = accounting.unformat(data[key][i]);
+
+				if (!parsedData[i])
+					parsedData[i] = {};
+				parsedData[i][insertKey] = insertValue;
+			}
+			parsedData[i]['YEAR'] = this.year;
+			parsedData[i]['CORP_SEQ'] = this._corpSeq;
+			parsedData[i]['MONTH'] = i + 1;
+		}
+
+	   	this.$.gridForm.request.body = parsedData;
+	},
+
+	_submitForm: function(e) {
+		if (this.$.gridForm.validate()) {
+			this.$.setSalary.body = this._salary;
+			this.$.setSalary.body['SALARY_AVG'] = accounting.unformat(this._salary.SALARY_AVG);
+
+			this.$.setSalary.generateRequest();
+			this.$.gridForm.submit();
+		}
+	},
+
+
+});
+</script>
+</dom-module>

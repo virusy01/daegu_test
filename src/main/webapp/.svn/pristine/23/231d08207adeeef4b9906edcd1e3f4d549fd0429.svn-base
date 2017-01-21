@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GP TEXT FIELD DEMO</title>
+    <script src="/bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <script src="/ui/assets/js/accounting.min.js"></script>
+
+    <link rel="import" href="/bower_components/sc-component/sc-elements.html">
+
+    <link rel="import" href="../gp-text-field.html"/>
+    <style>
+        body {
+            background-color: #f1f1f1;
+        }
+
+        #container {
+            margin: 500px auto;
+            text-align: center;
+        }
+
+        #test {
+            width: 200px;
+        }
+
+        .iconClose {
+            background: url('/ui/assets/img/btn_erase.png') white no-repeat center;
+            cursor: pointer;
+            width: 18px;
+            min-width: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="container">
+    <gp-text-field id="test" type="number" decimal-places="4"
+                   decimal-separator="." show-thousands allow-negative bind-value="43232"></gp-text-field>
+
+    <button id="showValue">show val</button>
+    <button id="assignValue">assign val</button>
+    <button id="assignSep">assign sep</button>
+
+    <script>
+        document.getElementById('showValue').addEventListener('click', function () {
+            var inpt = document.getElementById('test');
+            console.log('get value : ' + inpt.bindValue, inpt.value, inpt.number);
+        });
+
+        document.getElementById('assignValue').addEventListener('click', function () {
+            var inpt = document.getElementById('test');
+            var val = (Math.random() * 100000).toFixed(5);
+            inpt.bindValue = val;
+            inpt.update();
+        });
+
+        document.getElementById('assignSep').addEventListener('click', function () {
+            var inpt = document.getElementById('test');
+            inpt.decimalPlaces = 2;
+            inpt.thousandsSeparator = "/";
+            inpt.update();
+            console.log(inpt.value, inpt.number);
+        });
+    </script>
+</div>
+
+</body>
+</html>

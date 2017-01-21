@@ -1,0 +1,94 @@
+<dom-module id="page-yearly-report">
+<template>
+<style>
+	:host {
+		display: block;
+	}
+</style>
+
+<app-route route="{{route}}"
+	   pattern="/app/yearly-report/:tab"
+    data="{{routeData}}">
+</app-route>
+
+<div class="page-header">
+	<h2>연간 운영실적 <small>Yearly Report</small></h2>
+</div>
+
+<ul id="pageTab" class="nav nav-tabs">
+	<li name="economic" role="presentation"><a href="/app/yearly-report/economic">경제적 가치</a></li>
+	<li name="devotion" role="presentation"><a href="/app/yearly-report/devotion">사회혁신 노력</a></li>
+	<li name="capability" role="presentation"><a href="/app/yearly-report/capability">사업역량개발 노력</a></li>
+</ul>
+
+<iron-pages id="reportTabs" role="monthly-tab" selected="[[tab]]" attr-for-selected="name" on-iron-select="_assignYear">
+	<report-economic name="economic"></report-economic>
+	<report-devotion name="devotion"></report-devotion>
+	<report-capability name="capability"></report-capability>
+</iron-pages>
+
+</template>
+<script>
+Polymer({
+	is: 'page-yearly-report',
+
+	properties: {
+		route: String,
+		tab: {
+			type: String,
+			observer: "_selectTab"
+		},
+		_yearList: {
+			type: Array,
+			value: function() {
+				var list = [];
+
+				for (var i = 2013; i <= 2030; i++) {
+					list.push({cdNm:i, cd:i});
+				}
+
+				return list;
+			}
+		},
+		_year: {
+			type: Number,
+			value: function() {
+				return moment().year();
+			}
+		},
+	},
+	
+	observers: [
+		'_determineTab(routeData.tab)'
+	],
+
+	_determineTab: function(value) {
+		this.tab = value || "economic";
+	},
+
+	_selectTab: function(newValue, oldValue) {
+		var newTab = this.$.pageTab.querySelector("li[name='" + newValue + "']");
+		var oldTab = this.$.pageTab.querySelector("li[name='" + oldValue +"']");
+
+		newTab.classList.add('active');
+		if (oldTab) 
+			oldTab.classList.remove('active');
+
+		this.importHref(
+			this.resolveUrl('report/report-' + newValue + '.html'), null, null, true);
+	},
+
+	_getData: function(e) {
+		if (confirm('재조회시 저장되지 않은 데이타는 날아갑니다. 계속하시겠습니까?'))
+			this.$.reportTabs.selectedItem.requestData();
+	},
+
+	_assignYear: function(e) {
+		var page = this.$.reportTabs.selectedItem;
+		page.year = this._year;
+		page.apiTrigger = !page.apiTrigger;
+	},
+
+});
+</script>
+</dom-module>

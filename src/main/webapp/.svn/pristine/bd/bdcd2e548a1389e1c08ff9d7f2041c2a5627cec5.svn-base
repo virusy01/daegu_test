@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GP TEXT FIELD DEMO</title>
+    <script src="/bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+
+    <link rel="import" href="/bower_components/sc-component/sc-elements.html">
+    <link rel="import" href="/ui/lib/gp-elements.html">
+    <link rel="import" href="/ui/lib/mdi/sc-mdi.html">
+    <link rel="import" href="/ui/lib/preloads/sc-environment.html">
+
+    <link rel="import" href="../gp-text-field.html"/>
+    <link rel="import" href="/bower_components/iron-demo-helpers/demo-snippet.html"/>
+    <link rel="import" href="/bower_components/iron-demo-helpers/demo-pages-shared-styles.html"/>
+    <link rel="import" href="/bower_components/iron-doc-viewer/iron-doc-viewer.html"/>
+    <link rel="import" href="/bower_components/iron-doc-viewer/iron-doc-viewer-styles.html"/>
+    <style>
+        body {
+            background-color: #f1f1f1;
+        }
+
+        #container {
+            margin: 0 auto;
+            width: 1000px;
+        }
+
+        ol {
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            list-style-position: inside;
+        }
+
+        .toTop {
+            text-align: right;
+            font-size: 11px;
+            margin: 15px 5px;
+        }
+
+        .iconMagnify {
+            background: url('/ui/assets/img/icon_magnify.png') white no-repeat center;
+            cursor: pointer;
+            width: 18px;
+            min-width: 18px;
+        }
+
+        .iconClose {
+            background: url('/ui/assets/img/btn_erase.png') white no-repeat center;
+            cursor: pointer;
+            width: 18px;
+            min-width: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="container">
+
+    <h1>
+        GP-Text-Field Demo (alpha)
+    </h1>
+
+    <h2>기본</h2>
+    <demo-snippet class="centered-demo">
+        <template>
+            <gp-text-field></gp-text-field>
+        </template>
+    </demo-snippet>
+
+    <iron-doc-viewer id="docDefault"></iron-doc-viewer>
+
+    <script>
+        var desc = {
+            "is": "gp-text-field",
+            "properties": [
+                {
+                    "name": "type",
+                    "type": "string",
+                    "desc": "타입 설정<br/><br/>" +
+                    "text: 텍스트 (기본)<br/>" +
+                    "tel: 전화번호<br/>" +
+                    "number: 숫자<br/>" +
+                    "password: 비밀번호<br/>" +
+                    "date: 날짜<br/>" +
+                    "bn: 사업자 등록번호"
+                },
+                {
+                    "name": "mask",
+                    "type": "string",
+                    "desc": "'#' - 숫자<br/>" +
+                    "'A' - 알파벳<br/>" +
+                    "'U' - 대문자<br/>" +
+                    "'L' - 소문자<br/>"
+                },
+                {
+                    "name": "placeholder",
+                    "type": "string",
+                    "desc": "기본으로 들어가 있는 텍스트"
+                },
+                {
+                    "name": "text-align",
+                    "type": "string",
+                    "desc": "기본으로 left이며 right으로 변경시에만 사용"
+                },
+                {
+                    "name": "hidden",
+                    "type": "boolean",
+                    "desc": "숨김 처리"
+                },
+                {
+                    "name": "disabled",
+                    "type": "boolean",
+                    "desc": "비활성화"
+                },
+                {
+                    "name": "read-only",
+                    "type": "boolean",
+                    "desc": "읽기만 가능"
+                },
+                {
+                    "name": "max-length",
+                    "type": "string",
+                    "desc": "최대 길이 (character)"
+                },
+                {
+                    "name": "required",
+                    "type": "boolean",
+                    "desc": "필수 입력"
+                },
+                {
+                    "name": "prefix",
+                    "type": "string",
+                    "desc": "앞에 붙는 텍스트"
+                },
+                {
+                    "name": "suffix",
+                    "type": "string",
+                    "desc": "뒤에 붙는 텍스트"
+                },
+                {
+                    "name": "ime-mode",
+                    "type": "string",
+                    "desc": "기본 input css에 있는 ime-mode와 동일<br/>" +
+                    "auto (기본), normal, active, inactive, disabled"
+                },
+                {
+                    "name": "allowed-pattern",
+                    "type": "string",
+                    "desc": "사용가능한 정규표현식 전달 (allow랑 혼용사용 불가)"
+                },
+            ]
+        };
+        document.querySelector('#docDefault').descriptor = desc;
+    </script>
+
+    <ol>
+
+        <h2>Auto focus</h2>
+        <demo-snippet class="centered-demo">
+            <template>
+                <gp-text-field type="text" auto-focus></gp-text-field>
+            </template>
+        </demo-snippet>
+
+        <div class="toTop"><a href="#container">top</a></div>
+
+        <h2>Type</h2>
+        <hr/>
+        <li><h4>텍스트</h4></li>
+        <p><b style="color:red;">*</b> allow는 mask랑 함께 사용하면 안됩니다.</p>
+        <demo-snippet class="centered-demo">
+            <template>
+                <gp-text-field type="text" auto-lowercase></gp-text-field>
+                <gp-text-field type="text" allow="num"></gp-text-field>
+                <gp-text-field type="text" allow="en"></gp-text-field>
+                <gp-text-field type="text" allow="kr"></gp-text-field>
+                <gp-text-field type="text" allow="punc"></gp-text-field>
+                <gp-text-field type="text" allow="en,num" auto-uppercase></gp-text-field>
+                <gp-text-field type="text" allow="punc,kr,num"></gp-text-field>
+            </template>
+        </demo-snippet>
+
+        <iron-doc-viewer id="docText"></iron-doc-viewer>
+
+        <script>
+            var desc = {
+                "is": "gp-text-field",
+                "properties": [
+                    {
+                        "name": "allow",
+                        "type": "array",
+                        "desc": "허용하는 종류를 array로 전부 부여.<br/>" +
+                        "array에 들어있지 않는 종류는 자동으로 prohibit 처리됨<br/>" +
+                        "kr: 한글<br/>" +
+                        "en: 영문<br/>" +
+                        "num: 숫자<br/>" +
+                        "punc: 특수문자<br/>"
+                    },
+                    {
+                        "name": "auto-uppercase",
+                        "type": "boolean",
+                        "desc": "영문 자동 대문자 변환"
+                    },
+                    {
+                        "name": "auto-lowercase",
+                        "type": "boolean",
+                        "desc": "영문 자동 소문자 변환"
+                    }
+                ]
+            };
+            document.querySelector('#docText').descriptor = desc;
+        </script>
+
+        <li><h4>전화번호</h4></li>
+        <demo-snippet class="centered-demo">
+            <template>
+                <gp-text-field type="tel" mask="(###)###-####" bind-value="3333333333"></gp-text-field>
+                <gp-text-field type="tel" mask="###-####-####"></gp-text-field>
+            </template>
+        </demo-snippet>
+
+        <iron-doc-viewer id="docTel"></iron-doc-viewer>
+
+        <script>
+            var desc = {
+                "is": "gp-text-field",
+                "properties": [
+                    {
+                        "name": "mask",
+                        "type": "string",
+                        "desc": "'#' - 숫자<br/>" +
+                        "'A' - 알파벳<br/>" +
+                        "'U' - 대문자<br/>" +
+                        "'L' - 소문자<br/>"
+                    }
+                ]
+            };
+            document.querySelector('#docTel').descriptor = desc;
+        </script>
+
+        <li><h4>숫자</h4></li>
+        <p><b style="color:red;">*</b> mask와 allow는 type number에는 사용하지 마세요.</p>
+        <demo-snippet class="centered-demo">
+            <template>
+                <gp-text-field type="number"></gp-text-field>
+                <gp-text-field type="number" decimal-places="2"
+                               decimal-separator="."></gp-text-field>
+                <gp-text-field type="number" show-thousands></gp-text-field>
+                <gp-text-field type="number" decimal-places="-1" show-thousands></gp-text-field>
+                <gp-text-field type="number" show-thousands thousands-separator=" " allow-negative></gp-text-field>
+                <gp-text-field type="number" show-thousands thousands-separator="space" allow-negative></gp-text-field>
+            </template>
+        </demo-snippet>
+
+        <iron-doc-viewer id="docNum"></iron-doc-viewer>
+
+        <script>
+            var desc = {
+                "is": "gp-text-field",
+                "properties": [
+                    {
+                        "name": "show-thousands",
+                        "type": "boolean",
+                        "desc": "천단위 구분자 표시"
+                    },
+                    {
+                        "name": "thousands-separator",
+                        "type": "string",
+                        "desc": "천단위 구분자<br/>" +
+                        "기본은 ,"
+                    },
+                    {
+                        "name": "decimal-places",
+                        "type": "number",
+                        "desc": "소수점 표시 갯수 (소수좀 사용 시 필히 기재)<br/>" +
+                        "갯수 표기시 소수점이 고정으로 표시 됨" +
+                        "-1으로 설정시 소수점 무한대로 설정가능하며 기본으로 표시되지도 않음"
+                    },
+                    {
+                        "name": "decimal-separator",
+                        "type": "string",
+                        "desc": "소수점 구분자<br/>" +
+                        "기본은 ."
+                    },
+                    {
+                        "name": "allow-negative",
+                        "type": "boolean",
+                        "desc": "음수 허용 여부"
+                    },
+                    {
+                        "name": "value (get only)",
+                        "type": "string",
+                        "desc": "포멧팅 된 값을 string으로 리턴"
+                    },
+                    {
+                        "name": "number (get only)",
+                        "type": "number",
+                        "desc": "포멧팅 안된 값을 number형식으로 리턴"
+                    },
+                ]
+            };
+            document.querySelector('#docNum').descriptor = desc;
+        </script>
+
+        <li><h4>비밀번호</h4></li>
+        <demo-snippet class="centered-demo">
+            <template>
+                <gp-text-field type="password"></gp-text-field>
+            </template>
+        </demo-snippet>
+
+        <li><h4>날짜</h4></li>
+        <demo-snippet class="centered-demo">
+            <template>
+                <gp-text-field type="date"></gp-text-field>
+                <gp-text-field type="date" date-format="yyyy/MM/dd"></gp-text-field>
+                <gp-text-field type="date" date-format="yyyy/MM/dd HH:mm:ss"></gp-text-field>
+            </template>
+        </demo-snippet>
+
+        <iron-doc-viewer id="docDate"></iron-doc-viewer>
+
+        <script>
+            var desc = {
+                "is": "gp-text-field",
+                "properties": [
+                    {
+                        "name": "date-format",
+                        "type": "string",
+                        "desc": "형식뿐만 아니라 존재하지 않는 날짜일 시 focus가 나가면 빈값으로 처리됨<br/>" +
+                        "y - 연도<br/>" +
+                        "M - 월<br/>" +
+                        "d - 일<br/>" +
+                        "H - 시간<br/>" +
+                        "m - 분<br/>" +
+                        "s - 초"
+                    }
+                ]
+            };
+            document.querySelector('#docDate').descriptor = desc;
+        </script>
+
+        <li><h4>사업자번호</h4></li>
+        <demo-snippet class="centered-demo">
+            <template>
+                <gp-text-field type="bn"></gp-text-field>
+            </template>
+        </demo-snippet>
+
+        <h2>Placeholder</h2>
+        <demo-snippet class="centered-demo">
+            <template>
+                <gp-text-field placeholder="정보를 기입해주세요."></gp-text-field>
+            </template>
+        </demo-snippet>
+
+        <div class="toTop"><a href="#container">top</a></div>
+
+        <h2>Align</h2>
+        <demo-snippet class="centered-demo">
+            <template>
+                <gp-text-field type="text" text-align="right"></gp-text-field>
+                <gp-text-field type="number" text-align="right"></gp-text-field>
+                <gp-text-field type="number" mask="###-####" text-align="right"></gp-text-field>
+                <gp-text-field type="date" text-align="right"></gp-text-field>
+            </template>
+        </demo-snippet>
+
+        <div class="toTop"><a href="#container">top</a></div>
+
+        <h2>Hidden</h2>
+        <demo-snippet class="centered-demo">
+            <template>
+                <gp-text-field type="text" hidden></gp-text-field>
+            </template>
+        </demo-snippet>
+
+        <div class="toTop"><a href="#container">top</a></div>
+
+        <h2>Disabled</h2>
+        <demo-snippet class="centered-demo">
+            <template>
+                <gp-text-field type="text" disabled></gp-text-field>
+            </template>
+        </demo-snippet>
+
+        <div class="toTop"><a href="#container">top</a></div>
+
+        <h2>Read only</h2>
+        <demo-snippet class="centered-demo">
+            <template>
+                <gp-text-field type="text" bind-value="some text" readonly></gp-text-field>
+            </template>
+        </demo-snippet>
+
+        <div class="toTop"><a href="#container">top</a></div>
+
+        <h2>Max length</h2>
+        <demo-snippet class="centered-demo">
+            <template>
+                <gp-text-field type="text" max-length="5"></gp-text-field>
+                <gp-text-field type="number" max-length="5"></gp-text-field>
+                <gp-text-field type="number" mask="###-####-####" max-length="5"></gp-text-field>
+            </template>
+        </demo-snippet>
+
+        <div class="toTop"><a href="#container">top</a></div>
+
+        <h2>Required</h2>
+        <demo-snippet class="centered-demo">
+            <template>
+                <gp-text-field type="text" required></gp-text-field>
+            </template>
+        </demo-snippet>
+
+        <div class="toTop"><a href="#container">top</a></div>
+
+        <h2>Prefix/Suffix</h2>
+        <demo-snippet class="centered-demo">
+            <template>
+                <gp-text-field type="number" prefix-text="$" decimal-places="2" show-thousands
+                               text-align="right" disabled></gp-text-field>
+                <gp-text-field type="text" suffix-text="cm" readonly></gp-text-field>
+                <gp-text-field type="number" prefix-text="총 갯수" suffix-text="개" text-align="right"></gp-text-field>
+            </template>
+        </demo-snippet>
+
+        <div class="toTop"><a href="#container">top</a></div>
+
+
+        <h2>Two way binding</h2>
+        <p>::input을 줄 필요 없이 {{}}만 해주면 됩니다.</p>
+        <demo-snippet class="centered-demo">
+            <template>
+                <template is="dom-bind">
+                    <gp-text-field mask="UUU-#####" max-length="10"
+                                   bind-value="{{someValue}}"></gp-text-field>
+                    <gp-text-field bind-value="{{someValue}}"></gp-text-field>
+                    {{someValue}}
+                </template>
+            </template>
+        </demo-snippet>
+
+        <div class="toTop"><a href="#container">top</a></div>
+
+        <h2>Icons</h2>
+        <p>suffix와 겸해서 사용할 수 없습니다.</p>
+        <demo-snippet class="centered-demo">
+            <template>
+                <template is="dom-bind">
+                    <gp-text-field enable-icon></gp-text-field>
+                </template>
+            </template>
+        </demo-snippet>
+
+        <iron-doc-viewer id="docIcon"></iron-doc-viewer>
+
+        <script>
+            var desc = {
+                "is": "gp-text-field",
+                "properties": [
+                    {
+                        "name": "enable-icon",
+                        "type": "boolean",
+                        "desc": "돋보기 아이콘 표시"
+                    },
+                    {
+                        "name": "icon-class",
+                        "type": "string",
+                        "desc": "아이콘 변경시 부여 (기본 iconMagnify)"
+                    },
+                    {
+                        "name": "clear-class",
+                        "type": "string",
+                        "desc": "클리어 아이콘 변경시 부여 (기본 iconClear)"
+                    }
+                ],
+                "events": [
+                    {
+                        "name": "icon-tap",
+                        "desc": "아이콘 tap시 발생"
+                    },
+                    {
+                        "name": "clear",
+                        "desc": "clear tap시 발생"
+                    }
+                ]
+            };
+            document.querySelector('#docIcon').descriptor = desc;
+        </script>
+
+        <div class="toTop"><a href="#container">top</a></div>
+
+    </ol>
+
+</div>
+</body>
+</html>

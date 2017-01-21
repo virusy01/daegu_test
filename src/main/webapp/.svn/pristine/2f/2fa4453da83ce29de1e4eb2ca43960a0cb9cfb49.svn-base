@@ -1,0 +1,45 @@
+<script>
+    window.PS = window.PS || {};
+    PS.BehaviorPage = {
+
+        properties: {
+            _isAttached: Boolean,
+            _refresh: Boolean
+        },
+
+        _redirectOnError: function(e) {
+            var status = e.detail.request.status;
+            if (status == 403) {
+                location.href = "/";
+            }
+        },
+
+        _prependSelectAll: function(data, array) {
+            var refactoredArray = [];
+            var i;
+
+            refactoredArray.push({
+                cdNm: "전체",
+                cd: ""
+            });
+
+            for (i = 0; i < data.length; i++) {
+                refactoredArray.push(data[i]);
+            }
+
+            this.set(array, refactoredArray);
+        },
+
+        _openOverlay: function() {
+            // this.fire("iron-signal", {
+            //     name: "spinner-open"
+            // });
+        },
+
+        _closeOverlay: function() {
+            // this.fire("iron-signal", {
+            //     name: "spinner-close"
+            // });
+        }
+    }
+</script>

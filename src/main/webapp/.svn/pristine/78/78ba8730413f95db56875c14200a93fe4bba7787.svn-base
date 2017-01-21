@@ -1,0 +1,140 @@
+/**
+ * Created by jwm_000 on 2015-10-09.
+ */
+
+;var corpKpiGridPrint = (function (window, $, undefined) {
+    var corpDetailData;
+
+    $(document).ready(function () {
+        corpKpiGridPrint.initialize();
+    });
+
+    function initialize(){
+        if (opener){
+            document.commonForm.corpSeq.value = opener.document.commonForm.corpSeq.value;
+            $("#gridTitle").text("상세 지표별 점수 - " + opener.document.getElementById("dashboardHeader").innerText);
+        }
+        
+        showCorpDetail();
+    }
+    
+    function showCorpDetail(){
+        var form = document.commonForm;
+
+        var options = {
+            cache: false,
+            url: "../php/corp_kpi_detail.php",
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                corpDetailData = result;
+                drawCorpKpiDetailGrid();
+            }
+        };
+
+        $(form).ajaxSubmit(options);
+    }
+
+    function drawCorpKpiDetailGrid(){
+        $("#detailGrid > tbody").children().remove();
+
+        for (var i in corpDetailData){
+            var depth1 = corpDetailData[i];
+            var depth2 = depth1.DEPTH_2;
+
+            var tr = "<tr>";
+
+            for (var j in depth2){
+                if (j == 0){
+                    tr += "<td rowspan='" + depth2.length + "'>" + depth1.DEPTH_1_NM + "</td>";
+                    tr += "<td>" + depth2[j].DEPTH_2_NM + "</td>";
+                    tr += "<td>" + depth2[j].MAX_SCORE + "</td>";
+                    tr += "<td>" + depth2[j].SCORE + "</td>";
+                    break;
+                }
+            }
+
+            var scoreChartId = "scoreChart" + i;
+            var rankingChartId = "langkingChart" + i;
+            tr += "<td rowspan='" + depth2.length + "'><div id='" + scoreChartId + "'></div></td>";
+            tr += "<td rowspan='" + depth2.length + "'><div id='" + rankingChartId + "'></div></td>";
+            tr += "<td rowspan='" + depth2.length + "'>지원활동</td>";
+
+            tr +="</tr>";
+
+            for (var j in depth2){
+                if (j != 0){
+                    tr += "<tr><td>" + depth2[j].DEPTH_2_NM + "</td>";
+                    tr += "<td>" + depth2[j].MAX_SCORE + "</td>";
+                    tr += "<td>" + depth2[j].SCORE + "</td></tr>";
+                }
+            }
+
+            $("#detailGrid > tbody").append(tr);
+
+            // drawing SimpleBarChart
+            var simpleBarChart1 = new SimpleBarChart();
+            simpleBarChart1.options = {
+                width:40,
+                height:60,
+                data: [{label:'점수', value:depth1.SCORE, avg:depth1.AVG, max:10, depth2:depth1.DEPTH_2}],
+                contentHolder: scoreChartId,
+                labelFunction: function (d, i){
+                    return d.value + "점";
+                },
+                dataTipFunction: function (d, i, tooltip){
+                    var depth2 = d.depth2;
+                    $(tooltip).children().remove();
+                    for (index in depth2) {
+                        var depth2Item = depth2[index];
+                        $(tooltip).append("<span style='color:#666666;'>" + depth2Item.DEPTH_2_NM + " : </span><span style='color:#b2485f;font-weight: bold'>" + depth2Item.SCORE + "<span><br>");
+                    }
+                },
+                backgroundTipFunction: function (d, i, tooltip){
+                    $(tooltip).children().remove();
+                    $(tooltip).append("<span style='color:#666666;'>평균 : </span><span style='color:#222222;font-weight: bold'>" + Math.round(d.avg * 100)/100 + "<span><br>");
+                },
+                colorFunction: function (d, i){
+                    if (i == 0) {
+                        if (d.value <= 3) {
+                            return "#f94a76";
+                        }else if (d.value >= 8) {
+                            return "#00bf88"
+                        }else {
+                            return "#f4c100";
+                        }
+                    }else{
+                        return "#5da2e6";
+                    }
+                }
+            };
+            simpleBarChart1.draw();
+
+            var simpleBarChart2 = new SimpleBarChart();
+            simpleBarChart2.options = {
+                width:40,
+                height:60,
+                data: [{label:'순위', value:(depth1.CORP_COUNT - depth1.RANKING), max:depth1.CORP_COUNT}],
+                showDataTip:false,
+                contentHolder: rankingChartId,
+                labelFunction: function (d, i){
+                    return (d.max - d.value) + "위";
+                },
+                colorFunction: function (d, i){
+                    return "#5da2e6";
+                }
+
+            };
+            simpleBarChart2.draw();
+        }
+
+        window.print();
+    }
+
+    return {
+        initialize:initialize,
+        showCorpDetail:showCorpDetail,
+        drawCorpKpiDetailGrid:drawCorpKpiDetailGrid,
+    };
+
+})(window, jQuery, undefined)

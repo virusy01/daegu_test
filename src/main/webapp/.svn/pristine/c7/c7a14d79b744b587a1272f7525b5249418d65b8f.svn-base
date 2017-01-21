@@ -1,0 +1,95 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/app-route/app-route.html">
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="/bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="/bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html">
+
+<link rel="import" href="kpi-info-dashboard.html" />
+<link rel="import" href="kpi-info-chart.html" />
+<link rel="import" href="kpi-info-grid.html" />
+
+<link rel="import" href="../style/common-style.html" />
+
+<dom-module id="kpi-info">
+    <template>
+        <style include="common-style">
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+                --paper-button: {
+                    background-color: #ff6138;
+                    color: white;
+                }
+                --paper-tabs-selection-bar-color: #00a388;
+                --paper-tabs-selection-bar: {
+                    height: 5px;
+                }
+            }
+
+            paper-tabs,
+            paper-toolbar {
+                background-color: #79bd8f;
+                color: #fff;
+            }
+        </style>
+
+        <iron-ajax auto id="protocolGetInfo" url$="/api/corp/info/{{_id}}" method="post" content-type="application/json" last-response="{{_info}}"></iron-ajax>
+        <app-route route="{{route}}" pattern="/:id" data="{{routeData}}"></app-route>
+
+        <h1>[[_info.corpNm]] - 개별기업 성과지표 조회</h1>
+
+        <paper-card>
+            <div class="card-content">
+                <paper-tabs selected="{{_tab}}" attr-for-selected="key">
+                    <paper-tab key="dashboard">대시보드</paper-tab>
+                    <paper-tab key="chart">차트</paper-tab>
+                    <paper-tab key="grid">표</paper-tab>
+                </paper-tabs>
+
+                <iron-pages role="tab" selected="{{_tab}}" attr-for-selected="name">
+                    <kpi-info-dashboard name="dashboard" corp-id="{{_id}}"></kpi-info-dashboard>
+                    <kpi-info-chart name="chart"></kpi-info-chart>
+                </iron-pages>
+            </div>
+        </paper-card>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'kpi-info',
+
+            properties: {
+                route: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    }
+                },
+                _kpi: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _id: Number,
+                _tab: {
+                    type: String,
+                    value: "dashboard"
+                },
+            },
+
+            observers: [
+                '_routeDataChanged(routeData.id)'
+            ],
+
+            _routeDataChanged: function(id) {
+                this._id = id;
+            },
+
+        })
+    </script>
+</dom-module>

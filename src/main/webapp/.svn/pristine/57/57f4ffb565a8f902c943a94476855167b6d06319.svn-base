@@ -1,0 +1,437 @@
+<?php
+require( dirname(__FILE__)."/session_check.php");
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>광명시 사회적기업 성과관리시스템</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- MetisMenu CSS -->
+    <link href="../bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="../bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <style>
+
+        .barNum {
+            font-size: 9pt;
+            text-anchor: middle;
+        }
+        .axis text {
+            font-family: sans-serif;
+            font-size: 11px;
+        }
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: black;
+        }
+        .category {
+            font-size: 12pt;
+            text-anchor: middle;
+        }
+
+        .tip {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            z-index: 9999;
+            visibility: hidden;
+            border: 1px solid #666666;
+            background-color: #FFFFD4;
+            overflow: hidden;
+            padding: 8px;
+            text-align: left;
+            font-size: 9pt;
+            color: #111111;
+            border-radius: 4px;
+        }
+
+
+        .nav-tabs2 {
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .nav-tabs2 > li {
+            float: left;
+            margin-bottom: -1px;
+        }
+        .nav-tabs2 > li > a {
+            margin-right: 0px;
+            line-height: 1.42857143;
+            border: 0px solid transparent;
+            border-radius: 0px 0px 0 0;
+            background-color: transparent;
+            font-size: 13px;
+            color:#5c5c5c;
+        }
+        .nav-tabs2 > li > a:hover {
+            border-color: #eee #eee #ddd;
+            background-color: #eee;
+            border: 0px solid #ddd;
+        }
+        .nav-tabs2 > li > a:focus {
+            color: #555;
+            cursor: default;
+            background-color: #fff;
+            border: 0px solid #ddd;
+            border-bottom-color: transparent;
+        }
+
+        .nav-tabs2 > li.active > a,
+        .nav-tabs2 > li.active > a:hover,
+        .nav-tabs2 > li.active > a:focus {
+            color: #fff;
+            cursor: default;
+            background-color: #46b8da;
+            border: 0px solid #ddd;
+            border-bottom-color: transparent;
+            font-size: 13px;
+            font-family: 'NanumBarunGothicBold' , sans-serif;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #allOrderChart, #allOrderChart * {
+                visibility: visible;
+            }
+            #allOrderChart {
+                position: absolute;
+                width: 500px;
+                left: -100px;
+                top: 0px;
+            }
+        }
+
+    </style>
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../js/jquery-1.11.1.min.js"></script>
+    <script src="../js/jquery.form.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../dist/js/sb-admin-2.js"></script>
+
+    <script src="../js/d3.min.js"></script>
+
+    <script src="../js/HStackChart.js"></script>
+    <script src="../js/HColumnChart.js"></script>
+    <script src="../js/PieChart.js"></script>
+    <script src="./common_js/SelectBuilder.js"></script>
+    <script src="../js/SimpleBarChart.js"></script>
+    <script src="../js/RadarChart.js"></script>
+    <script src="../js/Pagenator.js"></script>
+    <script src="my_js/corp_sum.js"></script>
+    <script src="my_js/corp_kpi.js"></script>
+    <script>
+        function print(){
+            var prtContent = document.getElementById("page-wrapper");
+            var winPrint = window.open('corp_sum_view_print.php', '', 'left=0,top=0,width=920,height=900,toolbar=0,scrollbars=0,status=0');
+            winPrint.focus();
+            //winPrint.print();
+            //WinPrint.print();
+            //WinPrint.close();
+        }
+    </script>
+</head>
+
+<body>
+<form name="commonForm">
+<input type="hidden" name="corpSeq">
+<div id="wrapper">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="corp_sum_view.php"><img src="../images/logo.png"/></a>
+
+            <p class="top_title">광명시 사회적기업 성과관리시스템</p>
+        </div>
+        <!-- /.navbar-header -->
+        <a href="javascript:window.location.href='../php/logout.php';">
+            <button type="button" class="btn btn-outline btn-primary btn-xs"><i class="fa fa-power-off fa-fw"></i>
+                LOGOUT
+            </button>
+        </a>
+
+        <div class="top_admin"><?=$_SESSION['USER_NM']?>님 로그인중입니다.</div>
+
+
+        <div class="navbar-default sidebar" role="navigation">
+            <div class="sidebar-nav navbar-collapse">
+                <ul class="nav" id="side-menu">
+
+                    <li>
+                        <a href="javascript:;" onclick="window.location.href='corp_info_view.php'"><i class="fa fa-book fa-fw"></i> 기업일반정보 조회</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" onclick="window.location.href='corp_kpi_view.php'"><i class="fa fa-bar-chart-o fa-fw"></i> 개별기업 성과지표 조회</a>
+                    </li>
+                    <li class="active">
+                        <a class="active" href="javascript:;"><i class="fa fa-file-text fa-fw"></i> 전체 성과지표 조회</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;"><i class="fa fa-file-text fa-fw"></i>관리자<span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level">
+                            <li>
+                                <a href="javascript:;" onclick="window.location.href='corp_info_add_view.php'">기업 및 성과지표 등록</a>
+                            </li>
+                            <li>
+                                <a href="javascript:;" onclick="window.location.href='users_view.php'">사용자 등록</a>
+                            </li>
+
+                        </ul>
+                        <!-- /.nav-second-level -->
+                    </li>
+                </ul>
+            </div>
+            <!-- /.sidebar-collapse -->
+        </div>
+        <!-- /.navbar-static-side -->
+    </nav>
+
+    <!-- Page Content -->
+    <div id="page-wrapper">
+        <!-- /.container-fluid -->
+        <div id="corpList" class="container-fluid">
+
+            <div class="row">
+                <div class="col-lg-12">
+
+                    <h3 class="page-header">전체 성과지표 조회 </h3>
+                    <div style="background-color:#fff">
+                        <ul id="navTab" class="nav nav-tabs2">
+                            <li class="active"><a data-page="allOrder" href="#">유형별 전체순위</a></li>
+                            <li><a href="#" data-page="kpiOrder">지표별 순위</a></li>
+                            <li><a href="#" data-page="kpiPercent">지표별 분포도</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="allOrder" class="col-lg-12">
+                    <div class="panel02 panel-grid">
+                        <div class="panel02-heading">
+                            유형별 전체순위
+                        </div>
+
+                        <div style="margin: 8px 10px; 0px; 8px">
+                            <div class="panel_search panel-search01" style="margin-bottom: 0px">
+                                <div class="panel_search-body" style="height:auto; margin-bottom: 10px;">
+                                    <div class="search_box" style="width: auto; text-align: center; overflow: auto; float: none">
+                                        <div class="form-group" style="display:inline-block; margin-right: 20px; width: 30%;">
+                                            <label>법인형태</label>
+                                            <select id="selCorpType" class="form-control01" name="corpType">
+
+                                            </select>
+                                        </div>
+                                        <div class="form-group" style="display:inline-block; margin-right: 20px; width: 30%;">
+                                            <label>기업분류</label>
+                                            <select id="selCompKind" class="form-control01" name="compKind">
+
+                                            </select>
+                                        </div>
+                                        <div class="form-group" style="display:inline-block; margin-right: 20px; width: 30%;">
+                                            <label>업종분류</label>
+
+                                            <select id="selBizSect" class="form-control01" name="bizSect">
+
+                                            </select>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel02-body" style="position:relative; min-height: 1500px; padding-top: 0px">
+                            <!-- "#2A7FFF", "#7FAAFF", "#FFAA2A", "#FFD47F", "#7FFF55", "#D4FF2A" , "#D4FFAA", "#AA7FFF", "#D4AAFF", "#FFD4FF" -->
+                            <!-- 범례 -->
+                            <div class="search_box_right" style="text-align: right;">
+                                <input type="button" onclick="print()" value="인쇄">
+                            </div>
+                            <div id="allOrderChart" style="min-height: 500px">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="kpiOrder" class="col-lg-12" style="display:none">
+                    <div class="panel02 panel-grid">
+                        <div class="panel02-heading">
+                            지표별 순위
+                        </div>
+
+                        <div style="margin: 8px 10px 10px;">
+                            <div class="panel_search panel-search01" style="margin-bottom: 0px">
+                                <div class="panel_search-body" style="height:auto; margin-bottom: 10px;">
+                                    <div class="search_box" style="width: auto; text-align: center; overflow: auto; float: none">
+                                        <div class="form-group" style="display:inline-block; margin-right: 20px; width: 90%;">
+                                            <label>주요 지표</label>
+                                            <select id="selKpiDepth1" class="form-control01" name="depth1">
+
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="kpiOrderChart" class="panel02-body">
+
+                        </div>
+                    </div>
+                </div>
+                <div id="kpiPercent" class="col-lg-12" style="display:none">
+                    <div class="panel02 panel-grid">
+                        <div class="panel02-heading">
+                            지표별 분포도
+                        </div>
+                        <div id="kpiPercentChart" class="panel02-body">
+
+                        </div>
+                    </div>
+                </div>
+                <!-- /.col-lg-3 -->
+
+                <!-- /.col-lg-12 -->
+            </div>
+            <!-- /.row -->
+        </div>
+
+        <div id="dashboard" class="container-fluid" style="display:none;">
+
+            <div class="row">
+                <div class="col-lg-12">
+
+                    <h3 id="dashboardHeader" class="page-header">개별기업 성과지표 조회</h3>
+                    <div style="text-align: right">
+                        <a id="btnGoBack" href="javascript:;" class="btn btn-outline btn-info"><i class="fa fa-long-arrow-left fa-fw"></i>&nbsp;뒤로가기</a>
+                    </div>
+                    <div style="background-color:#fff">
+                        <ul id="navTabCorp" class="nav nav-tabs2">
+                            <li class="active"><a data-page="barChart" href="#">대시보드</a></li>
+                            <li><a href="#" data-page="radarChart">차트</a></li>
+                            <li><a href="#" data-page="depth2Grid">표</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="barChart">
+                    <div  class="col-lg-12">
+                        <div style="float: right;">
+                            <table>
+                                <tr>
+                                    <td>점수 :&nbsp;&nbsp;</td>
+                                    <td><div style="width:14px; height:14px; background:rgba(249,74,118,0.5)"></div></td><td style="padding: 4px">심각</td>
+                                    <td><div style="width:14px; height:14px; background:rgba(244,193,0,0.5)"></div></td><td style="padding: 4px">정상</td>
+                                    <td><div style="width:14px; height:14px; background:rgba(0,191,136,0.5)"></div></td><td style="padding: 4px">양호</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="barChartDiv">
+
+                    </div>
+                </div>
+                <div id="radarChart" class="col-lg-12" style="display: none;">
+                    <div class="panel02 panel-grid">
+                        <div class="panel02-heading">
+                            주요 지표별 점수 분포
+                        </div>
+                        <div id="radarChartDiv" class="panel02-body">
+
+                        </div>
+                    </div>
+                </div>
+                <div  id="depth2Grid" class="col-lg-12" style="display: none;">
+                    <div class="panel02 panel-grid">
+                        <div class="panel02-heading">
+                            상세 지표별 점수
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel02-body">
+                            <div style="float: right; font-size: 13px;">
+                                <table style="text-align: left;">
+                                    <tr>
+                                        <td>점수 :&nbsp;&nbsp;</td>
+                                        <td><div style="width:14px; height:14px; background:rgba(249,74,118,0.5)"></div></td><td style="padding: 4px">심각</td>
+                                        <td><div style="width:14px; height:14px; background:rgba(244,193,0,0.5)"></div></td><td style="padding: 4px">정상</td>
+                                        <td><div style="width:14px; height:14px; background:rgba(0,191,136,0.5)"></div></td><td style="padding: 4px">양호</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <table id="detailGrid" class="table table-striped table-bordered table-hover">
+                                <thead>
+                                <tr>
+                                    <th>성과지표</th>
+                                    <th>세부 성과지표</th>
+                                    <th>배점</th>
+                                    <th>점수</th>
+                                    <th>합계</th>
+                                    <th>순위<span id="detailGridCorpCount"></span></th>
+                                    <th>지원활동</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.col-lg-3 -->
+
+                <!-- /.col-lg-12 -->
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container-fluid -->
+    </div>
+    <!-- /#page-wrapper -->
+
+</div>
+<!-- /#wrapper -->
+</form>
+<!-- jQuery -->
+
+</body>
+
+</html>

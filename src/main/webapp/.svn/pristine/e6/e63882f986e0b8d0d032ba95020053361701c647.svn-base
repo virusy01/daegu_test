@@ -1,0 +1,111 @@
+/**
+ * Created by jwm_000 on 2015-10-09.
+ */
+
+;var corpSumPrint = (function (window, $, undefined) {
+    var allOrderChart;
+    var allOrderChartData;
+
+    var kpiOrderChartData;
+
+
+    $(document).ready(function () {
+        corpSumPrint.initialize();
+    });
+
+    function initialize(){
+        if (opener){
+            document.commonForm.corpType.value = $(opener.document).find("#selCorpType").val();
+            document.commonForm.compKind.value = $(opener.document).find("#selCompKind").val();
+            document.commonForm.bizSect.value = $(opener.document).find("#selBizSect").val();
+        }
+        getAllOrder();
+    }
+
+    function getAllOrder(){
+        var param = $(document.commonForm).serialize();
+        var options = {
+            cache: false,
+            url: "../php/corp_sum_depth1.php",
+            type: "post",
+            data: param,
+            dataType: "json",
+            success: function (result) {
+                allOrderChartData = result;
+                drawAllOrder(false);
+            }
+        };
+
+        $.ajax(options);
+
+
+    }
+
+    function drawAllOrder(bAnimate){
+        var options = {
+            contentHolder: "allOrderChart",
+            categoryField: "CORP_NM",
+            height: allOrderChartData.length * 40,
+            percentWidth: 100,
+            maxValue: 100,
+            showDataTip:true,
+            padding: {left:200, top:50, right:200, bottom:50},
+            data:allOrderChartData,
+            series: [
+                {name:"DEPTH_1_01", label:"사회적 가치증대"},
+                {name:"DEPTH_1_02", label:"기업수익성 향상"},
+                {name:"DEPTH_1_03", label:"사회적자본 확대"},
+                {name:"DEPTH_1_04", label:"제품/서비스 품질향상"},
+                {name:"DEPTH_1_05", label:"제품/서비스 차별화"},
+                {name:"DEPTH_1_06", label:"판로 확대 체계"},
+                {name:"DEPTH_1_07", label:"지배구조 체계"},
+                {name:"DEPTH_1_08", label:"조직몰입도 향상"},
+                {name:"DEPTH_1_09", label:"사업역량 강화"},
+                {name:"DEPTH_1_10", label:"구성원 인사 관리 개선"}
+            ],
+            dataTipFunction:function(partValue, allValue, tooltip){
+
+                $(tooltip).children().remove();
+                var partName = partValue.stackPart;
+                var depth2Values = allValue.DEPTH_2;
+                // partName (eg : DEPTH_1_01)
+                var depth1 = partName.substring(8, 10);
+
+                var firstMatched = false;
+                for (var index in depth2Values){
+                    var depth2Value = depth2Values[index];
+                    var depth1Ofdepth2 = depth2Value.DEPTH_2.substring(0, 2);
+                    if (depth1 == depth1Ofdepth2){
+                        if (!firstMatched){
+                            $(tooltip).append("<div style='text-align:center;font-weight: bold; font-size: 13px; margin-bottom: 8px'>[ " + depth2Value.DEPTH_1_NM + " : <span style='color:#b2485f;font-weight: bold'>" + (partValue.y1 - partValue.y0) + "</span> ]</div>");
+                            firstMatched = true;
+                        }
+
+                        $(tooltip).append("<span>" + depth2Value.DEPTH_2_NM + " : </span><span style='color:#b2485f;font-weight: bold'>" + depth2Value.SCORE + "<span><br>");
+                    }
+                }
+
+
+                //$(tooltip).children().remove();
+                //$(tooltip).append("<span>" + d.DEPTH_1_NM + " : </span><span style='color:#b2485f;font-weight: bold'>" + d.SCORE + "<span><br>");
+            }
+        }
+
+        if (!allOrderChart){
+            allOrderChart = new HStackChart();
+        }
+        $("#allOrderChart").children("svg").remove();
+
+        allOrderChart.options = options;
+        allOrderChart.draw(bAnimate);
+
+        // 출력
+        window.print();
+    }
+
+    return {
+        initialize:initialize,
+        drawAllOrder:drawAllOrder
+    };
+
+})(window, jQuery, undefined)

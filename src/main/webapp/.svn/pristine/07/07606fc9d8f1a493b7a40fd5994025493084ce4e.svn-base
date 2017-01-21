@@ -1,0 +1,125 @@
+/**
+ * Created by jwm_000 on 2015-10-09.
+ */
+
+;var corpKpiDashboardPrint = (function (window, $, undefined) {
+    var pagenator;
+    var radarChart;
+
+    var corpList;
+    var corpDetailData;
+    $(document).ready(function () {
+        corpKpiDashboardPrint.initialize();
+    });
+
+    function initialize(){
+        if (opener){
+            document.commonForm.corpSeq.value = opener.document.commonForm.corpSeq.value;
+            console.log( document.commonForm.corpSeq.value);
+        }
+        showCorpDetail();
+    }
+
+    function showCorpDetail(anchor){
+        var form = document.commonForm;
+
+        var options = {
+            cache: false,
+            url: "../php/corp_kpi_detail.php",
+            type: "post",
+            dataType: "json",
+            success: function (result) {
+                corpDetailData = result;
+                drawDashboard();
+
+            }
+        };
+
+        $(form).ajaxSubmit(options);
+    }
+
+    function drawDashboard(){
+        $("#barChartDiv").children().remove();
+
+        $("#barChartDiv").append("<table width='100%'><tbody><tr></tr><tr></tr></tbody><table></table>");
+        if (opener) {
+            $("#printTitle").text(opener.document.getElementById("dashboardHeader").innerText);
+        }
+
+        for (var index in corpDetailData){
+            var item = corpDetailData[index];
+            var chartId = "simpleBar_" + index;
+
+            var chartSource = "<td style='padding: 5px 5px'><div style='width: 100%'>" +
+            "<div class='panel01 panel-chart'>" +
+            "<div class='panel01-heading'>" + item.DEPTH_1_NM + "</div>" +
+            "<div id='" + chartId +  "' class='panel01-body'>" +
+
+            "</div>" +
+            "</div>" +
+            "</div></td>";
+
+            if (index < 5){
+                $($("#barChartDiv > table > tbody").children()[0]).append(chartSource);
+            }
+            else {
+                $($("#barChartDiv > table > tbody").children()[1]).append(chartSource);
+            }
+            
+
+            // drawing SimpleBarChart
+            var simpleBarChart = new SimpleBarChart();
+            simpleBarChart.options = {
+                width: 120,
+                height: 200,
+                data: [{label:'점수', value:item.SCORE, avg:item.AVG, max:10, depth2:item.DEPTH_2}, {label:'순위', value:(item.CORP_COUNT - item.RANKING), max:item.CORP_COUNT, depth2:item.DEPTH_2 }],
+                contentHolder: chartId,
+                labelFunction: function (d, i){
+                    if (i==0){
+                        return d.value + "점";
+                    }else{
+                        return (d.max - d.value) + "위";
+                    }
+                },
+                dataTipFunction: function (d, i, tooltip){
+                    var depth2 = d.depth2;
+                    $(tooltip).children().remove();
+                    for (index in depth2) {
+                        var depth2Item = depth2[index];
+                        $(tooltip).append("<span style='color:#666666;'>" + depth2Item.DEPTH_2_NM + " : </span><span style='color:#b2485f;font-weight: bold'>" + depth2Item.SCORE + "<span><br>");
+                    }
+                },
+                backgroundTipFunction: function (d, i, tooltip){
+                    $(tooltip).children().remove();
+                    $(tooltip).append("<span style='color:#666666;'>평균 : </span><span style='color:#222222;font-weight: bold'>" + Math.round(d.avg * 100)/100 + "<span><br>");
+
+                },
+                colorFunction: function (d, i){
+                    if (i == 0) {
+                        if (d.value <= 3) {
+                            return "#f94a76";
+                        }else if (d.value >= 8) {
+                            return "#00bf88"
+                        }else {
+                            return "#f4c100";
+                        }
+                    }else{
+                        return "#5da2e6";
+                    }
+                }
+            };
+            simpleBarChart.draw(false);
+        }
+
+        window.print();
+
+    }
+
+
+    return {
+        initialize:initialize,
+        showCorpDetail:showCorpDetail,
+        drawDashboard:drawDashboard,
+    };
+
+})(window, jQuery, undefined)

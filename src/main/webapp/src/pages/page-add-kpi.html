@@ -1,0 +1,316 @@
+<link rel="import" href="/bower_components/iron-form/iron-form.html">
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/src/components/common/number-input.html">
+<link rel="import" href="/src/components/behaviors/behavior-grid.html">
+<link rel="import" href="/src/components/behaviors/behavior-loader.html">
+<link rel="import" href="/src/components/common/normal-input.html">
+<link rel="import" href="/src/components/common/normal-select.html">
+
+<dom-module id="page-add-kpi">
+<template>
+	<iron-ajax id="getData" headers='{"X-Requested-With": "XMLHttpRequest"}' 
+			method="get"
+			url="/api/corp/yearly-report/manualKpi/"
+      		      on-request="_startLoader"
+		      on-response="_assignData">
+	</iron-ajax>
+
+	<form id="gridForm" is="iron-form"
+	      content-type="application/json"
+	      method="post" 
+	      action="/api/corp/yearly-report/manualKpi"
+       	      on-iron-form-presubmit="_parseDataBeforeSubmit"
+	      on-iron-form-response="_submitResponse"	
+	      class="form-horizontal">
+
+	<div class="page-header">
+		<h2>성과지표 등록 <small>Add KPI</small></h2>
+		<div class="title-buttons">
+			<button type="button" on-tap="_submitForm" class="btn btn-sm btn-primary">수정</button>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-xs-2">
+			<normal-select id="year" value="{{year}}" items="{{_yearList}}"></normal-select>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-xs-12 text-right">
+			<button type="button" on-tap="_resetData" class="btn btn-sm btn-default">되돌리기</button>
+			<button type="button" on-tap="_submitForm" class="btn btn-sm btn-primary">저장</button>
+		</div>
+	</div>
+
+	<div id="alert" class="alert alert-dismissible hide" role="alert"></div>
+
+	<div class="horizontal-margin-20"></div>
+
+	<table id="tableKPI" class="table table-bordered">
+		<thead>
+			<tr>
+				<th rowspan='2'>센터명</th>
+				<th>사회적 생태계 기여</th>
+				<th colspan='2'>품질관리체계 구축 결과</th>
+				<th colspan='10'>인사개선 노력정도</th>
+			</tr>
+			<tr>
+				<th>공동구매액</th>
+				<th>위생관리등급</th>
+				<th>HACCP</th>
+				<th>근로계약서 작성</th>
+				<th>법정 보상기준 이상 지급</th>
+				<th>취업규칙 구비</th>
+				<th>노사협의회 운영</th>
+				<th>입금 수준 개선</th>
+				<th>복리후생 수준 개선</th>
+				<th>고충 상담 및 조치 개선</th>
+				<th>근로환경 개선</th>
+				<th>교육/육성 프로그램 개선</th>
+				<th>구성원 이직율 개선</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+		<tfoot>
+		</tfoot>
+	</table>
+
+	</form>
+
+</template>
+<script>
+Polymer({
+	is: 'page-add-kpi',
+
+	behaviors: [Lunch.GridBehavior, Lunch.LoaderBehavior],
+
+	properties: {
+		year: {
+			type: Number,
+			value: function() {
+				return moment().year();
+			}
+		},
+		_corpSeq: {
+			type: Number,
+			value: function() {
+				return parseInt(sessionStorage.corpSeq);
+			}
+		},
+		_yearList: {
+			type: Array,
+			value: function() {
+				var list = [];
+
+				for (var i = 2013; i <= 2030; i++) {
+					list.push({cdNm:i, cd:i});
+				}
+
+				return list;
+			}
+		},
+		_data: {
+			type: Array,
+			value: function() {
+				return [];
+			}
+		},
+		_guide: {
+			type: Array,
+			value: function() {
+				return [
+					'CENTER_NM',
+					'020201',
+					'040101',
+					'040201',
+					'070101',
+					'070102',
+					'070103',
+					'070104',
+					'070201',
+					'070202',
+					'070203',
+					'070204',
+					'070205',
+					'070206',
+				];
+			}
+		},
+		_listGrade: {
+			type: Array,
+			value: function() {
+				return [
+					{cdNm: 'A', cd: 'A'},
+					{cdNm: 'B', cd: 'B'},
+					{cdNm: 'C', cd: 'C'},
+				];
+			}
+		},
+		_listVerify: {
+			type: Array,
+			value: function() {
+				return [
+					{cdNm: '인증', cd: 'Y'},
+					{cdNm: '미인증', cd: 'N'},
+				];
+			}
+		},
+		_listPerform: {
+			type: Array,
+			value: function() {
+				return [
+					{cdNm: '시행', cd: 'Y'},
+					{cdNm: '미시행', cd: 'N'},
+				];
+			}
+		},
+		_listStatus: {
+			type: Array,
+			value: function() {
+				return [
+					{cdNm: '개선', cd: 1},
+					{cdNm: '유지', cd: 2},
+					{cdNm: '악화', cd: 3},
+				];
+			}
+		},
+	},
+
+	observers: [
+		'requestData(year, _corpSeq)'
+	],
+
+	ready: function() {
+		this._hideSum = true;
+		this._hideTotal = true;
+	},
+
+	requestData: function() {
+		this._clearData();
+			this.$.getData.params = {
+				YEAR: this.year
+			};
+
+			this.$.getData.generateRequest();	
+	},
+
+	_clearData: function() {
+		Polymer.dom(this.$.tableKPI.querySelector('tbody')).innerHTML = '';
+		Polymer.dom(this.$.tableKPI.querySelector('tfoot')).innerHTML = '';
+	},
+
+	_assignData: function(e) {
+		this._data = e.target.lastResponse;
+
+		if (this._data) {
+			this._assignDataToTable('kpi', this.$.tableKPI, this._data, this._guide);
+			this._stopLoader();
+		}
+	},
+
+	_assignDataToTable: function(prefix, table, data, guide) { 
+		var body = table.querySelector('tbody');
+		var tr, th, td, value;
+		var input;
+		var total = {};
+
+		Polymer.dom(body).innerHTML = '';
+
+		for (var i = 0; i < data.length; i++) {
+			tr = document.createElement('tr');	
+
+			Polymer.dom(body).appendChild(tr);
+
+			for (var attribute in guide) {
+				td = document.createElement('td');
+				Polymer.dom(tr).appendChild(td);
+
+				value = data[i][guide[attribute]];
+
+				switch (guide[attribute]) {
+					case 'CENTER_NM':
+						input = document.createElement('normal-input');
+						input.setAttribute('transparent', true);
+						input.setAttribute('id', prefix + '_' + guide[attribute] + i);
+						input.setAttribute('name', prefix + '_' + guide[attribute]);
+						input.setAttribute('value', value);
+						input.setAttribute('readonly', true);
+						break;
+					case '020201':
+						input = document.createElement('number-input');
+						input.setAttribute('transparent', true);
+						input.setAttribute('id', prefix + '_' + guide[attribute] + i);
+						input.setAttribute('name', prefix + '_' + guide[attribute]);
+						input.setAttribute('value', value);
+						break;
+					default:
+						input = document.createElement('normal-select');
+						input.setAttribute('transparent', true);
+						input.setAttribute('id', prefix + '_' + guide[attribute] + i);
+						input.setAttribute('name', prefix + '_' + guide[attribute]);
+						switch (guide[attribute]) {
+							case '040101':
+								input.items = this._listGrade;
+								break;
+							case '040201':
+								input.items = this._listVerify;
+							case '070101':
+							case '070102':
+							case '070103':
+							case '070104':
+								input.items = this._listPerform;
+								break;
+							default:
+								input.items = this._listStatus;
+								break;
+						}
+		      				input.setAttribute('value', value);
+
+						break;
+				}
+
+				Polymer.dom(td).appendChild(input);
+
+			}
+
+			input = document.createElement('input');
+			input.setAttribute('id', prefix + '_CORP_SEQ' + i);
+			input.setAttribute('is', 'iron-input');
+			input.setAttribute('name', prefix + '_CORP_SEQ');
+			input.setAttribute('value', data[i].CORP_SEQ);
+			input.setAttribute('hidden', true);
+
+			Polymer.dom(td).appendChild(input);
+
+
+		}	
+
+		this._drawFooter(prefix, table, total);
+	},
+
+	_parseDataBeforeSubmit: function(e) {
+		var data = this.$.gridForm.serialize();
+		var parsedData = [];
+
+		for (var i = 0; i < this._data.length; i++) {
+			for (var key in data) {
+				var keySplit = key.split('_');
+				var category = keySplit[0];
+				var insertKey = keySplit.splice(1, keySplit.length).join('_');
+				var insertValue = data[key][i];
+
+				if (!parsedData[i])
+					parsedData[i] = {};
+				parsedData[i][insertKey] = insertValue;
+			}
+			parsedData[i]['YEAR'] = this.year;
+		}
+
+	   	this.$.gridForm.request.body = parsedData;
+	},
+
+});
+</script>
+</dom-module>

@@ -1,0 +1,220 @@
+<link rel="import" href="/bower_components/iron-form/iron-form.html">
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/src/components/common/number-input.html">
+<link rel="import" href="/src/components/behaviors/behavior-grid.html">
+<link rel="import" href="/src/components/behaviors/behavior-loader.html">
+
+<dom-module id="report-monthly">
+<template>
+	<div class="horizontal-margin-20"></div>
+
+	<iron-ajax id="getData" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
+			   url="/api/corp/monthly-report/operation"
+      		      on-request="_startLoader"
+		      on-response="_assignData">
+	</iron-ajax>
+
+	<form id="gridForm" is="iron-form"
+	      class="form-horizontal">
+
+	<div class="row">
+		<div class="col-xs-12 text-right">
+			<template is="dom-if" if="{{adminMode}}">
+				<button type="button" on-tap="_downloadExcel" class="btn btn-sm btn-default">엑셀 다운로드</button>
+			</template>
+		</div>
+	</div>
+
+	<div id="alert" class="alert alert-dismissible hide" role="alert"></div>
+
+	<div class="horizontal-margin-20"></div>
+
+	<table id="tableExpense" class="table table-bordered">
+		<thead>
+			<tr>
+				<th>운영실적</th>
+				<th colspan='3'>매출</th>
+				<th colspan='2'>이익</th>
+				<th colspan='2'>자립도</th>
+				<th rowspan='2'>취약계층 고용률(%)</th>
+			</tr>
+			<tr>
+				<th>월</th>
+				<th>총</th>
+				<th>공공급식</th>
+				<th>유료급식</th>
+				<th>영업이익</th>
+				<th>순이익</th>
+				<th>A</th>
+				<th>B</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+		<tfoot>
+		</tfoot>
+	</table>
+
+</form>
+</template>
+<script>
+Polymer({
+	is: 'report-monthly',
+
+	behaviors: [Lunch.GridBehavior, Lunch.LoaderBehavior],
+
+	properties: {
+		year: Number,
+		adminMode: {
+			type: Boolean,
+			value: false
+		},
+		apiTrigger: {
+			type: Boolean,
+			value: false
+		},
+		_corpSeq: {
+			type: Number,
+			value: function() {
+				return parseInt(sessionStorage.corpSeq);
+			}
+		},
+		_data: {
+			type: Array,
+			value: function() {
+				return [];
+			}
+		},
+		_guide: {
+			type: Array,
+			value: function() {
+				return [
+					'SUMMARY_TOTAL_SALES',
+					'PUBLIC_TOTAL_SALES',
+					'PAID_TOTAL_SALES',
+					'SUMMARY_OP_PROFIT',
+					'SUMMARY_NET_PROFIT',
+					'SUMMARY_INDEPEND_POWER_A',
+					'SUMMARY_INDEPEND_POWER_B',
+					'SUMMARY_EMP_WEAK_RATE',
+				];
+			}
+		},
+	},
+
+	observers: [
+		'requestData(apiTrigger, _corpSeq, year)'
+	],
+
+	created: function() {
+		this._adminAPIURL = '/api/hq/monthly-report/operation';
+	},
+
+	_clearData: function() {
+		Polymer.dom(this.$.tableExpense.querySelector('tbody')).innerHTML = '';
+		Polymer.dom(this.$.tableExpense.querySelector('tfoot')).innerHTML = '';
+	},
+
+	_assignData: function(e) {
+		this._data = e.target.lastResponse;
+
+		if (this._data) {
+			this._assignDataToTable('expense', this.$.tableExpense, this._data, this._guide);
+			this._stopLoader();
+		}
+	},
+
+	_assignDataToTable: function(prefix, table, data, guide, showTotal, showSum) {
+		showTotal = showTotal ? showTotal : true;
+		showSum = showSum ? showSum : true;
+		var body = table.querySelector('tbody');
+		var tr, th, td, value;
+		var input;
+		var total = {};
+
+		Polymer.dom(body).innerHTML = '';
+
+		for (var i = 0; i < 12; i++) {
+			tr = document.createElement('tr');
+			th = document.createElement('th');
+			Polymer.dom(th).innerHTML = data[i].MONTH;
+
+			Polymer.dom(body).appendChild(tr);
+			Polymer.dom(tr).appendChild(th);
+
+			for (var attribute in guide) {
+				td = document.createElement('td');
+				Polymer.dom(tr).appendChild(td);
+
+				value = data[i][guide[attribute]];
+
+				input = document.createElement('number-input');
+				input.setAttribute('transparent', true);
+				input.setAttribute('id', prefix + '_' + guide[attribute] + i);
+				input.setAttribute('name', prefix + '_' + guide[attribute]);
+				input.setAttribute('value', value);
+
+				input.setAttribute('readonly', true);
+				Polymer.dom(td).appendChild(input);
+
+				if (!total[guide[attribute]])
+					total[guide[attribute]] = 0;
+
+				total[guide[attribute]] += value;
+			}
+		}
+
+		this._drawFooter(prefix, table, total, showTotal, showSum);
+	},
+
+	_drawFooter: function(prefix, table, total) {
+
+		var foot = table.querySelector('tfoot');
+		Polymer.dom(foot).innerHTML = '';
+
+		if (!this._hideTotal) {
+			// total
+			tr = document.createElement('tr');
+			th = document.createElement('th');
+			Polymer.dom(th).innerHTML = '합계';
+			Polymer.dom(tr).appendChild(th);
+			Polymer.dom(foot).appendChild(tr);
+
+			for (var t in this._guide) {
+				attribute = this._guide[t];
+
+				td = document.createElement('td');
+
+				if (attribute != 'SUMMARY_INDEPEND_POWER_A' &&
+				    attribute != 'SUMMARY_INDEPEND_POWER_B' &&
+				    attribute != 'SUMMARY_EMP_WEAK_RATE') {
+					td.setAttribute('id', 'total_' + prefix + '_' + attribute);
+					td.innerHTML = accounting.formatNumber(total[attribute]);
+				}else
+					td.innerHTML = "-";
+
+				Polymer.dom(tr).appendChild(td);
+			}
+		}
+
+		if (!this._hideSum) {
+			// sum
+			tr = document.createElement('tr');
+			th = document.createElement('th');
+			Polymer.dom(th).innerHTML = '월평균';
+			Polymer.dom(tr).appendChild(th);
+			Polymer.dom(foot).appendChild(tr);
+
+			for (var t in total) {
+				td = document.createElement('td');
+				td.setAttribute('id', 'sum_' + prefix + '_' + t);
+				td.innerHTML = accounting.formatNumber(total[t] / 12);
+
+				Polymer.dom(tr).appendChild(td);
+			}
+		}
+
+	},
+});
+</script>
+</dom-module>

@@ -1,0 +1,513 @@
+<!-- <link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+<link rel="import" href="/bower_components/iron-form/iron-form.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/paper-checkbox/paper-checkbox.html" />
+<link rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html" />
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html" />
+<link rel="import" href="/bower_components/iron-meta/iron-meta.html" /> -->
+
+<!-- <link rel="import" href="../common/behavior-page.html" />
+<link rel="import" href="../common/normal-input.html" />
+<link rel="import" href="../common/dialog-alert.html" /> -->
+
+<link rel="import" href="../style/common-style.html" />
+<link rel="import" href="../style/bootstrap-style.html" />
+
+<dom-module id="menu-list">
+    <template>
+        <style include="common-style"></style>
+        <style include="bootstrap-style">
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+                --paper-checkbox-label-spacing: 0;
+                --paper-toolbar-content: {
+                    padding: 0;
+                }
+            }
+
+            paper-toolbar {
+                border: 0;
+                background-color: white;
+                color: #333;
+            }
+
+            paper-toolbar .title {
+                line-height: 120%;
+            }
+        </style>
+
+        <iron-ajax id="protocolGetMenu" url$="/api/common/menus/{{_menu}}" headers='{"X-Requested-With": "XMLHttpRequest"}' method="GET" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax id="protocolSaveMenu" url="/api/common/menus/" headers='{"X-Requested-With": "XMLHttpRequest"}' method="POST" content-type="application/json" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax id="protocolDeleteMenu" url$="/api/common/menu/{{_delMenuCd}}" headers='{"X-Requested-With": "XMLHttpRequest"}' method="DELETE" content-type="application/json" on-response="_formResponse" on-error="_redirectOnError"></iron-ajax>
+
+        <paper-card elevation="1">
+            <div class="card-content">
+                <div class="page-header">
+                    <h2>메뉴 관리</h2>
+                </div>
+
+                <paper-toolbar>
+                    <span class="title">대메뉴</span>
+                    <paper-button on-tap="_addMainMenu">행추가</paper-button>
+                    <paper-button on-tap="_saveMainMenu">저장</paper-button>
+                </paper-toolbar>
+
+                <form id="formMainMenu" is="iron-form">
+                    <div class="table-responsive">
+                        <table id="mainMenuTable" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <iron-icon icon="link"></iron-icon>
+                                    </th>
+                                    <th>
+                                        메뉴코드
+                                    </th>
+                                    <th>
+                                        메뉴명
+                                    </th>
+                                    <th>
+                                        아이콘
+                                    </th>
+                                    <th>
+                                        URL
+                                    </th>
+                                    <th>
+                                        순서
+                                    </th>
+                                    <th>
+                                        사용여부
+                                    </th>
+                                    <th>
+                                        -
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+
+                <paper-toolbar>
+                    <span class="title">[[_currentSubmenuNm]] 소메뉴</span>
+                    <paper-button on-tap="_addSubMenu">행추가</paper-button>
+                    <paper-button on-tap="_saveSubMenu">저장</paper-button>
+                </paper-toolbar>
+
+                <form id="formSubMenu" is="iron-form">
+                    <div class="table-responsive">
+                        <table id="subMenuTable" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        메뉴코드
+                                    </th>
+                                    <th>
+                                        메뉴명
+                                    </th>
+                                    <th>
+                                        아이콘
+                                    </th>
+                                    <th>
+                                        URL
+                                    </th>
+                                    <th>
+                                        순서
+                                    </th>
+                                    <th>
+                                        사용여부
+                                    </th>
+                                    <th>
+                                        -
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+
+            </div>
+        </paper-card>
+
+        <dialog-alert id="alert"></dialog-alert>
+    </template>
+
+    <script>
+        Polymer({
+            is: "menu-list",
+
+            behaviors: [PS.BehaviorPage],
+
+            properties: {
+                _menu: String,
+                _submenuList: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _currentSubmenuNm: String,
+                _currentSubmenuCd: Number,
+                _delMenuCd: Number,
+            },
+
+            ready: function() {
+                this.scopeSubtree(this.$.mainMenuTable.querySelector("tbody"), true);
+                this.scopeSubtree(this.$.subMenuTable.querySelector("tbody"), true);
+            },
+
+            attached: function() {
+                this._search();
+            },
+
+            _search: function() {
+                this._menu = "ROOT";
+                this.listen(this.$.protocolGetMenu, "response", "_insertMainData");
+                this.$.protocolGetMenu.generateRequest();
+            },
+
+            _insertMainData: function(e) {
+                this.unlisten(this.$.protocolGetMenu, "response", "_insertMainData");
+
+                var table = this.$.mainMenuTable.querySelector("tbody");
+                var data = e.target.lastResponse;
+                var i;
+
+                this._refreshMainMenu();
+
+                for (i = 0; i < data.length; i++) {
+                    this._appendRow(
+                        table,
+                        true,
+                        data[i].menuCd,
+                        data[i].menuIco,
+                        data[i].menuNm,
+                        data[i].url,
+                        data[i].sort,
+                        data[i].use,
+                        data[i].parentMenuCd,
+                        i
+                    )
+                }
+                this._closeOverlay();
+            },
+
+            _insertSubData: function(e) {
+                this.unlisten(this.$.protocolGetMenu, "response", "_insertSubData");
+
+                var table = this.$.subMenuTable.querySelector("tbody");
+                var data = e.target.lastResponse;
+                var i;
+
+                this._refreshSubMenu();
+
+                for (i = 0; i < data.length; i++) {
+                    this._appendRow(
+                        table,
+                        false,
+                        data[i].menuCd,
+                        data[i].menuIco,
+                        data[i].menuNm,
+                        data[i].url,
+                        data[i].sort,
+                        data[i].use,
+                        data[i].parentMenuCd,
+                        i
+                    )
+                }
+            },
+
+            _showSubmenus: function(e) {
+                var menuCd = e.target.getAttribute("alt");
+                var meta = new Polymer.IronMetaQuery({type: menuCd});
+                var menuNm = meta.byKey("menuNm");
+
+                this._currentSubmenuNm = menuNm;
+                this._currentSubmenuCd = menuCd;
+                this._menu = menuCd;
+                this.listen(this.$.protocolGetMenu, "response", "_insertSubData");
+                this.$.protocolGetMenu.generateRequest();
+            },
+
+            _appendRow: function(table, isMain, menuCd, menuIco, menuNm, url, sort, use, parentMenuCd, order) {
+                var tr, td, input, button, hidden;
+
+                tr = document.createElement("tr");
+
+                if (isMain) {
+                    td = document.createElement("td");
+                    td.setAttribute("class", "text-center");
+                    button = document.createElement("paper-icon-button");
+                    button.setAttribute("alt", menuCd);
+                    button.setAttribute("icon", "create");
+                    if (!menuCd)
+                        button.setAttribute("disabled", true);
+                    this.listen(button, "tap", "_showSubmenus");
+                    td.appendChild(button);
+                    tr.appendChild(td);
+                }
+
+                td = document.createElement("td");
+                input = document.createElement("normal-input");
+                input.setAttribute("name", "menuCd");
+                if (menuCd)
+                    input.setAttribute("readonly", true);
+                input.setAttribute("required", true);
+                input.setAttribute("class", "menuCd");
+                input.setAttribute("value", menuCd ? menuCd : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                input = document.createElement("normal-input");
+                input.setAttribute("name", "menuNm");
+                input.setAttribute("required", true);
+                input.setAttribute("class", "menuNm");
+                input.setAttribute("value", menuNm ? menuNm : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                input = document.createElement("normal-input");
+                input.setAttribute("name", "menuIco");
+                input.setAttribute("required", true);
+                input.setAttribute("value", menuIco ? menuIco : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                input = document.createElement("normal-input");
+                input.setAttribute("name", "url");
+                if (menuCd)
+                    input.setAttribute("readonly", true);
+                input.setAttribute("value", url ? url : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                input = document.createElement("normal-input");
+                input.setAttribute("name", "sort");
+                input.setAttribute("required", true);
+                input.setAttribute("value", sort ? sort : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                td.setAttribute("class", "text-center");
+                input = document.createElement("paper-checkbox");
+                input.setAttribute("name", "useCheckbox");
+                this.listen(input, "change", "_triggerUse");
+                if (use)
+                    input.setAttribute("checked", true);
+                td.appendChild(input);
+
+                hidden = document.createElement("input");
+                hidden.setAttribute("name", "use");
+                hidden.setAttribute("class", "use");
+                hidden.setAttribute("value", use ? true : false);
+                hidden.setAttribute("style", "display: none;");
+                td.appendChild(hidden);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                td.setAttribute("class", "text-center");
+                button = document.createElement("paper-button");
+                button.setAttribute("alt", menuCd ? menuCd : "");
+                button.addEventListener("tap", this._deleteRow.bind(this));
+                button.innerHTML = "삭제";
+                td.appendChild(button);
+
+                hidden = document.createElement("input");
+                hidden.setAttribute("name", "new");
+                hidden.setAttribute("value", menuCd ? false : true);
+                hidden.setAttribute("class", "new");
+                hidden.setAttribute("style", "display: none;");
+                td.appendChild(hidden);
+
+                hidden = document.createElement("input");
+                hidden.setAttribute("name", "paretMenuCd");
+                hidden.setAttribute("value", parentMenuCd ? parentMenuCd : "");
+                hidden.setAttribute("class", "parentMenuCd");
+                hidden.setAttribute("style", "display: none;");
+                td.appendChild(hidden)
+
+                if (menuCd) {
+                    input = document.createElement("iron-meta");
+                    input.setAttribute("type", menuCd);
+                    input.setAttribute("key", "menuNm");
+                    input.setAttribute("value", menuNm);
+                    td.appendChild(input);
+                    input = document.createElement("iron-meta");
+                    input.setAttribute("type", menuCd);
+                    input.setAttribute("key", "menuCd");
+                    input.setAttribute("value", menuCd);
+                    td.appendChild(input);
+                    input = document.createElement("iron-meta");
+                    input.setAttribute("type", menuCd);
+                    input.setAttribute("key", "parentMenuCd");
+                    input.setAttribute("value", parentMenuCd);
+                    td.appendChild(input);
+                }
+
+                tr.appendChild(td);
+
+                table.appendChild(tr);
+            },
+
+            _triggerUse: function(e) {
+                var tr = e.target.parentElement.parentElement;
+                var use = tr.getElementsByClassName("use")[0];
+
+                use.setAttribute("value", e.target.checked);
+            },
+
+            _deleteRow: function(e) {
+                var tr = e.target.parentElement.parentElement;
+                var menuCd = e.target.getAttribute("alt");
+
+                if (!menuCd) {
+                    Polymer.dom(tr.parentElement).removeChild(tr);
+                } else {
+                    var meta = new Polymer.IronMetaQuery({type: menuCd});
+                    var parentMenuCd = meta.byKey("parentMenuCd");
+
+                    this._delMenuCd = menuCd;
+                    this.$.protocolDeleteMenu.generateRequest();
+                    Polymer.dom(tr.parentElement).removeChild(tr);
+                    if (!parentMenuCd)
+                        this._refreshSubMenu();
+
+                    if (menuCd == this._currentSubmenuCd) {
+                        this._currentSubmenuCd = this._currentSubmenuNm = "";
+                    }
+                }
+            },
+
+            _addMainMenu: function() {
+                this._appendRow(this.$.mainMenuTable.querySelector("tbody"), true);
+            },
+
+            _addSubMenu: function() {
+                if (this._currentSubmenuNm)
+                    this._appendRow(this.$.subMenuTable.querySelector("tbody"));
+            },
+
+            _saveMainMenu: function() {
+                if (this.$.formMainMenu.validate()) {
+                    var data = this.$.formMainMenu.serialize();
+                    var parsedData = [];
+                    var length = Array.isArray(data.use) ? data.use.length : 1;
+
+                    for (var i = 0; i < length; i++) {
+                        parsedData.push({
+                            menuCd: Array.isArray(data.menuCd) ? data.menuCd[i] : data.menuCd,
+                            menuIco: Array.isArray(data.menuIco) ? data.menuIco[i] : data.menuIco,
+                            menuNm: Array.isArray(data.menuNm) ? data.menuNm[i] : data.menuNm,
+                            sort: Array.isArray(data.sort) ? data.sort[i] : data.sort,
+                            url: Array.isArray(data.url) ? data.url[i] : data.url,
+                            use: (Array.isArray(data.use) ? data.use[i] : data.use) == "true" ? true : false,
+                            new: Array.isArray(data.new) ? data.new[i] : data.new
+                        });
+                    }
+
+                    this.listen(this.$.protocolSaveMenu, "response", "_formResponseWithMainRefresh");
+                    this.$.protocolSaveMenu.body = parsedData;
+                    this.$.protocolSaveMenu.generateRequest();
+                }
+            },
+
+            _saveSubMenu: function() {
+                if (this.$.formSubMenu.validate()) {
+                    var data = this.$.formSubMenu.serialize();
+                    var parsedData = [];
+                    var length = Array.isArray(data.use) ? data.use.length : 1;
+
+                    for (var i = 0; i < length; i++) {
+                        parsedData.push({
+                            parentMenuCd: this._currentSubmenuCd,
+                            menuCd: Array.isArray(data.menuCd) ? data.menuCd[i] : data.menuCd,
+                            menuIco: Array.isArray(data.menuIco) ? data.menuIco[i] : data.menuIco,
+                            menuNm: Array.isArray(data.menuNm) ? data.menuNm[i] : data.menuNm,
+                            sort: Array.isArray(data.sort) ? data.sort[i] : data.sort,
+                            url: Array.isArray(data.url) ? data.url[i] : data.url,
+                            use: (Array.isArray(data.use) ? data.use[i] : data.use) == "true" ? true : false,
+                            new: Array.isArray(data.new) ? data.new[i] : data.new
+                        });
+                    }
+
+                    this.listen(this.$.protocolSaveMenu, "response", "_formResponseWithSubRefresh");
+                    this.$.protocolSaveMenu.body = parsedData;
+                    this.$.protocolSaveMenu.generateRequest();
+                }
+            },
+
+            _formResponse: function(e) {
+                this._showFormResponse(e.detail.status);
+            },
+
+            _formResponseWithMainRefresh: function(e) {
+                this.unlisten(this.$.protocolSaveMenu, "response", "_formResponseWithMainRefresh");
+
+                this._showFormResponse(e.detail.status, function() {
+                    this._search();
+
+                    this._refreshSubMenu();
+                    this._currentSubmenuNm = "";
+                }.bind(this))
+            },
+
+            _formResponseWithSubRefresh: function(e) {
+                this.unlisten(this.$.protocolSaveMenu, "response", "_formResponseWithSubRefresh");
+
+                this._showFormResponse(e.detail.status, function() {
+                    this._menu = this._currentSubmenuCd;
+                    this.listen(this.$.protocolGetMenu, "response", "_insertSubData");
+                    this.$.protocolGetMenu.generateRequest();
+                }.bind(this))
+            },
+
+            _refreshMainMenu: function() {
+                var table = this.$.mainMenuTable.querySelector("tbody");
+                table.innerHTML = "";
+            },
+
+            _refreshSubMenu: function() {
+                var subtable = this.$.subMenuTable.querySelector("tbody");
+                subtable.innerHTML = "";
+            },
+
+            _showFormResponse: function(status, callback) {
+                this.$.alert.type = "alert";
+
+                switch (status) {
+                    case 200:
+                        this.$.alert.msg = "정상적으로 반영되었습니다.";
+                        this.$.alert.dialog.open();
+                        if (typeof callback == "function")
+                            callback();
+                        break;
+                    default:
+                        this.$.alert.msg = "오류가 발생했습니다.";
+                        this.$.alert.dialog.open();
+                        break;
+                }
+            },
+
+            get parent() {
+                if (this.parentNode.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+                    return this.parentNode.host;
+                }
+                return this.parentNode;
+            },
+        })
+    </script>
+</dom-module>

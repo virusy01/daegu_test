@@ -1,0 +1,225 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/vaadin-date-picker/vaadin-date-picker.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input-container.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+<link rel="import" href="/bower_components/iron-form/iron-form.html" />
+<link rel="import" href="/bower_components/paper-dialog/paper-dialog.html" />
+
+<link rel="import" href="../common/input-business-number.html" />
+<link rel="import" href="../common/dialog-alert.html" />
+<link rel="import" href="../common/normal-input.html" />
+<link rel="import" href="../common/date-input.html" />
+<link rel="import" href="../common/normal-select.html" />
+<link rel="import" href="../common/behavior-page.html" />
+
+<link rel="import" href="../style/common-style.html" />
+<link rel="import" href="../style/bootstrap-style.html" />
+
+<dom-module id="corp-create">
+    <template>
+        <style include="common-style"></style>
+        <style include="bootstrap-style">
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+            }
+
+            .selectBox {
+                display: inline-block;
+                width: auto;
+            }
+
+            .selectText {
+                display: inline-block;
+            }
+
+            .bizNo normal-input {
+                display: inline-block;
+            }
+
+            .bizNo normal-input:nth-child(1) {
+                width: 70px;
+            }
+
+            .bizNo normal-input:nth-child(2) {
+                width: 50px;
+            }
+
+            .bizNo normal-input:nth-child(3) {
+                width: 80px;
+            }
+        </style>
+
+        <iron-ajax auto url="/api/common/comp_kind/code/" headers='{"X-Requested-With": "XMLHttpRequest"}' last-response="{{_codes.compKind}}" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax auto url="/api/common/corp_type/code/" headers='{"X-Requested-With": "XMLHttpRequest"}' last-response="{{_codes.corpType}}" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax auto url="/api/common/biz_sect/code/" headers='{"X-Requested-With": "XMLHttpRequest"}' last-response="{{_codes.bizSect}}" on-error="_redirectOnError"></iron-ajax>
+
+        <iron-ajax id="protocolSaveCorpInfo" url="/api/corp/info" method="POST" content-type="application/json" on-response="_formResponse" on-error="_redirectOnError"></iron-ajax>
+
+        <paper-card elevation="1">
+            <form is="iron-form" id="corpForm" method="POST" action="/api/corp/info" content-type="application/json" on-iron-form-reset="_resetForm">
+                <div class="card-content">
+                    <div class="page-header">
+                        <h2>기업현황 <smal>등록</smal></h2>
+                    </div>
+
+                    <table class="table table-bordered">
+                        <colgroup>
+                            <col width="20%" />
+                            <col width="30%" />
+                            <col width="20%" />
+                            <col width="30%" />
+                        </colgroup>
+                        <tr>
+                            <th>
+                                기업명
+                            </th>
+                            <td>
+                                <normal-input id="corpNm" name="corpNm" required></normal-input>
+                            </td>
+                            <th>
+                                사업개시일
+                            </th>
+                            <td>
+                                <date-input id="bizDt" name="bizDt" required></date-input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                대표자
+                            </th>
+                            <td>
+                                <normal-input name="ceoNm" required></normal-input>
+                            </td>
+                            <th>
+                                사업자번호
+                            </th>
+                            <td>
+                                <div class="bizNo">
+                                    <normal-input id="bizNo1" type="number" maxlength="3"></normal-input>
+                                    <normal-input id="bizNo2" type="number" maxlength="2"></normal-input>
+                                    <normal-input id="bizNo3" type="number" maxlength="5"></normal-input>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                법인형태
+                            </th>
+                            <td>
+                                <normal-select id="corpType" name="corpType" items="{{_codes.corpType}}" class="selectBox" on-value-changed="_showCorpType2"></normal-select>
+                                <normal-input id="corpType2" name="corpType2" class="hidden selectText"></normal-input>
+                            </td>
+                            <th>
+                                기업분류
+                            </th>
+                            <td>
+                                <normal-select id="compKind" name="compKind" items="{{_codes.compKind}}"></normal-select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                사업업종
+                            </th>
+                            <td colspan="3">
+                                <normal-select id="bizSect" name="bizSect" items="{{_codes.bizSect}}" class="selectBox" on-value-changed="_showBizSect2"></normal-select>
+                                <normal-input id="bizSect2" name="bizSect2" class="hidden selectText"></normal-input>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card-actions">
+                    <a href="/corp/all" tabindex="-1">
+                        <paper-button>
+                            <iron-icon icon="toc"></iron-icon>
+                            목록
+                        </paper-button>
+                    </a>
+                    <paper-button on-tap="_save">
+                        <iron-icon icon="save"></iron-icon>
+                        저장
+                    </paper-button>
+                </div>
+            </form>
+        </paper-card>
+
+        <dialog-alert id="alert"></dialog-alert>
+    </template>
+
+    <script>
+        Polymer({
+            is: "corp-create",
+
+            behaviors: [PS.BehaviorPage],
+
+            properties: {
+                _codes: {
+                    type: Object,
+                    value: function() {
+                        return {
+                            compKind: [],
+                            corpType: [],
+                            bizSect: [],
+                        };
+                    }
+                },
+                _pikaday: Object,
+            },
+
+            attached: function() {
+                this._closeOverlay();
+            },
+
+            _save: function() {
+                if (this.$.corpForm.validate()) {
+                    var body = this.$.corpForm.serialize();
+                    body.bizNo = this.$.bizNo1.value + "-" + this.$.bizNo2.value + "-" + this.$.bizNo3.value;
+
+                    this.$.protocolSaveCorpInfo.body = [body];
+
+                    this.$.protocolSaveCorpInfo.generateRequest();
+                }
+            },
+
+            _formResponse: function(e) {
+                switch (e.detail.status) {
+                    case 200:
+                        this.$.alert.msg = "정상적으로 반영되었습니다.";
+                        this.$.alert.dialog.open();
+                        break;
+                    default:
+                        this.$.alert.msg = "오류가 발생했습니다.";
+                        this.$.alert.dialog.open();
+                        break;
+                }
+            },
+
+            refresh: function() {
+                this.$.corpForm.reset();
+                this._closeOverlay();
+            },
+
+            _showCorpType2: function(e) {
+                if (e.target.value == "06")
+                    this.$.corpType2.classList.remove("hidden");
+                else
+                    this.$.corpType2.classList.add("hidden");
+            },
+
+            _showBizSect2: function(e) {
+                if (e.target.value == "16")
+                    this.$.bizSect2.classList.remove("hidden");
+                else
+                    this.$.bizSect2.classList.add("hidden");
+            },
+
+            _resetForm: function() {
+                this.$.corpNm.invalid = false;
+            },
+        })
+    </script>
+</dom-module>

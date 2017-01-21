@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sck.modules.common.UserRepository">
+
+	<select id="countUsers" resultType="int">
+		SELECT
+			COUNT(*) ROW_COUNT
+		FROM
+		(
+			SELECT
+				U.USER_SEQ
+				, U.USER_ID
+				, U.USER_NM
+				, U.EMAIL
+				, U.ADMIN_YN
+				, U.MOD_DT
+				, date(U.CRE_DT) as CRE_DT
+			FROM USERS U
+			WHERE 1 = 1
+			<if test="userNm != null and userNm != ''">
+			AND ( U.USER_ID LIKE CONCAT('%',#{userNm},'%') OR U.USER_NM LIKE CONCAT('%',#{userNm},'%') OR EMAIL LIKE CONCAT('%',#{userNm},'%') )
+			</if>
+			ORDER by U.USER_NM
+		) PAGING
+	</select>
+
+	<select id="findUsers" resultType="com.sck.model.User">
+		SELECT
+			U.USER_SEQ
+			, U.USER_ID
+			, U.USER_NM
+			, U.EMAIL
+			, U.ADMIN_YN
+			, U.MOD_DT
+			, date(U.CRE_DT) as CRE_DT
+		FROM USERS U
+		WHERE 1 = 1
+		<if test="userNm != null and userNm != ''">
+		AND ( U.USER_ID LIKE CONCAT('%',#{userNm},'%') OR U.USER_NM LIKE CONCAT('%',#{userNm},'%') OR EMAIL LIKE CONCAT('%',#{userNm},'%') )
+		</if>
+		ORDER by U.USER_NM
+		<if test="page != null">
+		LIMIT #{page.limitStart}, #{page.limitEnd}
+		</if>
+	</select>
+
+	<select id="findUser" resultType="com.sck.model.User">
+		SELECT
+			U.USER_SEQ
+			, U.USER_ID
+			, U.USER_NM
+			, U.EMAIL
+			, U.ADMIN_YN
+			, U.MOD_DT
+			, date(U.CRE_DT) as CRE_DT
+		FROM USERS U
+		WHERE USER_SEQ = #{p}
+	</select>
+
+	<select id="findUserByUsername" resultType="com.sck.model.User">
+		SELECT
+			U.USER_SEQ
+			, U.USER_ID
+			, U.USER_NM
+			, U.PASSWORD
+			, U.EMAIL
+			, U.ADMIN_YN
+			, U.MOD_DT
+			, date(U.CRE_DT) as CRE_DT
+		FROM USERS U
+		WHERE USER_ID = #{p}
+	</select>
+
+	<insert id="insertUser">
+		INSERT INTO USERS
+		(
+			USER_ID,
+			USER_NM,
+			EMAIL,
+			PASSWORD,
+			ADMIN_YN,
+			CRE_DT
+		)
+		VALUES
+		(
+			#{p.userId},
+			#{p.userNm},
+			#{p.email},
+			password(#{p.password}),
+			#{p.adminYn},
+			now()
+		)
+	</insert>
+
+	<update id="updateUser">
+		UPDATE USERS
+		SET
+			USER_ID = #{p.userId},
+			USER_NM = #{p.userNm},
+			EMAIL = #{p.email},
+			<if test="p.password != null and p.password != ''">
+			PASSWORD = password(#{p.password}),
+			</if>
+			ADMIN_YN = #{p.adminYn},
+			MOD_DT = now()
+		WHERE USER_SEQ = #{p.userSeq}
+	</update>
+	
+	<delete id="deleteUser">
+		DELETE FROM USERS
+		WHERE USER_SEQ = #{p}
+	</delete>
+
+</mapper>

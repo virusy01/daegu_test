@@ -1,0 +1,243 @@
+<link rel="import" href="/bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="/bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="/bower_components/iron-form/iron-form.html">
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/bower_components/iron-input/iron-input.html">
+<link rel="import" href="/src/components/common/normal-input.html" />
+<link rel="import" href="/src/components/common/normal-select.html" />
+<link rel="import" href="/src/components/common/date-input.html" />
+
+<link rel="import" href="/src/components/behaviors/behavior-loader.html">
+
+<link rel="import" href="/src/styles/base/common.html" />
+
+<dom-module id="page-general">
+	<style include="common-style"></style>
+        <template>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' 
+				method="get"
+    				url="/api/common/CORP_TYPE/code/"
+				last-response="{{_corpType}}">
+		</iron-ajax>
+		<iron-ajax id="getGeneral" headers='{"X-Requested-With": "XMLHttpRequest"}' 
+	     				   method="get"  
+	     				   url$="/api/corp/info/[[_corpSeq]]"
+	     				   on-request="_startLoader"
+	     				   on-response="_stopLoader"
+	     				   last-response="{{_data}}">
+		</iron-ajax>
+
+		<form id="generalForm" is="iron-form"
+		      content-type="application/json"
+		      method="post" 
+		      action="/api/corp/info"
+		      on-iron-form-presubmit="_parseOnPresubmit"
+		      on-iron-form-response="_submitResult"	
+		      class="form-horizontal">
+
+		<template is="dom-if" if="{{!adminMode}}">
+		<div class="page-header">
+			<h2>일반현황 <small>General Status</small></h2>
+			<div class="title-buttons">
+				<button type="button" on-tap="_submitForm" class="btn btn-sm btn-primary">수정</button>
+			</div>
+		</div>
+		</template>
+
+		<template is="dom-if" if="{{adminMode}}">
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="text-right">
+						<button type="button" on-tap="_submitForm" class="btn btn-sm btn-primary">수정</button>
+					</div>
+				</div>
+			</div>
+			<div class="horizontal-margin-20"></div>
+		</template>
+
+		<div id="alert" class="alert alert-dismissible hide" role="alert"></div>
+
+		  <div class="form-group">
+		    <label class="col-xs-2 control-label">센터명</label>
+		    <div class="col-xs-10">
+			    <normal-input name="CENTER_NM" value="{{_data.CENTER_NM}}" placeholder="센터명" readonly></normal-input>
+		    </div>
+		  </div>
+
+		  <div class="form-group">
+		    <label class="col-xs-2 control-label">모기관</label>
+		    <div class="col-xs-4">
+			    <normal-input name="UP_INSTITUTE_NM" value="{{_data.UP_INSTITUTE_NM}}" required></normal-input>
+		    </div>
+		    <label class="col-xs-2 control-label">개소일</label>
+		    <div class="col-xs-4">
+			    <date-input name="OPEN_DT" bind-value="{{_data.OPEN_DT}}" required></date-input>
+		    </div>
+		  </div>
+
+		  <div class="form-group">
+		    <label class="col-xs-2 control-label">전화번호</label>
+		    <div class="col-xs-4">
+			    <normal-input name="TEL_NO" value="{{_data.TEL_NO}}"></normal-input>
+		    </div>
+		    <label class="col-xs-2 control-label">팩스</label>
+		    <div class="col-xs-4">
+			    <normal-input name="FAX_NO" value="{{_data.FAX_NO}}"></normal-input>
+		    </div>
+		  </div>
+
+		  <div class="form-group">
+		    <label class="col-xs-2 control-label">주소</label>
+		    <div class="col-xs-10">
+			    <normal-input name="ADDRESS" value="{{_data.ADDRESS}}"></normal-input>
+		    </div>
+		  </div>
+
+		  <div class="form-group">
+		    <label class="col-xs-2 control-label">센터장</label>
+		    <div class="col-xs-4">
+			    <normal-input name="CEO_NM" value="{{_data.CEO_NM}}"></normal-input>
+		    </div>
+		    <label class="col-xs-2 control-label">휴대폰</label>
+		    <div class="col-xs-4">
+			    <normal-input name="CEO_MOBILE_NO" value="{{_data.CEO_MOBILE_NO}}"></normal-input>
+		    </div>
+		  </div>
+
+		  <div class="form-group">
+		    <label class="col-xs-2 control-label">담당자</label>
+		    <div class="col-xs-4">
+			    <normal-input name="MANAGER_NM" value="{{_data.MANAGER_NM}}"></normal-input>
+		    </div>
+		    <label class="col-xs-2 control-label">휴대폰</label>
+		    <div class="col-xs-4">
+			    <normal-input name="MANAGER_MOBILE_NO" value="{{_data.MANAGER_MOBILE_NO}}"></normal-input>
+		    </div>
+		  </div>
+
+		  <div class="form-group sub-header">
+			  <div class="col-xs-10 col-xs-offset-2">
+		<h4>사회적기업관련</h4>
+		<hr/>
+			  </div>
+		  </div>
+
+		<div class="form-group">
+			<label class="col-xs-2 control-label">조직형태</label>
+			<div class="col-xs-10">
+				<normal-select name="CORP_TYPE" items="{{_corpType}}" name-from="CD_NM" value-from="CD" value="{{_data.CORP_TYPE}}"</normal-select>
+			</div>
+		</div>
+
+		<div class="form-group">
+		    <label class="col-xs-2 control-label">SE 인증 여부</label>
+		    <div class="col-xs-4">
+			    <paper-radio-group selected="{{_data.SE_CERT_YN}}" attr-for-selected="value">
+				    <paper-radio-button name="SE_CERT_YN" value="Y" disabled="{{adminMode}}">Y</paper-radio-button>
+				    <paper-radio-button name="SE_CERT_YN" value="N" disabled="{{adminMode}}">N</paper-radio-button>
+			    </paper-radio-group>
+		    </div>
+		    <label class="col-xs-2 control-label">인증차수</label>
+		    <div class="col-xs-4">
+			    <normal-input name="SE_CERT_REV_NO" value="{{_data.SE_CERT_REV_NO}}"></normal-input>
+		    </div>
+		  </div>
+
+		  <div class="form-group">
+		    <label class="col-xs-2 control-label">SE 명칭</label>
+		    <div class="col-xs-4">
+			    <normal-input name="SE_NM" value="{{_data.SE_NM}}"></normal-input>
+		    </div>
+		    <label class="col-xs-2 control-label">인증시기</label>
+		    <div class="col-xs-4">
+			    <date-input name="SE_DT" bind-value="{{_data.SE_DT}}"></date-input>
+		    </div>
+		  </div>
+
+		  <div class="form-group">
+		    <label class="col-xs-2 control-label">사회적 일자리 지원 개시</label>
+		    <div class="col-xs-4">
+			    <date-input name="JOB_SUPP_BEGIN_DT" bind-value="{{_data.JOB_SUPP_BEGIN_DT}}"></date-input>
+		    </div>
+		    <label class="col-xs-2 control-label">사회적 일자리 지원 종료</label>
+		    <div class="col-xs-4">
+			    <date-input name="JOB_SUPP_END_DT" bind-value="{{_data.JOB_SUPP_END_DT}}"></date-input>
+		    </div>
+		  </div>
+
+		  <input is="iron-input" type="number" name="CORP_SEQ" bind-value="[[_corpSeq]]" hidden></input>
+
+		  <template is="dom-if" if="{{!adminMode}}">
+		</form>
+		  </template>
+	</template>
+        <script>
+                Polymer({
+                        is: 'page-general',
+
+			behaviors: [Lunch.LoaderBehavior],
+
+			properties: {
+				adminMode: {
+					type: Boolean,
+					value: false
+				},
+				readId: {
+					type: Number,
+					observer: '_callAPI'
+				},
+				_corpSeq: {
+					type: Number,
+					value: function() {
+						return parseInt(sessionStorage.corpSeq);
+					},
+					observer: '_getGeneral'
+				},
+				_corpType: {
+					type: Array,
+					value: function() {
+						return [];
+					}
+				},
+			},
+
+			_getGeneral: function(value) {
+				this._corpSeq = value;
+				this.$.getGeneral.generateRequest();
+			},
+
+			_callAPI: function(value) {
+				if (value) {
+					this.readId = value;
+					this._corpSeq = value;
+				}
+			},
+
+			_submitForm: function(e) {
+				if (this.$.generalForm.validate()) {
+					this.$.generalForm.submit();
+				}
+			},
+
+			_parseOnPresubmit: function(e) {
+				this.$.generalForm.request.body['CORP_SEQ'] = this._corpSeq;	
+			},
+
+			_submitResult: function(e) {
+				if (e.detail.response == 1) {
+					this.$.alert.innerHTML = '수정되었습니다';
+					this.$.alert.classList.remove('hide');	
+					this.$.alert.classList.add('alert-success');
+				}else {
+					this.$.alert.innerHTML = '오류가 발생하였습니다';
+					this.$.alert.classList.remove('hide');
+					this.$.alert.classList.add('alert-danger');
+				}
+
+				this.async(function() {
+					this.$.alert.classList.add('hide');
+				}, 2000);
+			},
+                });
+        </script>
+</dom-module>

@@ -1,0 +1,293 @@
+<link rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html" />
+<link rel="import" href="/bower_components/vaadin-date-picker/vaadin-date-picker.html" />
+
+<link rel="import" href="../common/dialog-alert.html" />
+<link rel="import" href="../gp-text-field/gp-text-field.html" />
+
+<dom-module id="corp-detail-employee">
+    <template>
+        <style include="common-style"></style>
+        <style include="bootstrap-style">
+            :host {
+                --paper-toolbar-height: 50px;
+            }
+        </style>
+
+        <iron-ajax id="protocolGetCorpEmployee" url$="/api/corp/employee/{{corpId}}/last5year" method="GET" content-type="application/json" last-response="{{_corpDetail}}" on-response="_insertEmployeeData"></iron-ajax>
+        <iron-ajax id="protocolSaveCorpEmployee" url="/api/corp/employee" method="POST" content-type="application/json" on-response="_formResponse"></iron-ajax>
+        <iron-ajax id="protocolDeleteCorpEmployee" url$="/api/corp/employee/{{_empSeq}}" method="DELETE" content-type="application/json" on-response="_formResponse"></iron-ajax>
+
+        <paper-toolbar class="toolbar-head">
+            <span class="title">고용현황</span>
+            <paper-button on-tap="_addRow">행추가</paper-button>
+            <paper-button on-tap="_save">저장</paper-button>
+        </paper-toolbar>
+
+        <form id="formCorpEmployee" is="iron-form">
+            <div class="table-responsive">
+                <table id="tableCorpEmployee" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">
+                                기준일
+                            </th>
+                            <th colspan="2">
+                                고용인원
+                            </th>
+                            <th colspan="2">
+                                고용현황/고용형태
+                            </th>
+                            <th colspan="2">
+                                급여수준(월평균급여:원)
+                            </th>
+                            <th rowspan="2">
+                                -
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                총고용인원
+                            </th>
+                            <th>
+                                취약계층 총인원
+                            </th>
+                            <th>
+                                정규직
+                            </th>
+                            <th>
+                                비정규직
+                            </th>
+                            <th>
+                                임원
+                            </th>
+                            <th>
+                                임원외
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </form>
+
+        <dialog-alert id="alert" on-confirm-ok="_onConfirmOk"></dialog-alert>
+
+    </template>
+
+    <script src="/scripts/moment.min.js"></script>
+    <script>
+        Polymer({
+            is: 'corp-detail-employee',
+
+            properties: {
+                corpId: Number,
+                _isAttached: Boolean,
+                _corpDetail: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    }
+                },
+                _empSeq: String
+            },
+
+            observers: [
+                '_search(corpId, _isAttached)'
+            ],
+
+            attached: function() {
+                this._isAttached = true;
+            },
+
+            _search: function() {
+                this.$.protocolGetCorpEmployee.generateRequest();
+            },
+
+            _insertEmployeeData: function(e) {
+                var table = this.$.tableCorpEmployee.querySelector("tbody");
+                var data = e.target.lastResponse;
+                var i;
+
+                table.innerHTML = "";
+
+                for (i = 0; i < data.length; i++) {
+                    this._appendRow(
+                        moment(data[i].clsDt).format("YYYY-MM-DD"),
+                        data[i].empNum,
+                        data[i].weakNum,
+                        data[i].fullNum,
+                        data[i].partNum,
+                        data[i].cxxSal,
+                        data[i].normSal,
+                        data[i].empSeq
+                    )
+                }
+            },
+
+            _save: function() {
+                if (this.$.formCorpEmployee.validate()) {
+                    var data = this.$.formCorpEmployee.serialize();
+                    var parsedData = [];
+                    var length = Array.isArray(data.clsDt) ? data.clsDt.length : 1;
+
+                    for (var i = 0; i < length; i++) {
+                        parsedData.push({
+                            clsDt: Array.isArray(data.clsDt) ? data.clsDt[i] : data.clsDt,
+                            empNum: accounting.unformat(Array.isArray(data.empNum) ? data.empNum[i] : data.empNum),
+                            weakNum: accounting.unformat(Array.isArray(data.weakNum) ? data.weakNum[i] : data.weakNum),
+                            fullNum: accounting.unformat(Array.isArray(data.fullNum) ? data.fullNum[i] : data.fullNum),
+                            partNum: accounting.unformat(Array.isArray(data.partNum) ? data.partNum[i] : data.partNum),
+                            cxxSal: accounting.unformat(Array.isArray(data.cxxSal) ? data.cxxSal[i] : data.cxxSal),
+                            normSal: accounting.unformat(Array.isArray(data.normSal) ? data.normSal[i] : data.normSal),
+                            empSeq: Array.isArray(data.empSeq) ? data.empSeq[i] : data.empSeq,
+                            corpSeq: this.corpId
+                        });
+                    }
+
+                    this.$.protocolSaveCorpEmployee.body = parsedData;
+                    this.$.protocolSaveCorpEmployee.generateRequest();
+                }
+            },
+
+            _formResponse: function(e) {
+                this.$.alert.type = "alert";
+
+                switch (e.detail.status) {
+                    case 200:
+                        this.$.alert.msg = "정상적으로 반영되었습니다.";
+                        this.$.alert.dialog.open();
+                        this._search();
+                        break;
+                    default:
+                        this.$.alert.msg = "오류가 발생했습니다.";
+                        this.$.alert.dialog.open();
+                        break;
+                }
+            },
+
+            _addRow: function() {
+                this._appendRow();
+            },
+
+            _appendRow: function(clsDt, empNum, weakNum, fullNum, partNum, cxxSal, normSal, empSeq) {
+                var table = this.$.tableCorpEmployee.querySelector("tbody");
+                var tr, td, input, button, hidden;
+
+                tr = document.createElement("tr");
+
+                td = document.createElement("td");
+                input = document.createElement("vaadin-date-picker");
+                input.setAttribute("name", "clsDt");
+                input.setAttribute("required", true);
+                input.setAttribute("value", clsDt ? clsDt : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                td.setAttribute("class", "align-right");
+                input = document.createElement("gp-text-field");
+                input.setAttribute("name", "empNum");
+                input.setAttribute("type", "number");
+                input.setAttribute("show-thousands", true);
+                input.setAttribute("required", true);
+                input.setAttribute("class", "form-control");
+                input.setAttribute("bind-value", empNum ? empNum : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                td.setAttribute("class", "align-right");
+                input = document.createElement("gp-text-field");
+                input.setAttribute("name", "weakNum");
+                input.setAttribute("type", "number");
+                input.setAttribute("show-thousands", true);
+                input.setAttribute("required", true);
+                input.setAttribute("class", "form-control");
+                input.setAttribute("bind-value", weakNum ? weakNum : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                td.setAttribute("class", "align-right");
+                input = document.createElement("gp-text-field");
+                input.setAttribute("name", "fullNum");
+                input.setAttribute("type", "number");
+                input.setAttribute("show-thousands", true);
+                input.setAttribute("required", true);
+                input.setAttribute("class", "form-control");
+                input.setAttribute("bind-value", fullNum ? fullNum : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                td.setAttribute("class", "align-right");
+                input = document.createElement("gp-text-field");
+                input.setAttribute("name", "partNum");
+                input.setAttribute("type", "number");
+                input.setAttribute("show-thousands", true);
+                input.setAttribute("required", true);
+                input.setAttribute("class", "form-control");
+                input.setAttribute("bind-value", partNum ? partNum : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+
+                td = document.createElement("td");
+                td.setAttribute("class", "align-right");
+                input = document.createElement("gp-text-field");
+                input.setAttribute("name", "cxxSal");
+                input.setAttribute("type", "number");
+                input.setAttribute("show-thousands", true);
+                input.setAttribute("required", true);
+                input.setAttribute("class", "form-control");
+                input.setAttribute("bind-value", cxxSal ? cxxSal : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                td.setAttribute("class", "align-right");
+                input = document.createElement("gp-text-field");
+                input.setAttribute("name", "normSal");
+                input.setAttribute("type", "number");
+                input.setAttribute("show-thousands", true);
+                input.setAttribute("required", true);
+                input.setAttribute("class", "form-control");
+                input.setAttribute("bind-value", normSal ? normSal : "");
+                td.appendChild(input);
+                tr.appendChild(td);
+
+                td = document.createElement("td");
+                button = document.createElement("paper-button");
+                button.addEventListener("tap", this._deleteRow.bind(this));
+                button.innerHTML = "삭제";
+                td.appendChild(button);
+
+                hidden = document.createElement("paper-input");
+                hidden.setAttribute("name", "empSeq");
+                hidden.setAttribute("value", empSeq ? empSeq : "");
+                hidden.setAttribute("class", "hidden empSeq");
+                td.appendChild(hidden);
+                tr.appendChild(td);
+
+                if (empSeq)
+                    table.appendChild(tr);
+                else
+                    table.insertBefore(tr, table.firstChild);
+            },
+
+            _deleteRow: function(e) {
+                var tr = e.target.parentNode.parentNode;
+                var empSeq = tr.getElementsByClassName("empSeq")[0].value;
+
+                if (!empSeq) {
+                    tr.remove();
+                } else {
+                    this._empSeq = empSeq;
+                    this.$.protocolDeleteCorpEmployee.generateRequest();
+                }
+            },
+        })
+    </script>
+</dom-module>

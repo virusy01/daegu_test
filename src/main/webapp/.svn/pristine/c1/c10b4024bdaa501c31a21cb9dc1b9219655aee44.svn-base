@@ -1,0 +1,322 @@
+<!--
+ * @Desc 위젯 엘리먼트
+ * @Author patrick.sung
+ * @Created 2016-03-28
+ -->
+
+<link rel="import" href="../gp-behaviors/gp-behavior-draggable.html"/>
+<link rel="import" href="gp-widget-style.html"/>
+
+<dom-module id="gp-widget">
+    <template>
+        <style include="gp-widget-style"></style>
+        <style>
+            :host {
+                position: absolute;
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+            }
+
+            #titleBar span {
+                pointer-events: none;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+
+            #titleBar div {
+                display: inline-block;
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+        </style>
+
+        <div id="titleBar">
+            <span>{{title}}</span>
+            <div id="settingsBtn"></div>
+            <div id="closeBtn"></div>
+        </div>
+        <content></content>
+        <div id="handle"></div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'gp-widget',
+
+            behaviors: [BehaviorDraggable],
+
+            properties: {
+                title: String,
+                minWidth: {
+                    type: Number,
+                    value: 100
+                },
+                minHeight: {
+                    type: Number,
+                    value: 100
+                },
+                noPositionSnapping: Boolean,
+                noSizeSnapping: Boolean,
+                disableMovement: {
+                    type: Boolean,
+                    value: false,
+                    observer: 'determineMovementAvailability'
+                },
+                disableResizing: {
+                    type: Boolean,
+                    value: false,
+                    observer: 'determineResizingAvailability'
+                },
+                disableClose: {
+                    type: Boolean,
+                    value: false,
+                    observer: 'determineCloseAvailability'
+                },
+                disableSettings: {
+                    type: Boolean,
+                    value: false,
+                    observer: 'determineSettingAvailability'
+                },
+                allowResize: {
+                    type: Boolean,
+                    value: false,
+                    readonly: true
+                },
+                contentWidget: Object,
+                contentWidgetProperty: Object,
+                editMode: {
+                    type: Boolean,
+                    value: false,
+                    observer: '_toggleEditMode'
+                },
+                _showingProperty: {
+                    type: Boolean,
+                    value: false
+                },
+                _snapValueWidth: Number,
+                _snapValueHeight: Number,
+            },
+
+            ready: function () {
+                this.lockMouseCoordinate = true;
+                this.noRightBottomBound = true;
+            },
+
+            determineMovementAvailability: function () {
+                if (this.disableMovement) {
+                    this.toggleDrag(false);
+                }
+            },
+
+            toggleDrag: function (show) {
+                if (show) {
+                    if (!this.disableMovement) {
+                        this.listen(this, 'track', '_onDragMove');
+                        this.listen(this, 'up', '_onDragEnd');
+                        this.$.titleBar.style.cursor = 'move';
+                    }
+                } else {
+                    this.unlisten(this, 'track', '_onDragMove');
+                    this.unlisten(this, 'up', '_onDragEnd');
+                    this.$.titleBar.style.cursor = 'auto';
+                }
+            },
+
+            determineResizingAvailability: function () {
+                if (!this.disableResizing) {
+                    this.toggleResize(true);
+                } else {
+                    this.$.handle.style.display = 'none';
+                }
+            },
+
+            toggleResize: function (show) {
+                if (show) {
+                    if (!this.disableResizing) {
+                        this.listen(this.$.handle, 'down', '_onHandleDown');
+                        this.listen(this.$.handle, 'track', '_onHandleMove');
+                        this.listen(this.$.handle, 'up', '_onHandleUp');
+                        this.$.handle.style.display = 'inline-block';
+                    }
+                } else {
+                    this.unlisten(this.$.handle, 'down', '_onHandleDown');
+                    this.unlisten(this.$.handle, 'track', '_onHandleMove');
+                    this.unlisten(this.$.handle, 'up', '_onHandleUp');
+                    this.$.handle.style.display = 'none';
+                }
+            },
+
+            determineCloseAvailability: function () {
+                if (!this.disableClose) {
+                    this.toggleClose(true);
+                } else {
+                    this.$.closeBtn.style.display = 'none';
+                }
+            },
+
+            toggleClose: function (show) {
+                if (show) {
+                    if (!this.disableClose) {
+                        this.listen(this.$.closeBtn, 'tap', '_onCloseBtnTap');
+                        this.$.closeBtn.style.display = 'inline-block';
+                    }
+                } else {
+                    this.unlisten(this.$.closeBtn, 'tap', '_onCloseBtnTap');
+                    this.$.closeBtn.style.display = 'none';
+                }
+            },
+
+            determineSettingAvailability: function () {
+                if (!this.disableSettings) {
+                    this.toggleSettings(true);
+                }
+            },
+
+            toggleSettings: function (show) {
+                if (show) {
+                    if (!this.disableSettings) {
+                        this.listen(this.$.settingsBtn, 'tap', '_onSettingsBtnTap');
+                        this.$.settingsBtn.style.display = 'inline-block';
+                    }else {
+                      this.unlisten(this.$.settingsBtn, 'tap', '_onSettingsBtnTap');
+                      this.$.settingsBtn.style.display = 'none';
+                    }
+                } else {
+                    this.unlisten(this.$.settingsBtn, 'tap', '_onSettingsBtnTap');
+                    this.$.settingsBtn.style.display = 'none';
+                }
+            },
+
+            attached: function () {
+                this.dragAreaID = 'titleBar';
+                this.setSettings();
+            },
+
+            setSettings: function () {
+                this.boundRect = {
+                    left: 0,
+                    top: 0,
+                    right: this.parentNode.width,
+                    bottom: this.parentNode.height
+                }
+
+                this._snapValueWidth = this.parentNode.gridSize;
+                this._snapValueHeight = this.parentNode.gridSize;
+            },
+
+            setZindex: function (zIndex) {
+                this.style.zIndex = zIndex;
+            },
+
+            snapWidget: function () {
+                if (!this.noPositionSnapping) {
+                    this.x = Math.round(this.x / this._snapValueWidth) * this._snapValueWidth;
+                    this.y = Math.round(this.y / this._snapValueHeight) * this._snapValueHeight;
+                }
+            },
+
+            _onHandleDown: function (e) {
+                this.allowResize = true;
+                this.fire('resize', {state: 'started'});
+                this.updateLocalBound();
+            },
+
+            _onHandleMove: function (e) {
+                if (this.allowResize) {
+                    this.fire('resize', {state: 'resizing'});
+
+                    var localCoordinate = this.globalToLocal(e.detail);
+                    var parsedSize = this.checkMinSize(localCoordinate.x, localCoordinate.y);
+
+                    this.width = parsedSize.width;
+                    this.height = parsedSize.height;
+
+                    this.snapSizeToGrid();
+                }
+            },
+
+            _onHandleUp: function (e) {
+                this.allowResize = false;
+                this.fire('resize', {state: 'ended'});
+            },
+
+            checkMinSize: function (width, height) {
+                width = width > this.minWidth ? width : this.minWidth;
+                height = height > this.minHeight ? height : this.minHeight;
+
+                return {width: width, height: height};
+            },
+
+            snapSizeToGrid: function () {
+                if (!this.noSizeSnapping) {
+                    var x = Math.round((this.x + this.width) / this._snapValueWidth) * this._snapValueWidth;
+                    var y = Math.round((this.y + this.height) / this._snapValueHeight) * this._snapValueHeight;
+                    var parsedSize = this.preventOutBoundRect(x, y);
+
+                    this.width = parsedSize.width;
+                    this.height = parsedSize.height;
+                }
+            },
+
+            preventOutBoundRect: function (x, y) {
+                var width = x > this.boundRect.right ? (Math.floor(this.boundRect.right / this._snapValueWidth) * this._snapValueWidth) - this.x : x - this.x;
+                var height = y > this.boundRect.bottom ? (Math.floor(this.boundRect.bottom / this._snapValueHeight) * this._snapValueHeight) - this.y : y - this.y;
+
+                width = x - this.x;
+                height = y - this.y;
+
+                return {width: width, height: height};
+            },
+
+            _onCloseBtnTap: function (e) {
+                this.parentNode.removeWidget(this);
+            },
+
+            afterCoordinateAssign: function () {
+                this.snapWidget();
+            },
+
+            _onSettingsBtnTap: function () {
+                if (!this._showingProperty)
+                    this.showWidgetProperty();
+                else
+                    this.showWidgetContent();
+            },
+
+            showWidgetContent: function () {
+                this.contentWidgetProperty.fire('toggleWidget');
+                this._showingProperty = false;
+            },
+
+            showWidgetProperty: function () {
+                this.contentWidget.fire('toggleWidget');
+                this._showingProperty = true;
+            },
+
+            _toggleEditMode: function (value) {
+                this.toggleDrag(value);
+                this.toggleResize(value);
+                this.toggleSettings(value);
+                this.toggleClose(value);
+
+                if (!value && this._showingProperty)
+                    this.showWidgetContent();
+
+                return value;
+            },
+        })
+    </script>
+</dom-module>

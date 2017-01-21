@@ -1,0 +1,66 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="/bower_components/paper-tabs/paper-tab.html">
+
+<link rel="import" href="../style/common-style.html" />
+<link rel="import" href="../style/bootstrap-style.html" />
+
+<link rel="import" href="../common/behavior-page.html" />
+
+<link rel="import" href="summary-rank-by-type.html" />
+<link rel="import" href="summary-rank-by-chart.html" />
+<link rel="import" href="summary-dist-by-chart.html" />
+
+<dom-module id="summary-all">
+    <template>
+        <style include="common-style"></style>
+        <style include="bootstrap-style">
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+            }
+        </style>
+
+        <paper-card>
+            <div class="card-content">
+                <div class="page-header">
+                    <h2>전체 성과지표 <small>목록</small></h2>
+                </div>
+
+                <paper-tabs selected="{{_tab}}" attr-for-selected="key">
+                    <paper-tab key="rankByType">유형별 전체순위</paper-tab>
+                    <paper-tab key="rankByChart">지표별 순위</paper-tab>
+                    <paper-tab key="distByChart">지표별 분포도</paper-tab>
+                </paper-tabs>
+
+                <iron-pages role="tab" selected="{{_tab}}" attr-for-selected="name" on-iron-select="_loadChart" fallback-selection="rankByType">
+                    <summary-rank-by-type name="rankByType"></summary-rank-by-type>
+                    <summary-rank-by-chart name="rankByChart"></summary-rank-by-chart>
+                    <summary-dist-by-chart name="distByChart"></summary-dist-by-chart>
+                </iron-pages>
+            </div>
+        </paper-card>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'summary-all',
+
+            behaviors: [PS.BehaviorPage],
+
+            properties: {
+                _tab: {
+                    type: String,
+                    value: "rankByType"
+                },
+            },
+
+            _loadChart: function(e) {
+                var page = e.target.selectedItem;
+                page.loadChart = true;
+            }
+        })
+    </script>
+</dom-module>

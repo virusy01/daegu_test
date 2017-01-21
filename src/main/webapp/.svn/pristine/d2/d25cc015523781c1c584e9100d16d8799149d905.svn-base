@@ -1,0 +1,136 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/vaadin-grid/vaadin-grid.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+<link rel="import" href="/bower_components/iron-icons/av-icons.html" />
+<link rel="import" href="/bower_components/paper-fab/paper-fab.html" />
+
+<link rel="import" href="/elements/common/header-search.html" />
+
+<link rel="import" href="../style/common-style.html" />
+<link rel="import" href="../style/bootstrap-style.html" />
+
+<dom-module id="kpi-list">
+
+    <template>
+        <style include="common-style"></style>
+        <style include="bootstrap-style">
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+            }
+        </style>
+
+        <iron-ajax id="protocolGetKpiList" url$="/api/corp/kpi/find/{{_evalYear}}" method="post" content-type="application/json" last-response="{{_kpiList}}" on-response="_onKpiDataLoad"></iron-ajax>
+
+        <paper-card elevation="1">
+            <div class="card-content">
+                <div class="page-header">
+                    <h2>개별기업 성과지표 <small>목록</small></h2>
+                </div>
+
+                <header-search id="searchForm" on-search="_search"></header-search>
+
+                <vaadin-grid id="tableKpi" items="{{_kpiList}}">
+                    <table>
+                        <colgroup>
+                            <col name="corpNm" />
+                            <col name="corpTypeNm" />
+                            <col name="compKindNm" />
+                            <col name="bizSectNm" />
+                            <col name="score" />
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>
+                                    기업명
+                                </th>
+                                <th>
+                                    법인형태
+                                </th>
+                                <th>
+                                    기업분류
+                                </th>
+                                <th>
+                                    사업 업종
+                                </th>
+                                <th>
+                                    성과지표 총점
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </vaadin-grid>
+            </div>
+        </paper-card>
+
+        <div class="state-red">
+
+        </div>
+
+    </template>
+
+    <script>
+        Polymer({
+
+            is: 'kpi-list',
+
+            properties: {
+                _evalYear: {
+                    type: String,
+                    value: ""
+                },
+                _kpiList: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                }
+            },
+
+            ready: function() {
+                this._search();
+            },
+
+            _search: function(e) {
+                this.$.protocolGetKpiList.body = {
+                    corpType: this.$.searchForm.corpType,
+                    compKind: this.$.searchForm.compKind,
+                    bizSect: this.$.searchForm.bizSect,
+                    corpNm: this.$.searchForm.keyword
+                };
+
+                this.$.protocolGetKpiList.generateRequest();
+            },
+
+            _onKpiDataLoad: function() {
+                this.$.tableKpi.columns[4].renderer = function(cell) {
+                    var state, text;
+
+                    if (cell.data <= 30) {
+                        state = "rgb(249, 74, 118)";
+                        text = "심각";
+                    } else if (cell.data >= 80) {
+                        state = "rgb(0, 191, 136)";
+                        text = "양호";
+                    } else {
+                        state = "rgb(244, 193, 0)";
+                        text = "정상";
+                    }
+
+                    cell.element.innerHTML = "<iron-icon icon='av:fiber-manual-record' style='color: " + state + ";'></iron-icon> " + cell.data + " (" + text + ")";
+                };
+
+                this.$.tableKpi.columns[0].renderer = function(cell) {
+                    cell.element.innerHTML = "<a href='/kpi/info/" + this._kpiList[cell.row.index].corpSeq + "' style='color:#555; text-decoration: none;'>" + cell.data +
+                        "<iron-icon icon='chevron-right' style='padding-bottom:2px;'></iron-icon></a>";
+                }.bind(this)
+            },
+
+        });
+    </script>
+
+</dom-module>

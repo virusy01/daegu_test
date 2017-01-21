@@ -1,0 +1,102 @@
+package com.sck.common.mybatis;
+
+import java.util.Map;
+import java.util.Properties;
+
+import org.apache.ibatis.binding.MapperMethod;
+import org.apache.ibatis.cache.CacheKey;
+import org.apache.ibatis.executor.Executor;
+import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.plugin.Interceptor;
+import org.apache.ibatis.plugin.Intercepts;
+import org.apache.ibatis.plugin.Invocation;
+import org.apache.ibatis.plugin.Plugin;
+import org.apache.ibatis.plugin.Signature;
+import org.apache.ibatis.session.ResultHandler;
+import org.apache.ibatis.session.RowBounds;
+
+@Intercepts({
+	@Signature(type = Executor.class, method = "query", args = {
+			MappedStatement.class, Object.class, RowBounds.class,
+			ResultHandler.class }),
+	@Signature(type = Executor.class, method = "query", args = {
+			MappedStatement.class, Object.class, RowBounds.class,
+			ResultHandler.class, CacheKey.class, BoundSql.class }),
+	@Signature(type = Executor.class, method = "update", args = {
+			MappedStatement.class, Object.class }) })
+public class ParameterInjectInterceptor implements Interceptor
+{
+
+	private static int PARAMETER_INDEX = 1;
+	
+	private ParameterInjector injector;
+	
+	private String alternateParameterName = "param";
+	
+	
+	public ParameterInjector getInjector()
+	{
+		return injector;
+	}
+
+	public void setInjector(ParameterInjector injector)
+	{
+		this.injector = injector;
+	}
+
+	public void setAlternateParameterName(String alternateParameterName)
+	{
+		this.alternateParameterName = alternateParameterName;
+	}
+
+	@Override
+	public Object intercept(Invocation invocation) throws Throwable
+	{
+		Object[] queryArgs = invocation.getArgs();
+		Object parameter = queryArgs[PARAMETER_INDEX];
+		Map<String, Object> params = convertParameter(parameter);
+		params.put(injector.getName(), injector.getValue());
+		queryArgs[PARAMETER_INDEX] = params;
+		Object result = invocation.proceed();
+		return result;
+	}
+
+	@Override
+	public Object plugin(Object target)
+	{
+		return Plugin.wrap(target, this);
+	}
+
+	@Override
+	public void setProperties(Properties properties)
+	{
+		String injectorClass = properties.getProperty("injectorClass");
+		try
+		{
+			setInjector((ParameterInjector) Class.forName(injectorClass).newInstance());
+		} 
+		catch (InstantiationException | IllegalAccessException | ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		String alternateParameterName = properties.getProperty("alternateParameterName");
+		if(alternateParameterName != null && !alternateParameterName.trim().isEmpty()){
+			this.alternateParameterName = alternateParameterName;
+		}
+
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected Map<String, Object> convertParameter(Object parameter) {
+		Map<String, Object> result = null;
+		if (parameter instanceof MapperMethod.ParamMap) {
+			result = (Map<String, Object>) parameter;
+		} else {
+			result = new MapperMethod.ParamMap<Object>();
+			result.put(alternateParameterName, parameter);
+		}
+		return result;
+	}
+
+}

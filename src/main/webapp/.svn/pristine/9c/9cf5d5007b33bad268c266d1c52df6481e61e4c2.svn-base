@@ -1,0 +1,55 @@
+<dom-module id="group-overall">
+    <template>
+        <style>
+
+        </style>
+
+        <app-route route="{{route}}" pattern="/:subpage" data="{{routeData}}" tail="{{subroute}}"></app-route>
+
+        <iron-pages role="submain" selected="[[subpage]]" attr-for-selected="id" fallback-selection="all">
+            <overall-all id="all"></summary-all>
+        </iron-pages>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'group-overall',
+
+            behaviors: [PS.BehaviorPage],
+
+            properties: {
+                route: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    }
+                },
+                subpage: {
+                    type: String,
+                    observer: '_subPageChanged'
+                },
+                _htmlNames: {
+                    type: Object,
+                    value: function() {
+                        return {
+                            all: 'overall-all',
+                        }
+                    }
+                },
+            },
+
+            observers: [
+                '_subRoutePageChanged(routeData.subpage)'
+            ],
+
+            _subRoutePageChanged: function(path) {
+                this.subpage = path || 'all';
+            },
+
+            _subPageChanged: function(subpage) {
+                if (this._htmlNames[subpage])
+                    this.importHref(this.resolveUrl('overall/' + this._htmlNames[subpage] + '.html'), null, null, true);
+            }
+        })
+    </script>
+</dom-module>

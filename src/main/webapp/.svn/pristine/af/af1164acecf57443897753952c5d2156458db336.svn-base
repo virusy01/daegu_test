@@ -1,0 +1,128 @@
+<!-- <link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" /> -->
+
+<!-- <link rel="import" href="../common/behavior-page.html" />
+<link rel="import" href="../common/normal-input.html" />
+<link rel="import" href="../px-data-table/px-data-table.html" />
+<link rel="import" href="../px-data-table/px-data-table-column.html" /> -->
+
+<link rel="import" href="../style/common-style.html" />
+<link rel="import" href="../style/bootstrap-style.html" />
+
+<dom-module id="user-list">
+    <template>
+        <style include="common-style"></style>
+        <style include="bootstrap-style">
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+            }
+
+            #searchForm paper-button {
+                --paper-button: {
+                    background-color: #ff6138;
+                    color: white;
+                    height: 34px;
+                }
+            }
+        </style>
+
+        <iron-ajax id="protocolGetUsers" url="/api/user/find" headers='{"X-Requested-With": "XMLHttpRequest"}' method="GET" on-response="_onDataLoad" on-error="_redirectOnError"></iron-ajax>
+
+        <paper-card elevation="1">
+            <div class="card-content">
+                <div class="page-header">
+                    <h2>사용자 정보 <small>목록</small></h2>
+                </div>
+
+                <div id="searchForm" class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label for="keyword">검색어</label>
+                            <normal-input id="keyword" placeholder="사용자명/ID/E-MAIL"></normal-input>
+                        </div>
+                        <paper-button class="header" on-tap="_search">
+                            <iron-icon icon="search"></iron-icon>
+                            조회
+                        </paper-button>
+                    </div>
+                </div>
+
+                <px-data-table table-data="{{_userList}}" enable-column-resize enable-column-reorder table-rows>
+                    <px-data-table-column label="사용자명" name="userNm" type="html"></px-data-table-column>
+                    <px-data-table-column label="ID" name="userId"></px-data-table-column>
+                    <px-data-table-column label="Email" name="email"></px-data-table-column>
+                    <px-data-table-column label="관리자 여부" name="adminYn"></px-data-table-column>
+                    <px-data-table-column label="등록일" name="creDt"></px-data-table-column>
+                </px-data-table>
+            </div>
+            <div class="card-actions">
+                <a href="/user/create">
+                    <paper-button>
+                        <iron-icon icon="add"></iron-icon>
+                        사용자 등록
+                    </paper-button>
+                </a>
+            </div>
+        </paper-card>
+
+    </template>
+
+    <!-- <script src="/scripts/moment.min.js"></script> -->
+    <script>
+        Polymer({
+            is: "user-list",
+
+            behaviors: [PS.BehaviorPage],
+
+            properties: {
+                _keyword: String
+            },
+
+            observers: [
+                '_search(_isAttached, _refresh)'
+            ],
+
+            attached: function() {
+                this._isAttached = true;
+                this._search();
+            },
+
+            _search: function() {
+                this._refresh = undefined;
+                this._keyword = this.$.keyword.value;
+
+                this.$.protocolGetUsers.params = {
+                    keyword: this._keyword
+                };
+
+                this.$.protocolGetUsers.generateRequest();
+            },
+
+            _onDataLoad: function(e) {
+                var data = e.target.lastResponse;
+                var i;
+
+                for (i = 0; i < data.length; i++) {
+                    data[i].creDt = moment(data[i].creDt).format("YYYY/MM/DD");
+                    data[i].userNm = "<a href='/user/info/" + data[i].userSeq + "' style='color:#555; text-decoration: none;'>" + data[i].userNm +
+                        "<iron-icon icon='chevron-right' style='padding-bottom:2px;'></iron-icon></a>"
+                }
+
+                this._userList = data;
+
+                this._closeOverlay();
+            },
+
+            refresh: function() {
+                this.$.keyword.value = "";
+                this._refresh = true;
+            },
+
+        })
+    </script>
+</dom-module>

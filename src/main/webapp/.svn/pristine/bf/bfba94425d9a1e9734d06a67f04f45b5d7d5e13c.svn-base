@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sck.modules.common.CommonRepository">
+	
+	<select id="findCodes" resultType="com.sck.model.Code">
+		/* common.xml findCodes */
+		SELECT 
+			GRP_CD,
+			CD,
+			CD_NM
+		FROM CODE
+		WHERE GRP_CD = #{p}
+	</select>
+	
+	<select id="findMenus" resultType="com.sck.model.MenuHierarchy">
+		/* common.xml findMenus */
+		SELECT
+			MENU_CD,
+			IFNULL(PARENT_MENU_CD,'ROOT') AS PARENT_MENU_CD,
+			MENU_NM,
+			MENU_ICO,
+			URL,
+			URL_PARAM,
+			SORT,
+			CASE WHEN USE_YN = 'Y' THEN 1 ELSE 0 END AS `USE`,
+			CRE_DT
+		FROM MENU
+		ORDER BY PARENT_MENU_CD, SORT
+	</select>
+	
+	<select id="findUserMenu" resultType="com.sck.model.MenuHierarchy">
+		/* common.xml findUserMenu */
+		SELECT
+			DISTINCT Z.MENU_CD,
+			IFNULL(Z.PARENT_MENU_CD,'ROOT') AS PARENT_MENU_CD,
+			Z.MENU_NM,
+			Z.MENU_ICO,
+			Z.URL,
+			Z.URL_PARAM
+		FROM
+		(
+			SELECT
+				MNU.MENU_CD,
+				MNU.PARENT_MENU_CD,
+				MNU.MENU_NM,
+				MNU.MENU_ICO,
+				MNU.URL,
+				MNU.URL_PARAM,
+				MNU.SORT
+			FROM MENU MNU
+			WHERE 'Y' = (SELECT ADMIN_YN FROM USERS WHERE USER_ID = #{p})
+			AND MNU.USE_YN = 'Y'
+			UNION ALL
+			SELECT
+				MNU.MENU_CD,
+				MNU.PARENT_MENU_CD,
+				MNU.MENU_NM,
+				MNU.MENU_ICO,
+				MNU.URL,
+				MNU.URL_PARAM,
+				MNU.SORT
+			FROM ROLE_MENU RMU LEFT OUTER JOIN MENU MNU ON (RMU.MENU_CD = MNU.MENU_CD)
+			WHERE RMU.ROLE_CD = (SELECT ROLE_CD FROM ROLE WHERE BASIC_YN = 'Y')
+			AND MNU.USE_YN = 'Y'
+			UNION ALL
+			SELECT
+				MNU.MENU_CD,
+				MNU.PARENT_MENU_CD,
+				MNU.MENU_NM,
+				MNU.MENU_ICO,
+				MNU.URL,
+				MNU.URL_PARAM,
+				MNU.SORT
+			FROM ROLE_MENU RMU LEFT OUTER JOIN MENU MNU ON (RMU.MENU_CD = MNU.MENU_CD)
+			WHERE RMU.ROLE_CD = (SELECT ROLE_CD FROM ROLE_USER WHERE USER_ID = #{p})
+			AND MNU.USE_YN = 'Y'
+		) Z
+		ORDER BY Z.PARENT_MENU_CD, Z.SORT 
+	</select>
+	
+	<select id="findMenu" resultType="com.sck.model.Menu">
+		/* common.xml findMenu */
+		SELECT
+			MENU_CD,
+			IFNULL(PARENT_MENU_CD,'ROOT') AS PARENT_MENU_CD,
+			MENU_NM,
+			MENU_ICO,
+			URL,
+			URL_PARAM,
+			SORT,
+			CASE WHEN USE_YN = 'Y' THEN 1 ELSE 0 END AS `USE`,
+			CRE_DT
+		FROM MENU
+		WHERE MENU_CD = #{p}
+	</select>
+	
+	<select id="findMenusByParent" resultType="com.sck.model.Menu">
+		/* common.xml findMenusByParent */
+		SELECT
+			MENU_CD,
+			PARENT_MENU_CD,
+			MENU_NM,
+			MENU_ICO,
+			URL,
+			URL_PARAM,
+			SORT,
+			CASE WHEN USE_YN = 'Y' THEN 1 ELSE 0 END AS `USE`,
+			CRE_DT
+		FROM MENU
+		<if test="p == null">
+		WHERE PARENT_MENU_CD IS NULL 
+		</if>
+		<if test="p != null and p != ''">
+		WHERE PARENT_MENU_CD = #{p} 
+		</if>
+		ORDER BY PARENT_MENU_CD, SORT
+	</select>
+	
+	<select id="findMenuCd" resultType="int">
+		/* common.xml findMenuCd */
+		SELECT
+			COUNT(MENU_CD)
+		FROM MENU
+		WHERE MENU_CD = #{p}
+	</select>
+	
+	<insert id="insertMenu">
+		/* common.xml insertMenu */
+		INSERT INTO MENU
+		(
+			MENU_CD,
+			PARENT_MENU_CD,
+			MENU_NM,
+			MENU_ICO,
+			URL,
+			URL_PARAM,
+			SORT,
+			USE_YN,
+			CRE_DT
+		)
+		VALUES
+		(
+			#{p.menuCd},
+			#{p.parentMenuCd},
+			#{p.menuNm},
+			#{p.menuIco},
+			#{p.url},
+			#{p.urlParam},
+			#{p.sort},
+			CASE WHEN #{p.use} = 1 THEN 'Y' ELSE 'N' END,
+			now()
+		)
+	</insert>
+	
+	<update id="updateMenu">
+		/* common.xml updateMenu */
+		UPDATE MENU 
+		SET
+			MENU_NM = #{p.menuNm},
+			PARENT_MENU_CD = #{p.parentMenuCd},
+			MENU_ICO = #{p.menuIco},
+			URL = #{p.url},
+			URL_PARAM = #{p.urlParam},
+			SORT = #{p.sort},
+			USE_YN = CASE WHEN #{p.use} = 1 THEN 'Y' ELSE 'N' END,
+			MOD_DT = now()
+		WHERE MENU_CD = #{p.menuCd}
+	</update>
+	
+	<delete id="deleteMenu">
+		/* common.xml deleteMenu */
+		DELETE FROM MENU
+		WHERE MENU_CD = #{p}
+	</delete>
+	
+	<select id="findRoles" resultType="com.sck.model.Role">
+		/* common.xml findRoles */
+		SELECT
+			ROLE_CD,
+			ROLE_NM,
+			CASE WHEN BASIC_YN = 'Y' THEN 1 ELSE 0 END AS BASIC,
+			CRE_DT
+		FROM ROLE 
+	</select>
+	
+	<select id="findRole" resultType="com.sck.model.Role">
+		/* common.xml findRole */
+		SELECT
+			ROLE_CD,
+			ROLE_NM,
+			CASE WHEN BASIC_YN = 'Y' THEN 1 ELSE 0 END AS BASIC,
+			CRE_DT
+		FROM ROLE
+		WHERE ROLE_CD = #{p}
+	</select>
+	
+	<select id="findRoleCd" resultType="int">
+		/* common.xml findRoleCd */
+		SELECT
+			COUNT(ROLE_CD)
+		FROM ROLE
+		WHERE ROLE_CD = #{p}
+	</select>
+	
+	<insert id="insertRole">
+		/* common.xml insertRole */
+		INSERT INTO ROLE
+		(
+			ROLE_CD,
+			ROLE_NM,
+			BASIC_YN,
+			CRE_DT
+		)
+		VALUES
+		(
+			#{p.roleCd},
+			#{p.roleNm},
+			CASE WHEN #{p.basic} = 1 THEN 'Y' ELSE 'N' END,
+			now()
+		)
+	</insert>
+	
+	<update id="updateRole">
+		/* common.xml updateRole */
+		UPDATE ROLE
+		SET
+			ROLE_NM = #{p.roleNm},
+			BASIC_YN = CASE WHEN #{p.basic} = 1 THEN 'Y' ELSE 'N' END,
+			MOD_DT = now()
+		WHERE ROLE_CD = #{p.roleCd}	
+	</update>
+	
+	<update id="disableBasicRoles">
+		/* common.xml disableBasicRoles */
+		UPDATE ROLE
+		SET
+			BASIC_YN = 'N',
+			MOD_DT = now()
+		WHERE BASIC_YN = 'Y'
+	</update>
+	
+	<delete id="deleteRole">
+		/* common.xml deleteRole */
+		DELETE FROM ROLE
+		WHERE ROLE_CD = #{p}
+	</delete>
+	
+	<select id="findRoleMenu" resultType="com.sck.model.MenuHierarchy">
+		/* common.xml findRoleMenu */
+		SELECT
+			MNU.MENU_CD,
+			IFNULL(MNU.PARENT_MENU_CD,'ROOT') AS PARENT_MENU_CD,
+			MNU.MENU_NM,
+			MNU.MENU_ICO,
+			MNU.URL,
+			MNU.URL_PARAM,
+			MNU.SORT,
+			CASE WHEN MNU.USE_YN = 'Y' THEN 1 ELSE 0 END AS `USE`,
+			MNU.CRE_DT
+		FROM ROLE_MENU RMU LEFT OUTER JOIN MENU MNU ON (RMU.MENU_CD = MNU.MENU_CD)
+		WHERE RMU.ROLE_CD = #{p}
+		ORDER BY MNU.PARENT_MENU_CD, MNU.SORT 
+	</select>
+	
+	<insert id="insertRoleMenu">
+		/* common.xml insertRoleMenu */
+		INSERT INTO ROLE_MENU
+		(
+			ROLE_CD,
+			MENU_CD,
+			CRE_DT
+		)
+		VALUES
+		(
+			#{roleCd},
+			#{menuCd},
+			now()
+		)
+	</insert>
+	
+	<delete id="deleteRoleMenu">
+		/* common.xml deleteRoleMenu */
+		DELETE FROM ROLE_MENU
+		WHERE 1 = 1  
+		<if test="roleCd != null and roleCd != ''">
+		AND ROLE_CD = #{roleCd}
+		</if>
+		<if test="menuCd != null and menuCd != ''">
+		AND MENU_CD = #{menuCd}
+		</if>
+	</delete>
+	
+	<insert id="insertRoleUser">
+		/* common.xml insertRoleUser */
+		INSERT INTO ROLE_USER
+		(
+			ROLE_CD,
+			USER_ID,
+			CRE_DT
+		)
+		VALUES
+		(
+			#{roleCd},
+			#{userId},
+			now()
+		)
+	</insert>
+	
+	<delete id="deleteRoleUser">
+		/* common.xml deleteRoleUser */
+		DELETE FROM ROLE_USER
+		WHERE 1 = 1 
+		<if test="roleCd != null and roleCd != ''">
+		AND ROLE_CD = #{roleCd}
+		</if>
+		<if test="userId != null and userId != ''">
+		AND USER_ID = #{userId}
+		</if> 
+	</delete>
+	
+</mapper>

@@ -1,0 +1,83 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+
+<link rel="import" href="../style/c3-chart-style.html" />
+
+<dom-module id="summary-dist-by-chart">
+    <template>
+        <style include="c3-chart-style">
+            :host {
+                @apply(--layout-vertical);
+                margin-top: 40px;
+            }
+        </style>
+
+        <iron-ajax id="protocolGetKpiChart" url="/api/corp/kpis/depth1" method="GET" content-type="application/json" on-response="_drawChart"></iron-ajax>
+
+        <div id="chart"></div>
+    </template>
+
+    <script src="/scripts/d3.min.js"></script>
+    <script src="/scripts/c3.min.js"></script>
+    <script>
+        Polymer({
+            is: 'summary-dist-by-chart',
+
+            properties: {
+                loadChart: Boolean,
+                _data: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _isAttached: Boolean,
+            },
+
+            observers: [
+                '_fetchData(loadChart, _isAttached)'
+            ],
+
+            ready: function() {
+                this.scopeSubtree(this.$.chart, true);
+            },
+
+            attached: function() {
+                this._isAttached = true;
+            },
+
+            _fetchData: function() {
+                this.$.protocolGetKpiChart.generateRequest();
+            },
+
+            _drawChart: function(e) {
+                this._data = e.target.lastResponse;
+
+                var pieData = [];
+                var i;
+
+                for (i = 0; i < this._data.length; i++) {
+                    pieData.push([this._data[i].depth1Nm, this._data[i].score]);
+                }
+
+                c3.generate({
+                    bindto: this.$.chart,
+                    data: {
+                        columns: pieData,
+                        keys: {
+                            value: ['score']
+                        },
+                        type: 'pie'
+                    },
+                    size: {
+                        height: 500
+                    },
+                    color: {
+                        pattern: ['#e74c3c', '#3498db', '#1f8a70', '#fd7400', '#e8cb0d', '#bedb39', '#2c3e50', '#91aa9d', '#ff8598', '#703030']
+                    }
+                });
+            },
+        })
+    </script>
+</dom-module>

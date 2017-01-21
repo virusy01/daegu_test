@@ -1,0 +1,52 @@
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/src/components/common/normal-table.html">
+
+<link rel="import" href="/src/components/behaviors/behavior-loader.html">
+
+<dom-module id="center-status-list">
+<template>
+	<iron-ajax auto id="getCorpList" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
+		       url="/api/hq/corps"
+	 	       on-request="_startLoader"
+	  	       on-response="_stopLoader"
+		       last-response="{{_data}}">
+	</iron-ajax>
+
+	<normal-table data="{{_data}}" header-labels="{{_headerLabels}}" link-url="{{_linkURL}}"></normal-table>
+</template>
+<script>
+Polymer({
+	is: 'center-status-list',
+
+	behaviors: [Lunch.LoaderBehavior],
+
+	properties: {
+		_data: {
+			type: Array,
+			value: function() {
+				return [];
+			}
+		},
+		_headerLabels: {
+			type: Object,
+			value: function() {
+				return {
+					CENTER_NM: '센터명',
+					CORP_TYPE_NM: '조직형태',
+					CEO_NM: '센터장',
+					MANAGER_NM: '담당자',
+					SE_DT: '개소일',
+					TEL_NO: '전화번호'
+				};
+			}
+		},
+		_linkURL: {
+			type: String,
+			value: '/app/center-status/view/'
+		},
+
+	},
+
+});
+</script>
+</dom-module>

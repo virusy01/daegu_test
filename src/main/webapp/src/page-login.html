@@ -1,0 +1,74 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
+
+<link rel="import" href="/src/components/common/normal-input.html" />
+
+<dom-module id="page-login">
+        <template>
+<style>
+	:host {
+		width: 100%;
+		height: 100vh;
+		display: flex;
+	}
+
+	.panel {
+		margin: auto;
+		width: 350px;
+		align-self: center;
+	}
+                
+	.panel-default>.panel-heading {
+		background-color: #fd7400;
+		padding-bottom: 15px;
+		text-align: center;
+	}
+
+</style>
+
+<div class="panel panel-default">
+                <div class="panel-heading"><img id="logo" src="img/logo.png" /></div>
+                <div class="panel-body">
+			<div id="alert" class="alert alert-danger hidden" role="alert">
+				로그인 정보를 확인해주세요.
+			</div>
+                        <form is="iron-form" name="loginForm" 
+				action="/api/auth/login" 
+				method="post" 
+				on-iron-form-response="_formResponse"
+				on-iron-form-error="_formError">
+                                <div class="form-group">
+                                        <label for="loginId">아이디</label>
+					<normal-input name="userId" required></normal-input>
+                                </div>
+                                <div class="form-group">
+                                        <label for="loginPassword">비밀번호</label>
+					<normal-input name="password" type="password" required></normal-input>
+                                </div>
+                                <button type="submit" class="btn btn-primary">로그인</button>
+                        </form>
+                </div>
+        </div>
+
+	</template>
+        <script>
+                Polymer({
+                        is: 'page-login',
+
+			_formError: function(e) {
+				console.log(e.detail);
+				this.$.alert.classList.remove('hidden');
+			},
+
+			_formResponse: function(e) {
+				var info = e.detail.response;
+				sessionStorage.setItem('userId', info.userId);
+				sessionStorage.setItem('userName', info.userName);
+				sessionStorage.setItem('email', info.email);
+				sessionStorage.setItem('corpSeq', info.corpSeq);
+
+				location.href = '/';
+			}
+                });
+        </script>
+</dom-module>

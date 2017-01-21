@@ -1,0 +1,107 @@
+<!-- <link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+<link rel="import" href="/bower_components/paper-fab/paper-fab.html" /> -->
+
+<!-- <link rel="import" href="../common/header-search.html" />
+<link rel="import" href="../common/behavior-page.html" />
+<link rel="import" href="../px-data-table/px-data-table.html" />
+<link rel="import" href="../px-data-table/px-data-table-column.html" /> -->
+
+<link rel="import" href="../style/common-style.html" />
+<link rel="import" href="../style/bootstrap-style.html" />
+
+<dom-module id="general-list">
+
+    <template>
+        <style include="common-style"></style>
+        <style include="bootstrap-style">
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+                --paper-button: {
+                    background-color: #ff6138;
+                    color: white;
+                }
+            }
+        </style>
+
+        <iron-ajax id="protocolGetGeneralList" url="/api/corp/info/find/" headers='{"X-Requested-With": "XMLHttpRequest"}' method="post" content-type="application/json" on-response="_addLinksToData" on-error="_redirectOnError"></iron-ajax>
+
+        <paper-card elevation="1">
+            <div class="card-content">
+                <div class="page-header">
+                    <h2>기업 일반정보 <small>목록</small></h2>
+                </div>
+
+                <header-search id="searchForm" on-search="_search"></header-search>
+
+                <px-data-table table-data="{{_bizList}}" enable-column-resize enable-column-reorder table-rows>
+                    <px-data-table-column label="기업명" name="corpNm" type="html"></px-data-table-column>
+                    <px-data-table-column label="대표자명" name="ceoNm"></px-data-table-column>
+                    <px-data-table-column label="사업자번호" name="bizNo"></px-data-table-column>
+                    <px-data-table-column label="법인 형태" name="corpTypeNm"></px-data-table-column>
+                    <px-data-table-column label="기업 분류" name="compKindNm"></px-data-table-column>
+                    <px-data-table-column label="사업 업종" name="bizSectNm"></px-data-table-column>
+                </px-data-table>
+            </div>
+        </paper-card>
+
+    </template>
+
+    <script>
+        Polymer({
+
+            is: 'general-list',
+
+            behaviors: [PS.BehaviorPage],
+
+            properties: {
+                _bizList: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+            },
+
+            attached: function() {
+                this._search();
+            },
+
+            _search: function() {
+                this.$.protocolGetGeneralList.body = {
+                    corpType: this.$.searchForm.corpType,
+                    compKind: this.$.searchForm.compKind,
+                    bizSect: this.$.searchForm.bizSect,
+                    corpNm: this.$.searchForm.keyword
+                };
+
+                this.$.protocolGetGeneralList.generateRequest();
+            },
+
+            _addLinksToData: function(e) {
+                var data = e.target.lastResponse;
+                var i, corpNm;
+
+                for (i = 0; i < data.length; i++) {
+                    corpNm = data[i].corpNm;
+
+                    data[i].corpNm = "<a href='/app/general/info/" + data[i].corpSeq + "' style='color:#555; text-decoration: none;'>" + corpNm +
+                        "<iron-icon icon='chevron-right' style='padding-bottom:2px;'></iron-icon></a>";
+                }
+
+                this._bizList = data;
+                this._closeOverlay();
+            },
+
+            refresh: function() {
+                this._closeOverlay();
+            }
+        });
+    </script>
+
+</dom-module>

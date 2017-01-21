@@ -1,0 +1,11 @@
+@charset "UTF-8";
+
+#searchForm {
+  paper-dropdown-menu {
+    width: 100px;
+  }
+
+  paper-input {
+    width: 300px;
+  }
+}

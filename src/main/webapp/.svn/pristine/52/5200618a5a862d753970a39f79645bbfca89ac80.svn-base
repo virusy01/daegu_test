@@ -1,0 +1,115 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/vaadin-grid/vaadin-grid.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/vaadin-combo-box/vaadin-combo-box.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+<link rel="import" href="/bower_components/paper-fab/paper-fab.html" />
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<link rel="import" href="/elements/common/header-search.html" />
+
+<dom-module id="individual-kpi">
+
+    <template>
+
+        <style>
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+                --paper-button: {
+                    background-color: #ff6138;
+                    color: white;
+                }
+            }
+        </style>
+
+        <iron-ajax id="protocolGetBiz" url$="/api/corp/kpi/find/{{_evalYear}}" method="post" content-type="application/json" last-response="{{_kpiList}}"></iron-ajax>
+
+        <h1>개별기업 성과지표 조회</h1>
+
+        <header-search id="searchForm" on-search="_search"></header-search>
+
+        <paper-card elevation="1">
+            <div class="card-content">
+                <vaadin-grid id="tableKpi" items="{{_kpiList}}" on-selected-items-changed="_onGridSelect">
+                    <table>
+                        <colgroup>
+                            <col name="corpNm" />
+                            <col name="corpTypeNm" />
+                            <col name="compKindNm" />
+                            <col name="bizSectNm" />
+                            <col name="score" />
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>
+                                    기업명
+                                </th>
+                                <th>
+                                    법인형태
+                                </th>
+                                <th>
+                                    기업분류
+                                </th>
+                                <th>
+                                    사업 업종
+                                </th>
+                                <th>
+                                    성과지표 총점
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </vaadin-grid>
+            </div>
+        </paper-card>
+
+    </template>
+
+    <script>
+        Polymer({
+
+            is: 'individual-kpi',
+
+            properties: {
+                _evalYear: {
+                    type: String,
+                    value: ""
+                },
+                _kpiList: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                }
+            },
+
+            ready: function() {
+                this._search();
+            },
+
+            _search: function() {
+                this.$.protocolGetBiz.body = {
+                    corpType: this.$.searchForm.corpType,
+                    compKind: this.$.searchForm.compKind,
+                    bizSect: this.$.searchForm.bizSect,
+                    corpNm: this.$.searchForm.keyword
+                };
+
+                this.$.protocolGetBiz.generateRequest();
+            },
+
+            _onGridSelect: function(e) {
+                if (e.currentTarget.selection.size > 0) {
+                    var selectedIndex = e.currentTarget.selection.selected();
+                    var data = this._kpiList[selectedIndex];
+                }
+            },
+
+        });
+    </script>
+
+</dom-module>

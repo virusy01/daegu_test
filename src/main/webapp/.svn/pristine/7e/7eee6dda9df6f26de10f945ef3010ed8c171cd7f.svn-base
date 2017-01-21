@@ -1,0 +1,72 @@
+<script>
+    window.PS = window.PS || {};
+    PS.BehaviorPage = {
+
+        properties: {
+            _isAttached: Boolean,
+            _refresh: Boolean,
+            _year: {
+                type: Array,
+                value: function() {
+                    return [];
+                }
+            },
+            _evalYear: String,
+        },
+
+        _redirectOnError: function(e) {
+            var status = e.detail.request.status;
+            if (status == 403) {
+                location.href = "/app";
+            }
+        },
+
+        _prependSelectAll: function(data, array) {
+            var refactoredArray = [];
+            var i;
+
+            refactoredArray.push({
+                cdNm: "전체",
+                cd: ""
+            });
+
+            for (i = 0; i < data.length; i++) {
+                refactoredArray.push(data[i]);
+            }
+
+            this.set(array, refactoredArray);
+        },
+
+        _openOverlay: function() {
+            // this.fire("iron-signal", {
+            //     name: "spinner-open"
+            // });
+        },
+
+        _closeOverlay: function() {
+            // this.fire("iron-signal", {
+            //     name: "spinner-close"
+            // });
+        },
+
+        _createYears: function() {
+            var currentYear = moment().year();
+            var startYear = moment().subtract(20, 'years').year();
+            var i, years = [];
+
+            for (i = currentYear; i >= startYear; i--) {
+                years.push({
+                    cdNm: i,
+                    cd: i
+                });
+            }
+
+            this._year = years;
+            this._evalYear = currentYear - 1;
+        },
+
+        _assignEvalYear: function(e) {
+            this._evalYear = e.target.value;
+        }
+    }
+</script>

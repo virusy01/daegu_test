@@ -1,0 +1,145 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input.html" />
+<link rel="import" href="/bower_components/vaadin-grid/vaadin-grid.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+
+<link rel="import" href="../common/normal-input.html" />
+
+<link rel="import" href="../style/common-style.html" />
+<link rel="import" href="../style/bootstrap-style.html" />
+
+<dom-module id="user-list">
+    <template>
+        <style include="common-style"></style>
+        <style include="bootstrap-style">
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+            }
+
+            #searchForm paper-button {
+                --paper-button: {
+                    background-color: #ff6138;
+                    color: white;
+                    height: 34px;
+                }
+            }
+        </style>
+
+        <iron-ajax id="protocolGetUsers" url="/api/user/find" headers='{"X-Requested-With": "XMLHttpRequest"}' method="GET" last-response="{{_userList}}" on-response="_onDataLoad" on-error="_onErrorHandler"></iron-ajax>
+
+        <paper-card elevation="1">
+            <div class="card-content">
+                <div class="page-header">
+                    <h2>사용자 정보 <small>목록</small></h2>
+                </div>
+
+                <div id="searchForm" class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label for="keyword">검색어</label>
+                            <normal-input id="keyword" placeholder="사용자명/ID/E-MAIL"></normal-input>
+                        </div>
+                        <paper-button on-tap="_search">
+                            <iron-icon icon="search"></iron-icon>
+                            조회
+                        </paper-button>
+                    </div>
+                </div>
+
+                <vaadin-grid id="tableUsers" items="{{_userList}}">
+                    <table>
+                        <colgroup>
+                            <col name="userNm" />
+                            <col name="userId" />
+                            <col name="email" />
+                            <col name="adminYn" />
+                            <col name="creDt" />
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>
+                                    사용자명
+                                </th>
+                                <th>
+                                    ID
+                                </th>
+                                <th>
+                                    Email
+                                </th>
+                                <th>
+                                    관리자 여부
+                                </th>
+                                <th>
+                                    등록일
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </vaadin-grid>
+            </div>
+            <div class="card-actions">
+                <a href="/user/create">
+                    <paper-button>
+                        <iron-icon icon="add"></iron-icon>
+                        사용자 등록
+                    </paper-button>
+                </a>
+            </div>
+        </paper-card>
+
+    </template>
+
+    <script src="/scripts/moment.min.js"></script>
+    <script>
+        Polymer({
+            is: "user-list",
+
+            properties: {
+                _keyword: String
+            },
+
+            attached: function() {
+                this._search();
+            },
+
+            _search: function() {
+                this._keyword = this.$.keyword.value;
+
+                this.$.protocolGetUsers.params = {
+                    keyword: this._keyword
+                };
+
+                this.$.protocolGetUsers.generateRequest();
+            },
+
+            _onDataLoad: function() {
+                this.$.tableUsers.columns[4].renderer = function(cell) {
+                    cell.element.innerHTML = moment(cell.data).format("YYYY/MM/DD");
+                }
+
+                this.$.tableUsers.columns[0].renderer = function(cell) {
+                    cell.element.innerHTML = "<a href='/user/info/" + this._userList[cell.row.index].userSeq + "' style='color:#555; text-decoration: none;'>" + cell.data +
+                        "<iron-icon icon='chevron-right' style='padding-bottom:2px;'></iron-icon></a>";
+                }.bind(this)
+            },
+
+            refresh: function() {
+                this.$.keyword.value = "";
+                this._search();
+            },
+            
+            _onErrorHandler : function(e)
+            {
+            	var status = e.detail.request.status;
+            	if(status == 403)
+           		{
+           			location.href = "/";
+           		}
+            }
+        })
+    </script>
+</dom-module>

@@ -1,0 +1,28 @@
+.card {
+	box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+	padding: 0 20px 30px 20px;
+	margin: 10px;
+	border-radius: 5px;
+	background-color: #fff;
+}
+
+.page-header {
+	border-color: #ffd34e;
+	border-width: 2px;
+	display: flex;
+	justify-content: space-between;
+}
+
+.title-buttons {
+	align-self: flex-end;
+	padding-bottom: 10px;
+}
+
+.nav {
+	margin-top: 20px;
+}
+
+.report-total {
+	margin-top: 5px;
+	display: block;
+}

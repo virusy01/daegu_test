@@ -1,0 +1,533 @@
+<?php
+require( dirname(__FILE__)."/session_check.php");
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>광명시 사회적기업 성과관리시스템</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- MetisMenu CSS -->
+    <link href="../bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="../bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <style>
+
+        .barNum {
+            font-size: 9pt;
+            text-anchor: middle;
+        }
+        .axis text {
+            font-family: sans-serif;
+            font-size: 11px;
+        }
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: black;
+        }
+        .category {
+            font-size: 12pt;
+            text-anchor: middle;
+        }
+
+        .tip {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            z-index: 9999;
+            visibility: hidden;
+            border: 1px solid #666666;
+            background-color: #FFFFD4;
+            overflow: hidden;
+            padding: 8px;
+            text-align: left;
+            font-size: 9pt;
+            color: #111111;
+            border-radius: 4px;
+        }
+
+
+        .nav-tabs2 {
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .nav-tabs2 > li {
+            float: left;
+            margin-bottom: -1px;
+        }
+        .nav-tabs2 > li > a {
+            margin-right: 0px;
+            line-height: 1.42857143;
+            border: 0px solid transparent;
+            border-radius: 0px 0px 0 0;
+            background-color: transparent;
+            font-size: 13px;
+            color:#5c5c5c;
+        }
+        .nav-tabs2 > li > a:hover {
+            border-color: #eee #eee #ddd;
+            background-color: #eee;
+            border: 0px solid #ddd;
+        }
+        .nav-tabs2 > li > a:focus {
+            color: #555;
+            cursor: default;
+            background-color: #fff;
+            border: 0px solid #ddd;
+            border-bottom-color: transparent;
+        }
+
+        .nav-tabs2 > li.active > a,
+        .nav-tabs2 > li.active > a:hover,
+        .nav-tabs2 > li.active > a:focus {
+            color: #fff;
+            cursor: default;
+            background-color: #46b8da;
+            border: 0px solid #ddd;
+            border-bottom-color: transparent;
+            font-size: 13px;
+            font-family: 'NanumBarunGothicBold' , sans-serif;
+        }
+
+
+    </style>
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../js/jquery-1.11.1.min.js"></script>
+    <script src="../js/jquery.form.min.js"></script>
+    <script src="../js/jsrender.min.js"></script>
+    <script src="../js/accounting.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../dist/js/sb-admin-2.js"></script>
+
+    <script src="../js/parsley.min.js"></script>
+    <script src="./common_js/SelectBuilder.js"></script>
+    <script src="../js/Pagenator.js"></script>
+    <script src="./my_js/admin.js"></script>
+
+</head>
+
+<body>
+
+
+    <div id="wrapper">
+
+        <!-- Navigation -->
+        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="corp_sum_view.php"><img src="../images/logo.png"/></a>
+
+                <p class="top_title">광명시 사회적기업 성과관리시스템</p>
+            </div>
+            <!-- /.navbar-header -->
+            <a href="javascript:window.location.href='../php/logout.php';">
+                <button type="button" class="btn btn-outline btn-primary btn-xs"><i class="fa fa-power-off fa-fw"></i>
+                    LOGOUT
+                </button>
+            </a>
+
+            <div class="top_admin"><?=$_SESSION['USER_NM']?>님 로그인중입니다.</div>
+
+
+            <div class="navbar-default sidebar" role="navigation">
+                <div class="sidebar-nav navbar-collapse">
+                    <ul class="nav" id="side-menu">
+                        <li>
+                            <a href="javascript:;" onclick="window.location.href='corp_info_view.php'"><i class="fa fa-book fa-fw"></i> 기업일반정보 조회</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;" onclick="window.location.href='corp_kpi_view.php'"><i class="fa fa-bar-chart-o fa-fw"></i> 개별기업 성과지표 조회</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;" onclick="window.location.href='corp_sum_view.php'"><i class="fa fa-file-text fa-fw"></i> 전체 성과지표 조회</a>
+                        </li>
+                        <li class="active">
+                            <a href="javascript:;"><i class="fa fa-file-text fa-fw"></i>관리자<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="javascript:;" class="active">기업 및 성과지표 등록</a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;" onclick="window.location.href='users_view.php'">사용자 등록</a>
+                                </li>
+
+                            </ul>
+                            <!-- /.nav-second-level -->
+                        </li>
+                    </ul>
+                </div>
+                <!-- /.sidebar-collapse -->
+            </div>
+            <!-- /.navbar-static-side -->
+        </nav>
+
+        <!-- Page Content -->
+        <div id="page-wrapper">
+            <div id="corpList" class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h3 class="page-header">기업 및 성과지표 등록</h3>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="panel02 panel-grid">
+                            <div class="panel02-heading">
+                                조회
+                            </div>
+                            <!-- /.panel-heading -->
+                            <div class="panel02-body">
+                                <form name="commonForm">
+                                    <input type="hidden" name="corpSeq" value="0"/>
+                                    <input type="hidden" name="pageRowCount"/>
+                                    <input type="hidden" name="pageNo"/>
+                                    <div class="panel_search panel-search">
+                                        <div class="panel_search-body" style="height:200px">
+                                            <div class="search_box">
+                                                <div class="form-group">
+                                                    <label>기업명/대표자명/사업자번호</label>
+                                                    <input class="form-control01" placeholder="기업명, 대표자명, 사업자번호 중 한가지를 입력하세요." name="corpNm">
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label>기업분류</label>
+                                                    <select id="selCompKind" name="compKind" class="form-control01">
+
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="search_box_right">
+
+                                                <div class="form-group">
+                                                    <label>법인형태</label>
+                                                    <select id="selCorpType" name="corpType" class="form-control01">
+
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>업종분류</label>
+                                                    <select id="selBizSect" name="bizSect" class="form-control01">
+
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <button id="btnSearch" type="button" class="btn btn-primary">&nbsp;&nbsp;<i
+                                                    class="fa fa-search fa-fw"></i> 조회&nbsp;&nbsp;&nbsp;</button>
+                                        </div>
+                                    </div>
+                                </form>
+                                <div class="search_box_right" style="text-align: right; margin-bottom: 8px">
+                                    <button id="btnAdd" type="button" class="btn btn-outline btn-info" style="margin-bottom: 8px">&nbsp;신규업체 등록&nbsp;</button>
+                                </div>
+
+                                <div class="dataTable_wrapper">
+                                    <table id="grid" class="table table-striped table-bordered table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>기업명</th>
+                                            <th>대표자명</th>
+                                            <th>사업자번호</th>
+                                            <th>법인형태</th>
+                                            <th>기업분류</th>
+                                            <th>사업업종</th>
+                                            <th>성과지표등록</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- Pagenation -->
+                                <div id="pagenum" class="pagenum">
+                                    <a id="prevPageGroup" href="javascript:;" class="n" style="display:none"><<</a>
+                                    <span id="pageIndex">
+
+                                    </span>
+                                    <a id="nextPageGroup" href="javascript:;" class="n" style="display:none">>></a>
+                                </div>
+                            </div>
+                            <!-- /.panel-body -->
+                        </div>
+                        <!-- /.panel -->
+                    </div>
+                    <!-- /.col-lg-12 -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+            <div id="corpDetail" class="container-fluid" style="display:none;">
+
+                <div class="row">
+                    <div class="col-lg-12">
+
+                        <h3 id="corpDetailHeader" class="page-header">기업현황 – ㈜나비프로젝트</h3>
+                        <div style="text-align: right">
+                            <a id="btnGoBack" href="javascript:;" class="btn btn-outline btn-info" style="margin-right: 10px"><i class="fa fa-long-arrow-left fa-fw"></i>&nbsp;뒤로가기</a>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-12">
+                        <div class="panel002 panel-grid">
+
+                            <!-- /.panel-heading -->
+                            <form name="detailForm" onsubmit="return false;">
+                                <input type="hidden" name="corpSeq">
+                                <div class="panel002-body">
+                                    <div class="table-responsive">
+                                        <h4>1. 일반사항</h4>
+                                        <table id="tblCorpInfo" class="table table-bordered">
+
+                                            <tbody>
+                                            <tr>
+                                                <td style="text-align:center; background-color:#f1f1f1;width:12%">기업명</td>
+                                                <td style="text-align:left"><input class="form-control01" type="text" name="corpNm" value="{{:CORP_NM}}"></td>
+                                                <td style="text-align:center; background-color:#f1f1f1;width:12%">사업개시일</td>
+                                                <td style="text-align:left;"><input class="form-control01" type="text" name="bizDt" value="{{:BIZ_DT}}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="text-align:center; background-color:#f1f1f1;;width:12%">대표자</td>
+                                                <td style="text-align:left"><input class="form-control01" type="text" name="ceoNm" value="{{:CEO_NM}}"></td>
+                                                <td style="text-align:center; background-color:#f1f1f1;width:12%">사업자번호</td>
+                                                <td style="text-align:left;"><input class="form-control01" type="text" name="bizNo" value="{{:BIZ_NO}}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="text-align:center; background-color:#f1f1f1;width:12%">법인형태</td>
+                                                <td style="text-align:left">
+                                                    <select id="selCorpType2" name="corpType" class="form-control01">
+                                                    </select></td>
+                                                <td style="text-align:center; background-color:#f1f1f1;width:12%">기업분류</td>
+                                                <td style="text-align:left"><select id="selCompKind2" name="compKind" class="form-control01">
+                                                    </select></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="text-align:center; background-color:#f1f1f1">사업업종</td>
+                                                <td colspan="5" style="text-align:left"><select id="selBizSect2" name="bizSect" class="form-control01" style="width:50%">
+                                                    </select></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <h4>2. 사회적기업일 경우</h4>
+                                        <table  id="tblSocInfo" class="table table-bordered">
+                                            <tbody>
+                                            <tr>
+                                                <td style="text-align:center; background-color:#f1f1f1;width:13%">사회적기업 유형</td>
+                                                <td style="text-align:left"><select id="selSocType2" name="socType" class="form-control01">
+                                                    </select></td>
+                                                <td style="text-align:center; background-color:#f1f1f1;width:12%">인증만료일</td>
+                                                <td style="text-align:left"><input class="form-control01" type="text" name="socCertEndDt" value="{{:SOC_CERT_END_DT}}"></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <h4>3. 고용현황과 고용자 특성</h4>
+                                        <table id="tblEmpInfo" class="table table-bordered">
+
+                                            <tbody>
+                                            <tr>
+                                                <td style="text-align:center; background-color:#f1f1f1;width:12%">고용인원</td>
+                                                <td style="text-align:center; background-color:#f1f1f1;width:12%">총고용인원</td>
+                                                <td colspan="2" style="text-align:right"><input class="form-control01" style="text-align:right;width:90%" type="text" name="empNum" value="{{:EMP_NUM}}"> 명</td>
+                                                <td style="text-align:center; background-color:#f1f1f1;width:13%">취약계층 총인원</td>
+                                                <td style="text-align:right;"><input class="form-control01" style="text-align:right;width:90%" type="text" name="empWeakNum" value="{{:EMP_WEAK_NUM}}"> 명</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="text-align:center; background-color:#f1f1f1;width:12%">고용현황</td>
+                                                <td style="text-align:center; background-color:#f1f1f1;width:12%">고용형태</td>
+                                                <td style="text-align:center; background-color:#f1f1f1;width:12%">정규직</td>
+                                                <td style="text-align:right"><input class="form-control01" style="text-align:right;width:90%" type="text" name="empFullNum" value="{{:EMP_FULL_NUM}}"> 명</td>
+                                                <td style="text-align:center; background-color:#f1f1f1;width:13%">비정규직</td>
+                                                <td style="text-align:right;"><input class="form-control01" style="text-align:right;width:90%" type="text" name="empPartNum" value="{{:EMP_PART_NUM}}"> 명</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="text-align:center; background-color:#f1f1f1;width:12%">급여수준</td>
+                                                <td style="text-align:center; background-color:#f1f1f1;width:12%">월급여평균</td>
+                                                <td style="text-align:center; background-color:#f1f1f1;width:12%">임원</td>
+                                                <td style="text-align:right"><input class="form-control01" style="text-align:right;width:90%" type="text" name="empCxxSal" value="{{:EMP_CXX_SAL}}"> 명</td>
+                                                <td style="text-align:center; background-color:#f1f1f1;width:13%">임원 외</td>
+                                                <td style="text-align:right"><input class="form-control01" style="text-align:right;width:90%" type="text" name="empNormSal" value="{{:EMP_NORM_SAL}}"> 명</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <h4>4. 최근 3년간 중앙정부, 지자체, 민간단체 등 외부로부터 받은 지원사항</h4>
+                                        <table class="table table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th style="text-align:center; background-color:#f1f1f1">지원처</th>
+                                                <th style="text-align:center; background-color:#f1f1f1">사업명</th>
+                                                <th style="text-align:center; background-color:#f1f1f1">지원기간</th>
+                                                <th style="text-align:center; background-color:#f1f1f1">금액</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="tblHelp">
+                                            <tr>
+                                                <td style="text-align:center"><input class="form-control01" type="text" name="helper" value="{{:HELPER}}"></td>
+                                                <td style="text-align:center"><input class="form-control01" type="text" name="prjNm" value="{{:PRJ_NM}}"></td>
+                                                <td style="text-align:center"><input class="form-control01" style="width:40%" type="text" name="helpStDt" value="{{:HELP_ST_DT}}"> ~ <input class="form-control01" style="width:40%" type="text" name="helpEndDt" value="{{:HELP_END_DT}}"></td>
+                                                <td style="text-align:right"><input class="form-control01" style="text-align:right" type="text" name="empWeakNum" value="{{:HELP_AMT}}"></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <div id="tblFinance" >
+                                            <h4>5. 재정현황 ({{:CLS_DT}} 결산)</h4>
+                                            <table class="table table-bordered">
+                                                <tbody>
+                                                <tr>
+                                                    <td colspan="3" style="text-align:center; background-color:#f1f1f1">항목</td>
+                                                    <td style="text-align:center; background-color:#f1f1f1">세부내용</td>
+                                                    <td style="text-align:center; background-color:#f1f1f1">금액</td>
+                                                </tr>
+                                                <tr>
+                                                    <td rowspan="3" style="text-align:center">재무상태</td>
+                                                    <td colspan="3" style="text-align:center">자산총계</td>
+                                                    <td style="text-align:right"><input class="form-control01" style="text-align:right" type="text" name="asstAmt" value="{{:ASST_AMT}}"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="3" style="text-align:center">부채총계</td>
+                                                    <td style="text-align:right"><input class="form-control01" style="text-align:right" type="text" name="deptAmt" value="{{:DEPT_AMT}}"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="3" style="text-align:center">자본총계</td>
+                                                    <td style="text-align:right"><input class="form-control01" style="text-align:right" type="text" name="capitAmt" value="{{:CAPIT_AMT}}"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td rowspan="9" style="text-align:center">손익계산</td>
+                                                    <td rowspan="5" style="text-align:center">매출</td>
+                                                    <td rowspan="3" style="text-align:center">매출액</td>
+                                                    <td style="text-align:center">소계</td>
+                                                    <td style="text-align:right"><input class="form-control01" style="text-align:right" type="text" name="soldAmt" value="{{:SOLD_AMT}}"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align:center">민간 시장</td>
+                                                    <td style="text-align:right"><input class="form-control01" style="text-align:right" type="text" name="soldPrivAmt" value="{{:SOLD_PRIV_AMT}}"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align:center">공공 시장</td>
+                                                    <td style="text-align:right"><input class="form-control01" style="text-align:right" type="text" name="soldPublAmt" value="{{:SOLD_PUBL_AMT}}"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td rowspan="2" style="text-align:center">*유통/제조업일 경우</td>
+                                                    <td style="text-align:center">매출원가</td>
+                                                    <td style="text-align:right"><input class="form-control01" style="text-align:right" type="text" name="soldOrgCost" value="{{:SOLD_ORG_COST}}"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align:center">매출 총이익(손실)</td>
+                                                    <td style="text-align:right"><input class="form-control01" style="text-align:right" type="text" name="soldIncom" value="{{:SOLD_INCOM}}"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2" style="text-align:left">비용</td>
+                                                    <td style="text-align:center">판매비와 관리비(영업비용)</td>
+                                                    <td style="text-align:right"><input class="form-control01" style="text-align:right" type="text" name="salesAmt" value="{{:SALES_AMT}}"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td rowspan="2" colspan="2" style="text-align:left">비용</td>
+                                                    <td style="text-align:center">영업이익</td>
+                                                    <td style="text-align:right"><input class="form-control01" style="text-align:right" type="text" name="salesIncom" value="{{:SALES_INCOM}}"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align:center">영업외 수익</td>
+                                                    <td style="text-align:right"><input class="form-control01" style="text-align:right" type="text" name="extProf" value="{{:EXT_PROF}}"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="3" style="text-align:center">당기순이익</td>
+                                                    <td style="text-align:right"><input class="form-control01" style="text-align:right" type="text" name="netIncom" value="{{:NET_INCOM}}"></td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <!-- /.panel-body -->
+                        </div>
+                    </div>
+
+                    <!-- /.col-lg-3 -->
+
+                    <!-- /.col-lg-12 -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <div  id="depth2Grid"  class="container-fluid" style="display:none;">
+                <div class="row">
+                    <div class="col-lg-12">
+
+                        <h3 id="kpiDetailHeader" class="page-header">지표 등록 – ㈜나비프로젝트</h3>
+                        <div style="text-align: right">
+                            <a id="btnGoBack2" href="javascript:;" class="btn btn-outline btn-info" style="margin-right: 10px"><i class="fa fa-long-arrow-left fa-fw"></i>&nbsp;뒤로가기</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="panel02 panel-grid">
+                            <div class="panel02-heading">
+                                상세 지표별 점수
+                            </div>
+                            <!-- /.panel-heading -->
+                            <div class="panel02-body">
+                                <table id="detailGrid" class="table table-striped table-bordered table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>성과지표</th>
+                                        <th>세부 성과지표</th>
+                                        <th>점수</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.container-fluid -->
+        </div>
+        <!-- /#page-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+<!-- jQuery -->
+
+</body>
+
+</html>

@@ -1,0 +1,213 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/app-route/app-location.html">
+<link rel="import" href="/bower_components/app-route/app-route.html">
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input.html" />
+<link rel="import" href="/bower_components/vaadin-grid/vaadin-grid.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/paper-radio-group/paper-radio-group.html" />
+<link rel="import" href="/bower_components/paper-radio-button/paper-radio-button.html" />
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+<link rel="import" href="/bower_components/iron-form/iron-form.html" />
+<link rel="import" href="/bower_components/paper-dialog/paper-dialog.html" />
+
+<link rel="import" href="../common/dialog-alert.html" />
+
+<link rel="import" href="../style/common-style.html" />
+
+<dom-module id="user-info">
+    <template>
+        <style include="common-style">
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+                --iron-icon-height: 15px;
+                --iron-icon-width: 15px;
+                --paper-button: {
+                    background-color: #ff6138;
+                    color: white;
+                    font-size: 13px;
+                }
+            }
+
+            paper-button iron-icon {
+                margin-right: 5px;
+            }
+
+            .card-content table {
+                font-size: 12px;
+                width: 100%;
+            }
+
+            .card-content table th {
+                text-align: right;
+                padding-right: 30px;
+            }
+        </style>
+
+        <app-route route="{{route}}" pattern="/:id" data="{{routeData}}"></app-route>
+
+        <iron-ajax id="protocolGetUserInfo" url$="/api/user/{{_id}}" method="GET" content-type="application/json" last-response="{{_userInfo}}"></iron-ajax>
+        <iron-ajax id="protocolDeleteUser" url$="/api/user/{{_id}}" method="DELETE" content-type="application/json" on-response="_onUserDeleted"></iron-ajax>
+
+        <h1>사용자 정보 수정</h1>
+
+        <paper-card elevation="1">
+            <form is="iron-form" id="userForm" method="POST" action="/api/user" content-type="application/json" on-iron-form-response="_formResponse">
+                <div class="card-content">
+                    <table>
+                        <colgroup>
+                            <col width="20%" />
+                            <col />
+                        </colgroup>
+                        <tr>
+                            <th>
+                                사용자명
+                            </th>
+                            <td>
+                                <paper-input name="userNm" value="{{_userInfo.userNm}}" required></paper-input>
+                            </td>
+                            <th>
+                                Email
+                            </th>
+                            <td>
+                                <paper-input name="email" value="{{_userInfo.email}}"></paper-input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                ID
+                            </th>
+                            <td colspan="3">
+                                <paper-input name="userId" value="{{_userInfo.userId}}" required></paper-input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                Password
+                            </th>
+                            <td colspan="3">
+                                <paper-input name="password" type="password" required></paper-input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                관리자 여부
+                            </th>
+                            <td colspan="3">
+                                <paper-radio-group attr-for-selected="value" selected="{{_userInfo.adminYn}}">
+                                    <paper-radio-button name="adminYn" value="Y">예</paper-radio-button>
+                                    <paper-radio-button name="adminYn" value="N">아니오</paper-radio-button>
+                                </paper-radio-group>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card-actions">
+                    <a href="/user/all" tabindex="-1">
+                        <paper-button>
+                            <iron-icon icon="toc"></iron-icon>
+                            목록
+                        </paper-button>
+                    </a>
+                    <paper-button on-tap="_save">
+                        <iron-icon icon="save"></iron-icon>
+                        저장
+                    </paper-button>
+                    <paper-button on-tap="_delete">
+                        <iron-icon icon="clear"></iron-icon>
+                        삭제
+                    </paper-button>
+                </div>
+                <paper-input name="userSeq" value="{{_userInfo.userSeq}}" class="hidden"></paper-input>
+            </form>
+        </paper-card>
+
+        <dialog-alert id="alert" on-confirm-ok="_onConfirmOk"></dialog-alert>
+
+    </template>
+
+    <script src="/scripts/moment.min.js"></script>
+    <script>
+        Polymer({
+            is: "user-info",
+
+            properties: {
+                route: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    }
+                },
+                _id: Number,
+                _userInfo: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _isAttached: Boolean,
+            },
+
+            observers: [
+                '_properlyAttached(routeData.id, _isAttached)'
+            ],
+
+            attached: function() {
+                this._isAttached = true;
+            },
+
+            _properlyAttached: function(id) {
+                this._id = id;
+                this._search();
+            },
+
+            _search: function() {
+                this.$.protocolGetUserInfo.generateRequest();
+            },
+
+            _save: function() {
+                this.$.userForm.submit();
+            },
+
+            _formResponse: function(e) {
+                this.$.alert.type = "alert";
+
+                switch (e.detail.status) {
+                    case 200:
+                        this.$.alert.msg = "정상적으로 반영되었습니다.";
+                        this.$.alert.dialog.open();
+                        break;
+                    default:
+                        this.$.alert.msg = "오류가 발생했습니다.";
+                        this.$.alert.dialog.open();
+                        break;
+                }
+            },
+
+            _delete: function() {
+                this.$.alert.type = "confirm";
+                this.$.alert.msg = "삭제하시겠습니까?";
+                this.$.alert.dialog.open();
+            },
+
+            _onConfirmOk: function() {
+                this.$.protocolDeleteUser.generateRequest();
+            },
+
+            _onUserDeleted: function(e) {
+                switch (e.detail.status) {
+                    case 200:
+                        location.href = "/user/all";
+                        break;
+                    default:
+                        this.$.alert.type = "alert";
+                        this.$.alert.msg = "오류가 발생했습니다.";
+                        this.$.alert.dialog.open();
+                        break;
+                }
+            }
+        })
+    </script>
+</dom-module>

@@ -1,0 +1,20 @@
+package com.sck.modules.common;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.sck.model.Code;
+
+@Service
+public class CommonService {
+
+	@Autowired
+	private CommonRepository repository;
+	
+	public List<Code> findCodes(String grpCd)
+	{
+		return repository.findCodes(grpCd);
+	}
+}

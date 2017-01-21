@@ -1,0 +1,28 @@
+package com.sck.common.mybatis;
+
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+public class DefaultParameterInjector implements ParameterInjector
+{
+
+	@Override
+	public String getName()
+	{
+		return "g";
+	}
+
+	@Override
+	public Object getValue()
+	{
+		Object result = null;
+		SecurityContext context = SecurityContextHolder.getContext();
+		if(context.getAuthentication() != null)
+		{
+			result = context.getAuthentication().getPrincipal();
+		}
+		
+		return result;
+	}
+
+}

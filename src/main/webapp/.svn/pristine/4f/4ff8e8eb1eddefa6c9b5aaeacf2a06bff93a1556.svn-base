@@ -1,0 +1,192 @@
+<!-- <link rel="import" href="/bower_components/paper-toolbar/paper-toolbar.html" /> -->
+
+<!-- <link rel="import" href="../common/dialog-alert.html" />
+<link rel="import" href="../common/behavior-page.html" />
+<link rel="import" href="../common/number-input.html" /> -->
+
+<dom-module id="corp-detail-kpi">
+    <template>
+        <style include="common-style"></style>
+        <style include="bootstrap-style">
+            :host {
+                --paper-toolbar-height: 50px;
+            }
+        </style>
+
+        <iron-ajax id="protocolGetCorpKpi" url$="/api/corp/{{corpId}}/kpi" headers='{"X-Requested-With": "XMLHttpRequest"}' method="GET" content-type="application/json" last-response="{{_corpDetail}}" on-response="_insertKpiData" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax id="protocolSaveCorpKpi" url="/api/corp/kpi" headers='{"X-Requested-With": "XMLHttpRequest"}' method="POST" content-type="application/json" on-response="_formResponse" on-error="_redirectOnError"></iron-ajax>
+
+        <paper-toolbar class="toolbar-head">
+            <span class="title">상세 지표별 점수</span>
+            <paper-button on-tap="_save">저장</paper-button>
+        </paper-toolbar>
+
+        <form id="formCorpKpi" is="iron-form">
+            <div class="table-responsive">
+            <table id="tableCorpKpi" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>
+                            성과지표
+                        </th>
+                        <th>
+                            세부 성과지표
+                        </th>
+                        <th>
+                            배점
+                        </th>
+                        <th>
+                            점수
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+            </div>
+        </form>
+
+        <dialog-alert id="alert" on-confirm-ok="_onConfirmOk"></dialog-alert>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'corp-detail-kpi',
+
+            behaviors: [PS.BehaviorPage],
+
+            properties: {
+                refresh: Boolean,
+                corpId: Number,
+                _isAttached: Boolean,
+                _corpDetail: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    }
+                }
+            },
+
+            observers: [
+                '_search(corpId, _isAttached, refresh)'
+            ],
+
+            ready: function() {
+                this.scopeSubtree(this.$.formCorpKpi.querySelector("tbody"), true);
+            },
+
+            attached: function() {
+                this._isAttached = true;
+            },
+
+            _search: function() {
+                this.refresh = undefined;
+                this.$.protocolGetCorpKpi.generateRequest();
+            },
+
+            _insertKpiData: function(e) {
+                var table = this.$.tableCorpKpi.querySelector("tbody");
+                var data = e.target.lastResponse;
+                var i, j, tr, th, td, depth2, input, hidden;
+
+                this._removeChilds(table);
+
+                for (i = 0; i < data.length; i++) {
+
+
+                    for (j = 0; j < data[i].depth2.length; j++) {
+                        tr = document.createElement("tr");
+
+                        if (j == 0) {
+                            th = document.createElement("th");
+                            th.setAttribute("rowspan", data[i].depth2.length);
+                            th.setAttribute("class", "text-center");
+                            th.innerHTML = data[i].depth1Nm;
+                            tr.appendChild(th);
+                        }
+
+                        depth2 = data[i].depth2[j];
+
+                        td = document.createElement("td");
+                        td.setAttribute("class", "text-center");
+                        td.innerHTML = depth2.depth2Nm;
+                        tr.appendChild(td);
+
+                        td = document.createElement("td");
+                        td.setAttribute("class", "text-right");
+                        td.innerHTML = depth2.maxScore;
+                        tr.appendChild(td);
+
+                        td = document.createElement("td");
+                        tr.appendChild(td);
+
+                        input = document.createElement("number-input");
+                        input.setAttribute("name", "score");
+                        input.setAttribute("decimal-places", "1");
+                        input.setAttribute("text-align", "right");
+                        input.setAttribute("value", depth2.score);
+                        input.setAttribute("required", true);
+                        td.appendChild(input);
+
+                        hidden = document.createElement("input");
+                        hidden.setAttribute("name", "depth1");
+                        hidden.setAttribute("value", data[i].depth1);
+                        hidden.setAttribute("style", "display: none;");
+                        td.appendChild(hidden);
+
+                        hidden = document.createElement("input");
+                        hidden.setAttribute("name", "depth2");
+                        hidden.setAttribute("value", depth2.depth2);
+                        hidden.setAttribute("style", "display: none;");
+                        td.appendChild(hidden);
+
+                        table.appendChild(tr);
+                    }
+                }
+                this.updateStyles();
+                this._closeOverlay();
+            },
+
+            _removeChilds: function(table) {
+                while (table.childNodes.length > 0) {
+                    Polymer.dom(table).removeChild(table.childNodes[0]);
+                }
+            },
+
+            _save: function() {
+                if (this.$.formCorpKpi.validate()) {
+                    var data = this.$.formCorpKpi.serialize();
+                    var parsedData = [];
+                    for (var i = 0; i < data.depth1.length; i++) {
+                        parsedData.push({
+                            depth1: data.depth1[i],
+                            depth2: data.depth2[i],
+                            score: data.score[i],
+                            corpSeq: this.corpId
+                        });
+                    }
+
+                    this.$.protocolSaveCorpKpi.body = parsedData;
+                    this.$.protocolSaveCorpKpi.generateRequest();
+                }
+            },
+
+            _formResponse: function(e) {
+                this.$.alert.type = "alert";
+
+                switch (e.detail.status) {
+                    case 200:
+                        this.$.alert.msg = "정상적으로 반영되었습니다.";
+                        this.$.alert.dialog.open();
+                        break;
+                    default:
+                        this.$.alert.msg = "오류가 발생했습니다.";
+                        this.$.alert.dialog.open();
+                        break;
+                }
+            },
+        })
+    </script>
+</dom-module>

@@ -1,0 +1,98 @@
+[
+  {
+    "type": "gp-widget-callcenter",
+    "label": "Call Center",
+    "title": "Call Center",
+    "width": "400",
+    "height": "160",
+    "resizable": "true",
+    "draggable": "true",
+    "closeable": "true",
+    "editable": "false",
+    "icon_image": "/ui/lib/gp-portal/tmp/cc_off.png"
+  },
+  {
+    "type": "gp-widget-purchase",
+    "label": "Purchase Status",
+    "title": "Purchase Status",
+    "width": "650",
+    "height": "170",
+    "resizable": "true",
+    "draggable": "true",
+    "closeable": "true",
+    "editable": "false",
+    "icon_image": "/ui/lib/gp-portal/tmp/ps_off.png"
+  },
+  {
+    "type": "gp-widget-popular",
+    "label": "Popular Items",
+    "title": "Popular Items",
+    "width": "650",
+    "height": "170",
+    "resizable": "true",
+    "draggable": "true",
+    "closeable": "true",
+    "editable": "false",
+    "icon_image": "/ui/lib/gp-portal/tmp/pi_off.png"
+  },
+  {
+    "type": "gp-widget-cmdt",
+    "label": "Commodity",
+    "title": "Shop by Commodity",
+    "width": "500",
+    "height": "170",
+    "resizable": "true",
+    "draggable": "true",
+    "closeable": "true",
+    "editable": "false",
+    "icon_image": "/ui/lib/gp-portal/tmp/cmdt_off.png"
+  },
+  {
+    "type": "gp-widget-favorite-links",
+    "label": "Favorite Links",
+    "title": "Favorite Links",
+    "width": "650",
+    "height": "170",
+    "resizable": "true",
+    "draggable": "true",
+    "closeable": "true",
+    "editable": "true",
+    "icon_image": "/ui/lib/gp-portal/tmp/fl_off.png"
+  },
+  {
+    "type": "gp-widget-catalog",
+    "label": "Catalog",
+    "title": "Catalog Shopping",
+    "width": "500",
+    "height": "170",
+    "resizable": "true",
+    "draggable": "true",
+    "closeable": "true",
+    "editable": "false",
+    "icon_image": "/ui/lib/gp-portal/tmp/catalog_off.png"
+  },
+  {
+    "type": "gp-widget-search",
+    "label": "Search",
+    "title": "Search",
+    "width": "750",
+    "height": "160",
+    "resizable": "true",
+    "draggable": "true",
+    "closeable": "true",
+    "editable": "false",
+    "icon_image": "/ui/lib/gp-portal/tmp/srch_off.png"
+  },
+  {
+    "type": "gp-widget-contract",
+    "label": "Contract",
+    "title": "Shop by Contract",
+    "width": "500",
+    "height": "170",
+    "resizable": "true",
+    "draggable": "true",
+    "closeable": "true",
+    "editable": "false",
+    "icon_image": "/ui/lib/gp-portal/tmp/cntrct_off.png"
+  }
+]

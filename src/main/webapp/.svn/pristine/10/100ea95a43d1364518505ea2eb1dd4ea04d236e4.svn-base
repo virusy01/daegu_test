@@ -1,0 +1,49 @@
+<html>
+<head>
+	<script src="/scripts/jquery-1.12.3.min.js"></script>
+	<script>
+		function doLogin()
+		{
+			$.ajax({
+	            url:"/api/login",
+	            method : "POST",
+	            data : {username : $("#loginId").val(), password : $("#loginPassword").val()},
+	            success:function(responseData){
+	            	location.href = "/";
+	            },
+	            error: function(jqXHR,textStatus,errorThrown){
+					alert(jqXHR.status);
+				}
+	        });
+		}
+		
+		function hitEnterKey(e)
+		{
+		    if(e.keyCode == 13)
+		    {
+		    	doLogin();
+		    } 
+		}
+	</script>
+</head>
+<body>
+<form name="loginForm" method="post" onsubmit="return false">
+	<!-- Wrapper Start -->
+	<div id="login">
+		<ul>
+			<li>로그인ID
+				<input type="text" id="loginId" name="userId" type="text" maxlength="20"  class="inputL" style="width:120px;" value="admin4" tabindex="1" />
+			</li>
+			<li> 비밀번호
+				<input type="password"  id="loginPassword" name="password"  value="" maxlength="20"  class="inputL" style="width:120px;" tabindex="2" onkeypress="hitEnterKey(event)"/>
+			</li>
+			<li> remember
+				<input type="checkbox"  id="remember" name="remember"/>
+			</li>
+		</ul>
+		<span><input type="button" value="로그인" onclick="doLogin();"/></span>
+	</div>
+	<!-- Wrapper End -->
+</form>
+</body>
+</html>

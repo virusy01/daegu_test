@@ -1,0 +1,12 @@
+<script>
+window.Lunch = window.Lunch || {};
+Lunch.LoaderBehavior = {
+	_startLoader: function() {
+		this.fire('iron-signal', {name: 'start-spinner'});
+	},	
+
+	_stopLoader: function() {
+		this.fire('iron-signal', {name: 'end-spinner'});
+	},
+};
+</script>

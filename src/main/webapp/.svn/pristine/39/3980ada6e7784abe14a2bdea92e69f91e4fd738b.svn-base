@@ -1,0 +1,65 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/app-route/app-route.html">
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+
+<link rel="import" href="common/behavior-page.html" />
+
+<dom-module id="group-summary">
+
+    <template>
+        <style>
+
+        </style>
+
+        <app-route route="{{route}}" pattern="/:subpage" data="{{routeData}}" tail="{{subroute}}"></app-route>
+
+        <iron-pages role="submain" selected="[[subpage]]" attr-for-selected="id" fallback-selection="all" on-iron-select="_openOverlay">
+            <summary-all id="all"></summary-all>
+        </iron-pages>
+
+    </template>
+
+    <script>
+        Polymer({
+
+            is: 'group-summary',
+
+            behaviors: [PS.BehaviorPage],
+
+            properties: {
+                route: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    }
+                },
+                subpage: {
+                    type: String,
+                    observer: '_subPageChanged'
+                },
+                _htmlNames: {
+                    type: Object,
+                    value: function() {
+                        return {
+                            all: 'summary-all',
+                        }
+                    }
+                },
+            },
+
+            observers: [
+                '_subRoutePageChanged(routeData.subpage)'
+            ],
+
+            _subRoutePageChanged: function(path) {
+                this.subpage = path || 'all';
+            },
+
+            _subPageChanged: function(subpage) {
+                if (this._htmlNames[subpage])
+                    this.importHref(this.resolveUrl('summary/' + this._htmlNames[subpage] + '.html'), null, null, true);
+            }
+        });
+    </script>
+
+</dom-module>

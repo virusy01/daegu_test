@@ -1,0 +1,134 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input.html" />
+<link rel="import" href="/bower_components/vaadin-grid/vaadin-grid.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+
+<link rel="import" href="../style/common-style.html" />
+
+<dom-module id="user-list">
+    <template>
+        <style include="common-style">
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+                --iron-icon-height: 15px;
+                --iron-icon-width: 15px;
+                --paper-button: {
+                    background-color: #ff6138;
+                    color: white;
+                    font-size: 13px;
+                }
+            }
+
+            #searchForm {
+                margin-bottom: 20px;
+            }
+
+            #searchForm paper-input {
+                width: 400px;
+                margin-right: 10px;
+                vertical-align: bottom;
+                display: inline-block;
+            }
+
+            paper-button iron-icon {
+                margin-right: 5px;
+            }
+        </style>
+
+        <iron-ajax id="protocolGetUsers" url="/api/user/find" method="GET" last-response="{{_userList}}" on-response="_onDataLoad"></iron-ajax>
+
+        <h1>사용자 정보 조회</h1>
+
+        <div id="searchForm">
+            <paper-input id="keyword" label="사용자명/ID/E-MAIL"></paper-input>
+            <paper-button on-tap="_search" raised>
+                <iron-icon icon="search"></iron-icon>
+                조회
+            </paper-button>
+        </div>
+
+        <paper-card elevation="1">
+            <div class="card-content">
+                <vaadin-grid id="tableUsers" items="{{_userList}}" on-selected-items-changed="_onGridSelect">
+                    <table>
+                        <colgroup>
+                            <col name="userNm" />
+                            <col name="userId" />
+                            <col name="email" />
+                            <col name="adminYn" />
+                            <col name="creDt" />
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>
+                                    사용자명
+                                </th>
+                                <th>
+                                    ID
+                                </th>
+                                <th>
+                                    Email
+                                </th>
+                                <th>
+                                    관리자 여부
+                                </th>
+                                <th>
+                                    등록일
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </vaadin-grid>
+            </div>
+            <div class="card-actions">
+                <a href="/user/create">
+                    <paper-button>사용자 등록</paper-button>
+                </a>
+            </div>
+        </paper-card>
+
+    </template>
+
+    <script src="/scripts/moment.min.js"></script>
+    <script>
+        Polymer({
+            is: "user-list",
+
+            properties: {
+                _keyword: String
+            },
+
+            attached: function() {
+                this._search();
+            },
+
+            _search: function() {
+                this._keyword = this.$.keyword.value;
+
+                this.$.protocolGetUsers.params = {
+                    keyword: this._keyword
+                };
+
+                this.$.protocolGetUsers.generateRequest();
+            },
+
+            _onDataLoad: function() {
+                this.$.tableUsers.columns[4].renderer = function(cell) {
+                    cell.element.innerHTML = moment(cell.data).format("YYYY/MM/DD");
+                }
+            },
+
+            _onGridSelect: function(e) {
+                if (e.currentTarget.selection.size > 0) {
+                    var selectedIndex = e.currentTarget.selection.selected();
+                    var data = this._userList[selectedIndex];
+
+                    location.href = "/user/detail/" + data.userSeq;
+                }
+            }
+        })
+    </script>
+</dom-module>

@@ -1,0 +1,80 @@
+package com.sck.config;
+
+import java.util.LinkedHashMap;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.authentication.DelegatingAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.util.matcher.ELRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+
+import com.sck.common.security.MySQLPasswordEncoder;
+import com.sck.modules.common.UserService;
+
+@Configuration
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled=true)
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+	@Autowired
+	private UserService userService;
+	
+	@Bean
+	public PasswordEncoder passwordEncoder()
+	{
+		return new MySQLPasswordEncoder();
+	}
+	
+	@Override
+    public void configure(AuthenticationManagerBuilder auth) throws Exception 
+	{
+		auth.userDetailsService(userService).passwordEncoder(passwordEncoder());
+    }
+	
+	@Bean
+	public DelegatingAuthenticationEntryPoint delegatingAuthenticationEntryPoint()
+	{
+		LinkedHashMap<RequestMatcher, AuthenticationEntryPoint> map = new LinkedHashMap<RequestMatcher, AuthenticationEntryPoint>();
+		map.put(new ELRequestMatcher("hasHeader('X-Requested-With','XMLHttpRequest')"), new Http403ForbiddenEntryPoint());
+
+		DelegatingAuthenticationEntryPoint delegatingAuthenticationEntryPoint = new DelegatingAuthenticationEntryPoint(map);
+		delegatingAuthenticationEntryPoint.setDefaultEntryPoint(new LoginUrlAuthenticationEntryPoint("/login.html"));
+
+		return delegatingAuthenticationEntryPoint;
+	}
+	
+	@Override
+	protected void configure(HttpSecurity http) throws Exception 
+	{
+		http
+			.headers().frameOptions().disable()
+			.and().requestCache().disable()
+			.csrf().disable() 
+			.formLogin().loginPage("/login.html").loginProcessingUrl("/login").defaultSuccessUrl("/",true)
+			.and().logout().logoutUrl("/logout").logoutSuccessUrl("/")
+			.and().httpBasic().disable()
+			.exceptionHandling().authenticationEntryPoint(delegatingAuthenticationEntryPoint())
+			.and().authorizeRequests()
+				.antMatchers(
+						"/**/*.html",
+						"/**/*.js",
+						"/**/*.css",
+						"/**/*.ico",
+						"/**/*.png",
+						"/**/*.jpg",
+						"/**/*.gif"
+						).permitAll()
+				.anyRequest().authenticated();
+	}
+				
+}

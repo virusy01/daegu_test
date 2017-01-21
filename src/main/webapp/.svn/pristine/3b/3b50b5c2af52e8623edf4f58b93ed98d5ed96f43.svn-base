@@ -1,0 +1,182 @@
+<!--
+ * @Desc 포탈 매니저/팔레트 스타일
+ * @Author patrick.sung
+ * @Created 2016-03-28
+ -->
+
+<dom-module id="gp-portal-manager-style">
+    <template>
+        <style>
+            :host {
+                float: left;
+                position: relative;
+                --component-width: 100px;
+                --component-height: 54px;
+            }
+
+            ol,
+            ul,
+            li {
+                list-style: none
+            }
+
+            a {
+                color: #666;
+                text-decoration: none
+            }
+
+            a:link,
+            a:visited {
+                text-decoration: none
+            }
+
+            a:hover {
+                text-decoration: underline;
+                color: #c00c3f
+            }
+
+            .components {
+                cursor: pointer;
+            }
+            /* figure when component is dragged out of the manager area */
+
+            .ghost {
+                border: 1px dashed red;
+                background-color: rgba(238, 238, 238, 0.9);
+                text-align: center;
+                vertical-align: middle;
+                cursor: all-scroll;
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+                -webkit-border-radius: 4px;
+                -moz-border-radius: 4px;
+                border-radius: 4px;
+            }
+
+            .icon {
+                position: relative;
+                top: 58%;
+                transform: translateY(-50%);
+            }
+
+            .btn_wrap {
+                width: 100px;
+                padding: 10px;
+            }
+
+            .sidebar_wrap {
+                width: 120px;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            .sidebar_list {
+                position: relative;
+                text-align: center;
+                border: none;
+                margin: 0 10px 10px;
+                width: 100px;
+            }
+
+            .sidebar_list .components {
+                display: block;
+                height: 70px;
+                text-align: center;
+                border: 1px solid #c6c6c6;
+                background-color: #FFF;
+                -webkit-border-radius: 3px;
+                -moz-border-radius: 3px;
+                border-radius: 3px;
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+            }
+
+            .sidebar_list .components:hover {
+                display: block;
+                height: 70px;
+                text-align: center;
+                border: 2px solid #c00c3f;
+                text-decoration: none;
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+            }
+
+            .sidebar_list .name {
+                font-size: 11px;
+                font-weight: bold;
+                line-height: 1.33em;
+                display: inline-block;
+                vertical-align: middle;
+                width: 100%;
+                margin-top: 5px;
+                height: 35px;
+            }
+
+            .sidebar_list .no_type {
+                height: 21px;
+            }
+
+            .sidebar_list .selected .name,
+            .sidebar_list .components:hover .name {
+                text-decoration: none;
+            }
+
+            .sidebar_ico {
+                display: inline-block;
+                vertical-align: middle;
+            }
+
+            button.upperBtn {
+                width: 100px;
+                height: 14px;
+                background: transparent url("/images/btn_upper_N.png") no-repeat center top;
+                border: none;
+            }
+
+            button.upperBtn:hover {
+                background: transparent url("/images/btn_upper_H.png") no-repeat center top;
+            }
+
+            button.lowerBtn {
+                width: 100px;
+                height: 14px;
+                background: transparent url("/images/btn_lower_N.png") no-repeat center top;
+                border: none;
+            }
+
+            button.lowerBtn:hover {
+                background: transparent url("/images/btn_lower_H.png") no-repeat center top;
+            }
+
+            button.showBtn {
+                width: 120px;
+                height: 20px;
+                background: #525252 url("/images/btn_show_N.png") no-repeat right 5px;
+                border: none;
+                -webkit-border-radius: 0;
+                -moz-border-radius: 0;
+                border-radius: 0;
+            }
+
+            button.showBtn:hover {
+                background: #c00c3f url("/images/btn_show_N.png") no-repeat right 5px;
+            }
+
+            button.hideBtn {
+                width: 120px;
+                height: 20px;
+                background: #525252 url("/images/btn_hide_N.png") no-repeat right 5px;
+                border: none;
+                border-top-left-radius: 4px;
+            }
+
+            button.hideBtn:hover {
+                background: #c00c3f url("/images/btn_hide_N.png") no-repeat right 5px;
+            }
+        </style>
+    </template>
+</dom-module>

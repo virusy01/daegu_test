@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="snp.infra.user.UserRepo">
+	<resultMap id="User" type="snp.infra.user.model.User">
+		<constructor>
+			<arg column="USER_ID" javaType="string"/>
+			<arg column="USER_NAME" javaType="string"/>
+			<arg column="CORP_SEQ" javaType="Integer"/>
+			<arg column="EMAIL" javaType="string"/>
+		</constructor>
+	</resultMap>
+
+	<!--
+	user.xml#get_system_user
+	-->
+	<select id="find" resultMap="User">
+		<![CDATA[
+		SELECT USER_ID,
+			   USER_NAME,
+			   CORP_SEQ,
+		       EMAIL
+		  FROM USERS
+		 WHERE USER_ID = #{userId}
+		]]>
+	</select>
+
+	<!--
+        id      : check_system_user
+        comment : 내부사용자 인증
+        path    : \resources\sql\oracle\userMng.xml
+        type    : SELECT
+    -->
+	<select id="password" resultType="string">
+		<![CDATA[
+        SELECT PASSWORD
+		  FROM USERS
+		 WHERE USER_ID = #{userId}
+        ]]>
+	</select>
+
+</mapper>

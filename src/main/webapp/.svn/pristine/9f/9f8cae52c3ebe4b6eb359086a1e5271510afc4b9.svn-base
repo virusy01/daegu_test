@@ -1,0 +1,317 @@
+<!-- <link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/app-route/app-location.html">
+<link rel="import" href="/bower_components/app-route/app-route.html">
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+<link rel="import" href="/bower_components/iron-form/iron-form.html" />
+<link rel="import" href="/bower_components/paper-dialog/paper-dialog.html" /> -->
+
+<!-- <link rel="import" href="../common/dialog-alert.html" />
+<link rel="import" href="../common/normal-input.html" />
+<link rel="import" href="../common/date-input.html" />
+<link rel="import" href="../common/normal-select.html" />
+<link rel="import" href="../common/behavior-page.html" /> -->
+
+<link rel="import" href="../style/common-style.html" />
+<link rel="import" href="../style/bootstrap-style.html" />
+
+<dom-module id="corp-info">
+    <template>
+        <style include="common-style"></style>
+        <style include="bootstrap-style">
+            :host {
+                @apply(--layout-vertical);
+                padding: 15px;
+            }
+
+            .selectBox {
+                display: inline-block;
+                /*width: auto;*/
+            }
+
+            .selectText {
+                display: inline-block;
+            }
+
+            .bizNo normal-input {
+                display: inline-block;
+            }
+
+            .bizNo normal-input:nth-child(1) {
+                width: 70px;
+            }
+
+            .bizNo normal-input:nth-child(2) {
+                width: 50px;
+            }
+
+            .bizNo normal-input:nth-child(3) {
+                width: 80px;
+            }
+        </style>
+
+        <app-route route="{{route}}" pattern="/:id" data="{{routeData}}"></app-route>
+
+        <iron-ajax id="protocolGetCompKind" headers='{"X-Requested-With": "XMLHttpRequest"}' url="/api/common/comp_kind/code/" last-response="{{_codes.compKind}}" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax id="protocolGetCorpType" headers='{"X-Requested-With": "XMLHttpRequest"}' url="/api/common/corp_type/code/" last-response="{{_codes.corpType}}" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax id="protocolGetBizSect" headers='{"X-Requested-With": "XMLHttpRequest"}' url="/api/common/biz_sect/code/" last-response="{{_codes.bizSect}}" on-error="_redirectOnError"></iron-ajax>
+
+        <iron-ajax id="protocolGetCorpInfo" headers='{"X-Requested-With": "XMLHttpRequest"}' url$="/api/corp/info/{{_id}}" method="POST" content-type="application/json" last-response="{{_corpInfo}}" on-response="_setData" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax id="protocolDeleteCorp" headers='{"X-Requested-With": "XMLHttpRequest"}' url$="/api/corp/info/{{_id}}" method="DELETE" content-type="application/json" on-response="_onCorpDeleted" on-error="_redirectOnError"></iron-ajax>
+        <iron-ajax id="protocolSaveCorpInfo" headers='{"X-Requested-With": "XMLHttpRequest"}' url="/api/corp/info" method="POST" content-type="application/json" on-response="_formResponse" on-error="_redirectOnError"></iron-ajax>
+
+        <paper-card elevation="1">
+            <form is="iron-form" id="corpForm" method="POST" action="/api/corp/info" content-type="application/json">
+                <div class="card-content">
+                    <div class="page-header">
+                        <h2>기업현황 수정 <small>[[_corpInfo.corpNm]]</small></h2>
+                    </div>
+
+                    <table class="table table-bordered">
+                        <colgroup>
+                            <col width="20%" />
+                            <col width="30%" />
+                            <col width="20%" />
+                            <col width="30%" />
+                        </colgroup>
+                        <tr>
+                            <th>
+                                기업명
+                            </th>
+                            <td>
+                                <normal-input name="corpNm" value="{{_corpInfo.corpNm}}" required></normal-input>
+                            </td>
+                            <th>
+                                사업개시일
+                            </th>
+                            <td>
+                                <date-input id="bizDt" name="bizDt" bind-value="{{_corpInfo.bizDt}}" required></date-input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                대표자
+                            </th>
+                            <td>
+                                <normal-input name="ceoNm" value="{{_corpInfo.ceoNm}}" required></normal-input>
+                            </td>
+                            <th>
+                                사업자번호
+                            </th>
+                            <td>
+                                <div class="bizNo">
+                                    <normal-input id="bizNo1" type="number" maxlength="3"></normal-input>
+                                    <normal-input id="bizNo2" type="number" maxlength="2"></normal-input>
+                                    <normal-input id="bizNo3" type="number" maxlength="5"></normal-input>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                법인형태
+                            </th>
+                            <td>
+                                <normal-select id="corpType" name="corpType" items="{{_codes.corpType}}" class="selectBox" on-value-changed="_showCorpType2" value="[[_corpInfo.corpType]]"></normal-select>
+                                <normal-input id="corpType2" name="corpType2" value="{{_corpInfo.corpTypeNm}}" class="hidden selectText"></normal-input>
+                            </td>
+                            <th>
+                                기업분류
+                            </th>
+                            <td>
+                                <normal-select id="compKind" name="compKind" items="{{_codes.compKind}}" value="[[_corpInfo.compKind]]"></normal-select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                사업업종
+                            </th>
+                            <td colspan="3">
+                                <normal-select id="bizSect" name="bizSect" items="{{_codes.bizSect}}" class="selectBox" on-value-changed="_showBizSect2" value="[[_corpInfo.bizSect]]"></normal-select>
+                                <normal-input id="bizSect2" name="bizSect2" value="{{_corpInfo.bizSectNm}}" class="hidden selectText"></normal-input>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card-actions">
+                    <a href="/corp/all" tabindex="-1">
+                        <paper-button>
+                            <iron-icon icon="toc"></iron-icon>
+                            목록
+                        </paper-button>
+                    </a>
+                    <paper-button on-tap="_save">
+                        <iron-icon icon="save"></iron-icon>
+                        저장
+                    </paper-button>
+                    <paper-button on-tap="_delete">
+                        <iron-icon icon="clear"></iron-icon>
+                        삭제
+                    </paper-button>
+                </div>
+                <normal-input name="corpSeq" value="{{_corpInfo.corpSeq}}" class="hidden"></normal-input>
+            </form>
+        </paper-card>
+
+        <dialog-alert id="alert" on-confirm-ok="_onConfirmOk"></dialog-alert>
+
+    </template>
+
+    <!-- <script src="/scripts/moment.js"></script>
+    <script src="/scripts/pikaday.js"></script> -->
+    <script>
+        Polymer({
+            is: "corp-info",
+
+            behaviors: [PS.BehaviorPage],
+
+            properties: {
+                _codes: {
+                    type: Object,
+                    value: function() {
+                        return {
+                            compKind: [],
+                            corpType: [],
+                            bizSect: [],
+                        };
+                    }
+                },
+                _id: Number,
+                _corpInfo: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _isAttached: Boolean,
+                route: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    }
+                },
+            },
+
+            observers: [
+                '_routeIdChanged(routeData.id, _isAttached)'
+            ],
+
+            attached: function() {
+                this._isAttached = true;
+            },
+
+            _routeIdChanged: function(id) {
+                this._id = id;
+                this._search();
+            },
+
+            _search: function() {
+                this.$.protocolGetCorpInfo.generateRequest();
+            },
+
+            _save: function() {
+                if (this.$.corpForm.validate()) {
+                    var body = this.$.corpForm.serialize();
+                    body.bizNo = this.$.bizNo1.value + "-" + this.$.bizNo2.value + "-" + this.$.bizNo3.value;
+
+                    this.$.protocolSaveCorpInfo.body = [body];
+
+                    this.$.protocolSaveCorpInfo.generateRequest();
+                }
+            },
+
+            _delete: function() {
+                this.$.alert.type = "confirm";
+                this.$.alert.msg = "삭제하시겠습니까?";
+                this.$.alert.dialog.open();
+            },
+
+            _onConfirmOk: function() {
+                this.$.protocolDeleteCorp.generateRequest();
+            },
+
+            _formResponse: function(e) {
+                switch (e.detail.status) {
+                    case 200:
+                        this.$.alert.msg = "정상적으로 반영되었습니다.";
+                        this.$.alert.dialog.open();
+                        break;
+                    default:
+                        this.$.alert.msg = "오류가 발생했습니다.";
+                        this.$.alert.dialog.open();
+                        break;
+                }
+            },
+
+            refresh: function() {
+                if (this.$.corpForm)
+                    this.$.corpForm.reset();
+
+                this._closeOverlay();
+            },
+
+            _bizDtChanged: function(date) {
+                this.$.bizDt.value = moment(date).format("YYYY/MM/DD");
+            },
+
+            _onCorpDeleted: function(e) {
+                switch (e.detail.status) {
+                    case 200:
+                        location.href = "/corp/all";
+                        break;
+                    default:
+                        this.$.alert.type = "alert";
+                        this.$.alert.msg = "오류가 발생했습니다.";
+                        this.$.alert.dialog.open();
+                        break;
+                }
+            },
+
+            _showCorpType2: function(e) {
+                if (e.target.value == "06")
+                    this.$.corpType2.classList.remove("hidden");
+                else
+                    this.$.corpType2.classList.add("hidden");
+            },
+
+            _showBizSect2: function(e) {
+                if (e.target.value == "16")
+                    this.$.bizSect2.classList.remove("hidden");
+                else
+                    this.$.bizSect2.classList.add("hidden");
+            },
+
+            _computeCorpTypeSelection: function(code) {
+                return code == this._corpInfo.corpType ? true : false;
+            },
+
+            _computeCompKindSelection: function(code) {
+                return code == this._corpInfo.compKind ? true : false;
+            },
+
+            _computeBizSectSelection: function(code) {
+                return code == this._corpInfo.bizSect ? true : false;
+            },
+
+            _setData: function(e) {
+                this.set("_corpInfo.corpType", e.target.lastResponse.corpType);
+                this.set("_corpInfo.compKind", e.target.lastResponse.compKind);
+                this.set("_corpInfo.bizSect", e.target.lastResponse.bizSect);
+
+                this._codes = {};
+                this.$.protocolGetCorpType.generateRequest();
+                this.$.protocolGetCompKind.generateRequest();
+                this.$.protocolGetBizSect.generateRequest();
+
+                var bizNo = e.target.lastResponse.bizNo.split("-");
+                this.$.bizNo1.value = bizNo[0];
+                this.$.bizNo2.value = bizNo[1];
+                this.$.bizNo3.value = bizNo[2];
+
+                this._closeOverlay();
+            }
+        })
+    </script>
+</dom-module>

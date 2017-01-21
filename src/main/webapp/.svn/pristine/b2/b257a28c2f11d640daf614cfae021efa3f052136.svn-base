@@ -1,0 +1,373 @@
+package com.sck.modules.corp;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.sck.model.Corp;
+import com.sck.model.CorpDetail;
+import com.sck.model.CorpEmployee;
+import com.sck.model.CorpFinance;
+import com.sck.model.CorpHelp;
+import com.sck.model.CorpKpi;
+import com.sck.model.CorpKpiDepth1;
+import com.sck.model.CorpKpiDetail;
+import com.sck.model.Kpi;
+import com.sck.model.PageList;
+
+@RestController
+@RequestMapping("/api/corp")
+public class CorpController
+{
+	@Autowired
+	private CorpService service;
+	
+	/**
+	 * 기업 상세 정보 
+	 * corp_detail_all.php, corp_detail.php
+	 * @param corpSeq
+	 * @return
+	 */
+	@RequestMapping(value="/detail/{corpSeq}")
+	public CorpDetail findCorpDetail(@PathVariable("corpSeq") Integer corpSeq)
+	{
+		return service.findCorpDetail(corpSeq);
+	}
+	
+	/**
+	 * 기업 정보 목록
+	 * corp_info.php, corp_info_count.php 
+	 * @param page
+	 * @param keyword
+	 * @param corpType
+	 * @param compKind
+	 * @param bizSect
+	 * @param order
+	 * @return
+	 */
+	@RequestMapping(value="/info/find/{page}")
+	public PageList findCorpInfos(@PathVariable("page") Integer page, @RequestBody Corp param)
+	{
+		return service.findCorpInfos(page, param);
+	}
+	
+	/**
+	 * 기업 정보 목록
+	 * corp_info.php, corp_info_count.php 
+	 * @param page
+	 * @param keyword
+	 * @param corpType
+	 * @param compKind
+	 * @param bizSect
+	 * @param order
+	 * @return
+	 */
+	@RequestMapping(value="/info/find")
+	public List<Corp> findCorpInfos(@RequestBody Corp param)
+	{
+		return service.findCorpInfos(param);
+	}
+	
+	/**
+	 * 기업정보 조회 
+	 * corp_detail_info.php
+	 * @param corpSeq
+	 * @return
+	 */
+	@RequestMapping(value="/info/{corpSeq}")
+	public Corp findCorpInfo(@PathVariable("corpSeq") Integer corpSeq)
+	{
+		return service.findCorpInfo(corpSeq);
+	}
+	
+	/**
+	 * 기업 정보 저장 
+	 * corp_info_save.php
+	 * @param params
+	 * @return
+	 */
+	@RequestMapping(value="/info", method=RequestMethod.POST)
+	public int saveCorpInfo(@RequestBody List<Corp> params)
+	{
+		return service.saveCorpInfos(params);
+	}
+	
+	/**
+	 * 기업 정보 삭제
+	 * corp_info_del.php
+	 * @param corpSeq
+	 * @return
+	 */
+	@RequestMapping(value="/info/{corpSeq}", method=RequestMethod.DELETE)
+	public int deleteCorpInfo(@PathVariable("corpSeq") Integer corpSeq)
+	{
+		return service.deleteCorpInfo(corpSeq);
+	}
+	
+	/**
+	 * 기업별 최근5년 고용현황 목록
+	 * corp_detail_employee.php
+	 * @param corpSeq
+	 * @return
+	 */
+	@RequestMapping(value="/employee/{corpSeq}/last5year")
+	public List<CorpEmployee> findCorpEmployeeLast5Years(@PathVariable("corpSeq") Integer corpSeq)
+	{
+		return service.findCorpEmployeeLast5Years(corpSeq);
+	}
+	
+	/**
+	 * 기업별 현재년도 고용현황
+	 * @param corpSeq
+	 * @return
+	 */
+	@RequestMapping(value="/employee/{corpSeq}")
+	public CorpEmployee findCorpEmployee(@PathVariable("corpSeq") Integer corpSeq)
+	{
+		return service.findCorpEmployee(corpSeq);
+	}
+	
+	/**
+	 * 고용현황 저장
+	 * corp_employee_save.php
+	 * @param params
+	 * @return
+	 */
+	@RequestMapping(value="/employee", method=RequestMethod.POST)
+	public int saveCorpEmployee(@RequestBody List<CorpEmployee> params)
+	{
+		return service.saveCorpEmployees(params);
+	}
+	
+	/**
+	 * 고용현황 항목 삭제
+	 * corp_employee_del.php
+	 * @param employeeSeq
+	 * @return
+	 */
+	@RequestMapping(value="/employee/{employeeSeq}", method=RequestMethod.DELETE)
+	public int deleteCorpEmployee(@PathVariable("employeeSeq") Integer employeeSeq)
+	{
+		return service.deleteCorpEmployee(employeeSeq);
+	}
+	
+	/**
+	 * 기업별 최근10년 재무상태목록
+	 * corp_detail_finance.php
+	 * @param corpSeq
+	 * @return
+	 */
+	@RequestMapping(value="/finance/{corpSeq}/last10years")
+	public List<CorpFinance> findCorpFinanceLast10Years(@PathVariable("corpSeq") Integer corpSeq)
+	{
+		return service.findCorpFinanceLast10Years(corpSeq);
+	}
+	
+	/**
+	 * 기업별 현재년도 재무상태
+	 * @param corpSeq
+	 * @return
+	 */
+	@RequestMapping(value="/finance/{corpSeq}")
+	public CorpFinance findCorpFinance(@PathVariable("corpSeq") Integer corpSeq)
+	{
+		return service.findCorpFinance(corpSeq);
+	}
+	
+	/**
+	 * 기업 재무상태 저장
+	 * corp_finance_save.php
+	 * @param params
+	 * @return
+	 */
+	@RequestMapping(value="/finance", method=RequestMethod.POST)
+	public int saveCorpFinances(@RequestBody List<CorpFinance> params)
+	{
+		return service.saveCorpFinances(params);
+	}
+	
+	/**
+	 * 재무상태 항목 삭제
+	 * corp_finance_del.php
+	 * @param finnSeq
+	 * @return
+	 */
+	@RequestMapping(value="/finance/{finnSeq}", method=RequestMethod.DELETE)
+	public int deleteCorpFinance(@PathVariable("finnSeq") Integer finnSeq)
+	{
+		return service.deleteCorpFinance(finnSeq);
+	}
+	/**
+	 * 기업별 외부지원 최근3년 조회 
+	 * corp_detail_help.php
+	 * @param corpSeq
+	 * @return
+	 */
+	@RequestMapping(value="/help/{corpSeq}/last3year")
+	public List<CorpHelp> findCorpHelpLast3Years(@PathVariable("corpSeq") Integer corpSeq)
+	{
+		return service.findCorpHelpLast3Years(corpSeq);
+	}
+	
+	/**
+	 * 외부지원 항목 저장
+	 * corp_help_save.php
+	 * @param params
+	 * @return
+	 */
+	@RequestMapping(value="/help", method=RequestMethod.POST)
+	public int saveCorpHelps(@RequestBody List<CorpHelp> params)
+	{
+		return service.saveCorpHelps(params);
+	}
+	
+	/**
+	 * 외부지원 항목 삭제
+	 * corp_help_del.php
+	 * @param helpSeq
+	 * @return
+	 */
+	@RequestMapping(value="/help/{helpSeq}", method=RequestMethod.DELETE)
+	public int deleteCorpHelp(@PathVariable("helpSeq") Integer helpSeq)
+	{
+		return service.deleteCorpHelp(helpSeq);
+	}
+	
+	/**
+	 * 기업별 KPI목록
+	 * corp_kpi.php
+	 * @param page
+	 * @param keyword
+	 * @param corpType
+	 * @param compKind
+	 * @param bizSect
+	 * @return
+	 */
+	@RequestMapping(value="/kpi/find/{evalYear}/{page}")
+	public PageList findCorpInfoKpis(@PathVariable("evalYear") String evalYear, @PathVariable("page") Integer page, @RequestBody Corp param)
+	{
+		return service.findCorpKpis(page, evalYear, param);
+	}
+	
+	/**
+	 * 기업별 KPI목록
+	 * corp_kpi.php
+	 * @param page
+	 * @param keyword
+	 * @param corpType
+	 * @param compKind
+	 * @param bizSect
+	 * @return
+	 */
+	@RequestMapping(value="/kpi/find")
+	public List<Corp> findCorpInfoKpis(@RequestBody Corp param)
+	{
+		return service.findCorpKpis(null, param);
+	}
+	
+	/**
+	 * 기업별 KPI목록
+	 * corp_kpi.php
+	 * @param page
+	 * @param keyword
+	 * @param corpType
+	 * @param compKind
+	 * @param bizSect
+	 * @return
+	 */
+	@RequestMapping(value="/kpi/find/{evalYear}")
+	public List<Corp> findCorpInfoKpis(@PathVariable("evalYear") String evalYear, @RequestBody Corp param)
+	{
+		return service.findCorpKpis(evalYear, param);
+	}
+	
+	/**
+	 * KPI 등록,수정 
+	 * corp_kpi_save.php
+	 * @param params
+	 * @return
+	 */
+	@RequestMapping(value="/kpi", method=RequestMethod.POST)
+	public int saveCorpKpis(@RequestBody List<CorpKpi> params)
+	{
+		return service.saveCorpKpis(params);
+	}
+	
+	/**
+	 * 기업별 KPI 상세
+	 * corp_kpi_detail.php
+	 * @param corpSeq
+	 * @param evalYear
+	 * @return
+	 */
+	@RequestMapping(value="/{corpSeq}/kpi")
+	public List<CorpKpiDetail> findCorpKpiDetail(@PathVariable("corpSeq") Integer corpSeq, @RequestParam(value="evalYear",required=false) Integer evalYear)
+	{
+		return service.findCorpKpiDetail(corpSeq, evalYear);
+	}
+	
+	/**
+	 * KPI depth1 점수합산
+	 * corp_all_sum_depth1.php
+	 * @param evalYear
+	 * @return
+	 */
+	@RequestMapping(value="/kpis/depth1")
+	public List<Kpi> findKpiDepth1(@RequestParam(value="evalYear",required=false) Integer evalYear)
+	{
+		return service.findKpiDepth1(evalYear);
+	}
+	
+	/**
+	 * 연도,기업,KPI별 점수 
+	 * corp_sum_depth1_kpi.php
+	 * @param evalYear
+	 * @param depth1
+	 * @return
+	 */
+	@RequestMapping(value="/kpi/sum/{depth1}")
+	public List<CorpKpi> findCorpKpiDepth1(@RequestParam(value="evalYear",required=false) Integer evalYear, @PathVariable("depth1") String depth1)
+	{
+		return service.findCorpKpiDepth1(evalYear, depth1);
+	}
+	
+	/**
+	 * 연도,기업별 전체 KPI 목록 조회
+	 * corp_sum_depth1.php
+	 * @param evalYear
+	 * @param corpType
+	 * @param compKind
+	 * @param bizSect
+	 * @return
+	 */
+	@PreAuthorize("hasPermission('CRP00001','VIEW')")
+	@RequestMapping(value="/kpis")
+	public List<CorpKpiDepth1> findCorpKpiAllDepth(@RequestParam(value="evalYear",required=false) Integer evalYear, @RequestParam(value="corpType", required=false) String corpType, @RequestParam(value="compKind", required=false) String compKind, @RequestParam(value="bizSect", required=false) String bizSect)
+	{
+		Corp param = new Corp();
+		param.setCorpType(corpType);
+		param.setCompKind(compKind);
+		param.setBizSect(bizSect);
+		return service.findCorpKpiAllDepth(evalYear, param);
+	}
+	
+	/**
+	 * 연도별 기업 KPI 점수 목록 조회
+	 * @param corpSeq
+	 * @return
+	 */
+	@RequestMapping(value="/kpis/depth1/period")
+	public List<Map> findKpiScoreByCorp(@RequestParam("corpSeq") Integer corpSeq, @RequestParam("fromDate") String fromDate, @RequestParam("toDate") String toDate)
+	{
+		return service.findKpiScoreByCorp(corpSeq, fromDate, toDate);
+	}
+	
+}

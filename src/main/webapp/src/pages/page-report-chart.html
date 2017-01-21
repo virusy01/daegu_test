@@ -1,0 +1,246 @@
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/bower_components/iron-location/iron-location.html">
+<link rel="import" href="/src/components/behaviors/behavior-loader.html">
+<link rel="import" href="/src/pages/popup/popup-bar-chart.html">
+<link rel="import" href="/src/pages/popup/popup-pie-chart.html">
+
+<dom-module id="page-report-chart">
+<template>
+	<iron-location id="location"></iron-location>
+
+	<iron-ajax id="getData" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
+			 on-request="_startLoader"
+			   url="/api/corp/yearly-report/kpi"
+		      on-response="_drawChart">
+	</iron-ajax>
+
+	<template is="dom-if" if="{{!adminMode}}">
+	<div class="page-header">
+		<h2>성과지표 조회 <small>KPI</small></h2>
+	</div>
+	</template>
+
+	<template is="dom-if" if="{{adminMode}}">
+	<div class="row">
+		<div class="col-xs-12 text-right">
+			<button type="button" on-tap="_toList" class="btn btn-sm btn-default">목록으로</button>
+		</div>
+	</div>
+	</template>
+
+	<div class="horizontal-margin-20"></div>
+	
+	<table id="tableKPI" class="table-kpi table-bordered">
+		<thead>
+			<tr>
+				<th>성과지표</th>
+				<th>세부 성과지표</th>
+				<th>측정 방법</th>
+				<th>지표집계</th>
+				<th>평가등급</th>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+
+	<popup-bar-chart id="barChart" class="hide"></popup-bar-chart>
+	<popup-pie-chart id="pieChart" class="hide"></popup-pie-chart>
+
+</template>
+<script>
+Polymer({
+	is: 'page-report-chart',
+
+	behaviors: [Lunch.LoaderBehavior],
+
+	properties: {
+		adminMode: {
+			type: Boolean,
+			value: false
+		},
+		id: {
+			type: Number,
+			observer: '_callAPI'
+		},
+		_corpSeq: {
+			type: Number,
+			value: function() {
+				return parseInt(sessionStorage.corpSeq);
+			}
+		},
+		_data: {
+			type: Array,
+			value: function() {
+				return [];
+			}
+		},
+		_options: {
+			type: Object,
+			value: function() {
+				return {
+					k040101: {A: 'A 등급', B: 'B 등급', C: 'C 등급'},
+					k040201: {Y: '인증', N: '미인증'},
+					k070101: {Y: '시행', N: '미시행'},
+					k070102: {Y: '시행', N: '미시행'},
+					k070103: {Y: '시행', N: '미시행'},
+					k070104: {Y: '시행', N: '미시행'},
+					k070201: ['개선', '유지', '악화'],
+					k070202: ['개선', '유지', '악화'],
+					k070203: ['개선', '유지', '악화'],
+					k070204: ['개선', '유지', '악화'],
+					k070205: ['개선', '유지', '악화'],
+					k070206: ['개선', '유지', '악화']
+				};
+			}
+		},
+		_grade: {
+			type: Object,
+			value: function() {
+				return {B: 'legend-danger', W: 'legend-warning', G: 'legend-good'};
+			}
+		},
+	},
+
+	attached: function() {
+		this._callAPI();
+	},
+
+	_callAPI: function() {
+		this.$.getData.params = {
+			YEAR: moment().year(),
+			CORP_SEQ: this.id ? this.id : this._corpSeq
+		};
+		
+		this.$.getData.generateRequest();
+	},
+
+	_drawChart: function(e) {
+		this._data = e.currentTarget.lastResponse;
+
+		var table = this.$.tableKPI.querySelector('tbody');
+		var tr, th, td;
+		var startOfRow = true;
+		var startOf2ndDepth = true;
+		var prevRowNum, prev2ndDepth;
+		var row;
+
+		Polymer.dom(table).innerHTML = '';
+
+		for (var key in this._data) {
+			row = this._data[key];
+			tr = document.createElement('tr');
+
+			if (prevRowNum != row.L1_KPI_CD)
+				startOfRow = true;
+
+			if (startOfRow) {
+				startOfRow = false;
+
+				td = document.createElement('td');
+				td.setAttribute('rowspan', this._getRowCount(key, 'L1_KPI_CD'));
+				td.innerHTML = row.L1_KPI_NM;
+				Polymer.dom(tr).appendChild(td);
+			}
+
+			if (prev2ndDepth != row.L2_KPI_CD)
+				startOf2ndDepth = true;
+
+			if (startOf2ndDepth) {
+				startOf2ndDepth = false;
+
+				td = document.createElement('td');
+				td.setAttribute('rowspan', this._getRowCount(key, 'L2_KPI_CD'));
+				td.innerHTML = row.L2_KPI_NM;
+				Polymer.dom(tr).appendChild(td);
+			}
+
+			td = document.createElement('td');
+			td.setAttribute('class', 'text-left');
+			td.innerHTML = row.L3_KPI_NM;
+			Polymer.dom(tr).appendChild(td);
+
+			td = document.createElement('td');
+
+			if (this._options['k' + row.L3_KPI_CD])
+				td.innerHTML = this._options['k' + row.L3_KPI_CD][row.RESULT];
+			else
+				td.innerHTML = accounting.formatNumber(row.RESULT);
+			Polymer.dom(tr).appendChild(td);
+
+
+			td = document.createElement('td');
+			td.setAttribute('class', 'pointer');
+			td.setAttribute('row', row.L3_KPI_CD);
+			Polymer.dom(tr).appendChild(td);
+
+			switch (row.STATUS) {
+				case 'B':
+				case 'W':
+				case 'G':
+					var legend = document.createElement('div');
+					legend.setAttribute('class', this._grade[row.STATUS]);
+					Polymer.dom(td).appendChild(legend);
+					this.listen(td, 'tap', '_showPieChart');
+					break;
+				case 'NA':
+					var btn = document.createElement('button');
+					btn.setAttribute('type', 'button');
+					btn.setAttribute('class', 'btn btn-xs btn-success');
+					btn.innerHTML = '비교';
+					Polymer.dom(td).appendChild(btn);
+					<!--td.innerHTML = '비교';-->
+					this.listen(td, 'tap', '_showBarChart');
+					break;
+				default:
+					var legend = document.createElement('div');
+					legend.setAttribute('class', this._grade['B']);
+					Polymer.dom(td).appendChild(legend);
+					break;
+			}
+			
+			Polymer.dom(table).appendChild(tr);
+
+			prevRowNum = row.L1_KPI_CD;
+			prev2ndDepth = row.L2_KPI_CD;
+		}
+
+		this._stopLoader();
+	},
+
+	_getRowCount: function(rowKey, column) {
+		var cd = this._data[rowKey][column];
+		var count = 0;
+
+		while (this._data[rowKey] && this._data[rowKey][column] == cd) {
+			count++;
+			rowKey++;
+		}
+
+		return count;
+	},
+
+	_showPieChart: function(e) {
+		var chart = this.$.pieChart;
+		chart.setAttribute('row', e.currentTarget.getAttribute('row'));
+		chart.setAttribute('corp-seq', this._corpSeq);
+		chart.setAttribute('year', moment().year());
+
+		chart.classList.remove('hide');
+	},
+
+	_showBarChart: function(e) {
+		var chart = this.$.barChart;
+		chart.setAttribute('row', e.currentTarget.getAttribute('row'));
+		chart.setAttribute('corp-seq', this.adminMode ? this.id : this._corpSeq);
+		chart.setAttribute('year', moment().year());
+
+		chart.classList.remove('hide');
+	},
+
+	_toList: function(e) {
+		this.$.location.path = '/app/center-kpi/list/';
+	},	
+});
+</script>
+</dom-module>

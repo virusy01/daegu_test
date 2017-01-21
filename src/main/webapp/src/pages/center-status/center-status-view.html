@@ -1,0 +1,197 @@
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="/bower_components/iron-location/iron-location.html">
+
+<link rel="import" href="/src/pages/page-general.html">
+<link rel="import" href="/src/pages/page-employment.html">
+
+<link rel="import" href="/src/components/common/normal-select.html">
+
+<dom-module id="center-status-view">
+<template>
+	<iron-location id="location"></iron-location>
+	
+	<div class="row">
+		<div class="col-xs-12 text-right">
+			<button type="button" on-tap="_toList" class="btn btn-sm btn-default">목록으로</button>
+		</div>
+	</div>
+
+	<div class="horizontal-margin-20"></div>
+
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">일반현황</h3>
+	  </div>
+	  <div class="panel-body">
+	    <page-general admin-mode="true" read-id="{{id}}"></page-general>
+	  </div>
+	</div>
+
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">고용현황</h3>
+	  </div>
+	  <div class="panel-body">
+		  <page-employment admin-mode="true" read-id="{{id}}"></page-employment>
+	  </div>
+	</div>
+
+
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">월간 운영실적</h3>
+	  </div>
+	  <div class="panel-body">
+		<div class="row">
+			<div class="col-xs-2">
+				<normal-select id="year" value="{{_year}}" items="{{_yearList}}"></normal-select>
+			</div>
+			<div class="col-xs-2">
+				<button on-tap="_getData" class="btn btn-sm btn-primary">재조회</button>
+			</div>
+		</div>
+		<ul id="pageTab" class="nav nav-tabs">
+			<li name="income" role="presentation" on-tap="_changeTab"><a href="#">수입현황</a></li>
+			<li name="expense" role="presentation" on-tap="_changeTab"><a href="#">비용현황</a></li>
+			<li name="employment" role="presentation" on-tap="_changeTab"><a href="#">고용현황</a></li>
+			<li name="contribution" role="presentation" on-tap="_changeTab"><a href="#">사회적 공헌 활동 실적</a></li>
+			<li name="monthly" role="presentation" on-tap="_changeTab"><a href="#">월별 운영실적</a></li>
+			<li name="summary" role="presentation" on-tap="_changeTab"><a href="#">요약</a></li>
+		</ul>
+
+		<iron-pages id="reportTabs" role="monthly-tab" selected="[[tab]]" attr-for-selected="name">
+			<report-income name="income" year="[[_year]]" read-id="{{id}}"></report-income>
+			<report-expense name="expense" year="[[_year]]" read-id="{{id}}"></report-expense>
+			<report-employment name="employment" year="[[_year]]" read-id="{{id}}"></report-employment>
+			<report-contribution name="contribution" year="[[_year]]" read-id="{{id}}"></report-contribution>
+			<report-monthly name="monthly" year="[[_year]]" read-id="{{id}}"></report-monthly>
+			<report-summary name="summary" year="[[_year]]" read-id="{{id}}"></report-summary>
+		</iron-pages>
+	  </div>
+	</div>
+
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">연간 운영실적</h3>
+	  </div>
+	  <div class="panel-body">
+		<div class="row">
+			<div class="col-xs-2">
+				<normal-select value="{{_yearForYearly}}" items="{{_yearList}}"></normal-select>
+			</div>
+			<div class="col-xs-2">
+				<button on-tap="_getDataYearly" class="btn btn-sm btn-primary">재조회</button>
+			</div>
+		</div>
+		<ul id="pageTabYearly" class="nav nav-tabs">
+			<li name="economic" on-tap="_changeYearlyTab"><a href="#">경제적 가치</a></li>
+			<li name="devotion" on-tap="_changeYearlyTab"><a href="#">사회혁신 노력</a></li>
+			<li name="capability" on-tap="_changeYearlyTab"><a href="#">사업역량개발 노력</a></li>
+		</ul>
+
+		<iron-pages id="reportTabsYearly" role="yearly-tab" selected="[[tabYearly]]" attr-for-selected="name">
+			<report-economic name="economic" read-id="{{id}}"></report-economic>
+			<report-devotion name="devotion" read-id="{{id}}"></report-devotion>
+			<report-capability name="capability" read-id="{{id}}"></report-capability>
+		</iron-pages>
+	  </div>
+	</div>
+
+</template>
+<script>
+Polymer({
+	is: 'center-status-view',
+
+	properties: {
+		id: Number,
+		tab: {
+			type: String,
+			value: 'income',
+			observer: "_selectTab"
+		},
+		tabYearly: {
+			type: String,
+			observer: '_selectTabYearly'
+		},
+		_yearList: {
+			type: Array,
+			value: function() {
+				var list = [];
+
+				for (var i = 2013; i <= 2030; i++) {
+					list.push({cdNm:i, cd:i});
+				}
+
+				return list;
+			}
+		},
+		_year: {
+			type: Number,
+			value: function() {
+				return moment().year();
+			}
+		},
+		_yearForYearly: {
+			type: Number,
+			value: function() {
+				return moment().year();
+			}
+		},
+	},
+
+	attached: function() {
+		this.async(function() {
+			this.tabYearly = 'economic';
+		}, 1000);
+	},
+
+	_changeTab: function(e) {
+		var name = e.currentTarget.getAttribute('name');
+
+		this.tab = name;
+	},
+
+	_changeYearlyTab: function(e) {
+		var name = e.currentTarget.getAttribute('name');
+		this.tabYearly = name;
+	},
+
+	_selectTab: function(newValue, oldValue) {
+		var newTab = this.$.pageTab.querySelector("li[name='" + newValue + "']");
+		var oldTab = this.$.pageTab.querySelector("li[name='" + oldValue +"']");
+
+		newTab.classList.add('active');
+		if (oldTab) 
+			oldTab.classList.remove('active');
+
+		this.importHref(
+			this.resolveUrl('/src/pages/report/report-' + newValue + '.html'), null, null, true);
+	},
+
+	_selectTabYearly: function(newValue, oldValue) {
+		var newTab = this.$.pageTabYearly.querySelector("li[name='" + newValue + "']");
+		var oldTab = this.$.pageTabYearly.querySelector("li[name='" + oldValue +"']");
+
+		newTab.classList.add('active');
+		if (oldTab) 
+			oldTab.classList.remove('active');
+
+		this.importHref(
+			this.resolveUrl('/src/pages/report/report-' + newValue + '.html'), null, null, true);
+	},
+
+
+	_getData: function(e) {
+		this.$.reportTabs.selectedItem.requestData();
+	},
+
+	_getDataYearly: function(e) {
+		this.$.reportTabsYearly.selectedItem.requestData();
+	},
+
+	_toList: function(e) {
+		this.$.location.path = '/app/center-status/list/';
+	},
+});
+</script>
+</dom-module>

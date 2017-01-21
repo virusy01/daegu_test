@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="snp.example.biz2.Biz2Repo">
+    <select id="list" resultType="hashmap">
+		SELECT TABLE_NAME AS TABLE_NAME, 'TABLE' AS TABLE_TYPE FROM ALL_TABLES WHERE OWNER = #{user}
+		UNION ALL
+        SELECT VIEW_NAME AS TABLE_NAME, 'VIEW' AS TABLE_TYPE FROM ALL_VIEWS  WHERE OWNER = #{user}
+        ORDER BY TABLE_NAME
+	</select>
+</mapper>

@@ -1,0 +1,87 @@
+<!--
+ * @Desc 위젯 스타일
+ * @Author patrick.sung
+ * @Created 2016-03-28
+ -->
+
+<dom-module id="gp-widget-style">
+    <template>
+        <style>
+            :host {
+                --widget-titleBar-height: 26px;
+
+                background-color: #fff;
+                display: block;
+                border: 1px solid #d6d6d6;
+                cursor: auto;
+                display: inline-block;
+                border-radius: 4px;
+                box-shadow: 0px 1px 1px #999;
+            }
+
+            #titleBar {
+                width: 100%;
+                height: var(--widget-titleBar-height);
+                background-color: #fff;
+                text-align: right;
+                cursor: move;
+                color: white;
+                font-size: 11px;
+                display: table;
+                line-height: 120%;
+            }
+
+            #titleBar span {
+                font-size: 12px;
+                color: #555;
+                float: left;
+                margin: 9px 15px 0px 15px;
+                max-width: 30ch;
+                white-space: nowrap;
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+            }
+
+            #titleBar div {
+                width: 16px;
+                height: 16px;
+                text-align: center;
+                vertical-align: middle;
+                margin: 7px 5px 0px 0px;
+                cursor: pointer;
+            }
+
+            #titleBar div:last-child {
+                margin-right: 15px;
+            }
+
+            #handle {
+                position: absolute;
+                width: 7px;
+                height: 7px;
+                right: 0;
+                bottom: 0;
+                background: url('img/handle.png') no-repeat;
+                cursor: se-resize;
+            }
+
+            /* Widget Close btn */
+            #closeBtn {
+                background: transparent url('img/btn_wgt_close_N.png') no-repeat right top;
+            }
+
+            #closeBtn:hover {
+                background: transparent url('img/btn_wgt_close_H.png') no-repeat right top;
+            }
+
+            #settingsBtn {
+                background: url('img/btn_wgt_edit_N.png') no-repeat right top;
+            }
+
+            #settingsBtn:hover {
+                background: url('img/btn_wgt_edit_H.png') no-repeat right top;
+            }
+        </style>
+    </template>
+</dom-module>

@@ -1,0 +1,74 @@
+<link rel="import" href="/bower_components/iron-input/iron-input.html" />
+<link rel="import" href="/bower_components/iron-validatable-behavior/iron-validatable-behavior.html" />
+<link rel="import" href="/bower_components/iron-form-element-behavior/iron-form-element-behavior.html">
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+
+<link rel="import" href="../style/bootstrap-style.html" />
+
+<dom-module id="normal-input">
+    <template>
+        <style include="bootstrap-style"></style>
+        <div id="container" class="">
+            <input id="input" type="{{type}}" is="iron-input" class="form-control" bind-value="{{value}}" placeholder="{{placeholder}}" required="{{required}}" max-length="{{maxlength}}" />
+            <span class="glyphicon form-control-feedback">
+                <iron-icon id="icon" icon="close" class="hide"></iron-icon>
+            </span>
+        </div>
+    </template>
+    <script>
+        Polymer({
+            is: 'normal-input',
+
+            behaviors: [Polymer.IronFormElementBehavior, Polymer.IronValidatableBehavior],
+
+            properties: {
+                name: String,
+                type: {
+                    type: String,
+                    observer: '_assignType'
+                },
+                value: {
+                    type: String,
+                    notify: true
+                },
+                placeholder: {
+                    type: String
+                },
+                maxlength: Number,
+                required: {
+                    type: Boolean,
+                    value: false
+                }
+            },
+
+            _assignType: function(value) {
+                if (value == "number")
+                    this.$.input.allowedPattern = "[0-9]";
+            },
+
+            _getValidity: function() {
+                if (this.required) {
+                    this._toggleErrorGraphic(!!this.value ? false : true);
+                    return !!this.value;
+                }
+                return true;
+            },
+
+            _toggleErrorGraphic: function(flag) {
+                if (flag) {
+                    this.$.container.classList.add("has-error");
+                    this.$.container.classList.add("has-feedback");
+                    this.$.icon.classList.remove("hide");
+                }else {
+                    this.$.container.classList.remove("has-error");
+                    this.$.container.classList.remove("has-feedback");
+                    this.$.icon.classList.add("hide");
+                }
+            },
+
+            _invalidChanged: function() {
+                this._toggleErrorGraphic(this.invalid ? true: false);
+            }
+        })
+    </script>
+</dom-module>

@@ -1,0 +1,244 @@
+package com.sck.modules.common;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.sck.model.Code;
+import com.sck.model.Menu;
+import com.sck.model.MenuHierarchy;
+import com.sck.model.Role;
+import com.sck.model.RoleMenu;
+
+@Service
+public class CommonService {
+
+	@Autowired
+	private CommonRepository repository;
+	
+	public List<Code> findCodes(String grpCd)
+	{
+		return repository.findCodes(grpCd);
+	}
+	
+	/**
+	 * get all menus hierarchy
+	 * @return
+	 */
+	public MenuHierarchy findAllMenus()
+	{
+		List<MenuHierarchy> targets = repository.findMenus();
+		MenuHierarchy root = new MenuHierarchy("ROOT");
+		root.setUrl("/");
+		buildHierarchyMenu(root, targets);
+		setFirstChild(root);
+		return root;
+	}
+	
+	private static synchronized void buildHierarchyMenu(MenuHierarchy parentMenu, List<MenuHierarchy> targets)
+	{
+		for(MenuHierarchy t : targets)
+		{
+			if(t.getParentMenuCd() != null && t.getParentMenuCd().equals(parentMenu.getMenuCd()))
+			{
+				if(parentMenu.getChildren() == null)
+				{
+					parentMenu.setChildren(new ArrayList<MenuHierarchy>());
+				}
+				parentMenu.getChildren().add(t);
+				if(parentMenu.getUrl() == null)
+				{
+					parentMenu.setUrl(t.getUrl());
+				}
+				buildHierarchyMenu(t, targets);
+			}
+		}
+	}
+	
+	//상위 메뉴의 URL이 null인경우 첫번째 URL이 있는 메뉴의 URL을 설정해준다.
+	private static synchronized void setFirstChild(MenuHierarchy parentMenu)
+	{
+		List<MenuHierarchy> topChilds = parentMenu.getChildren();
+		if(topChilds == null)
+		{
+			return;
+		}
+		for (MenuHierarchy top : topChilds)
+		{
+			setFirstChild(top);
+			if(parentMenu.getUrl() == null && top.getUrl() != null)
+			{
+				parentMenu.setUrl(top.getUrl());
+				parentMenu.setUrlParam(top.getUrlParam());
+				break;
+			}
+		}
+	}
+	
+	/**
+	 * find menu
+	 * @param menuCd
+	 * @return
+	 */
+	public Menu findMenu(String menuCd)
+	{
+		return repository.findMenu(menuCd);
+	}
+	
+	/**
+	 * get menus by parent
+	 * @param parentMenuCd
+	 * @return
+	 */
+	public List<Menu> findMenusByParent(String parentMenuCd)
+	{
+		return repository.findMenusByParent(parentMenuCd);
+	}
+	
+	/**
+	 * get dup menucd count
+	 * @param menuCd
+	 * @return
+	 */
+	public int findMenuCd(String menuCd)
+	{
+		return repository.findMenuCd(menuCd);
+	}
+	
+	/**
+	 * insert menu
+	 * @param p
+	 * @return
+	 */
+	public int insertMenu(Menu p)
+	{
+		return repository.insertMenu(p);
+	}
+	
+	/**
+	 * update menu
+	 * @param p
+	 * @return
+	 */
+	public int updateMenu(Menu p)
+	{
+		return repository.updateMenu(p);
+	}
+	
+	/**
+	 * delete menu
+	 * @param menuCd
+	 * @return
+	 */
+	/*
+	public synchronized void deleteMenu(String menuCd)
+	{
+		List<Menu> childMenus = repository.findMenusByParent(menuCd);
+		repository.deleteRoleMenu(null, menuCd);
+		repository.deleteMenu(menuCd);
+		for(Menu m : childMenus)
+		{
+			deleteMenu(m.getMenuCd());
+		}
+	}
+	*/
+	public int deleteMenu(String menuCd)
+	{
+		deleteChildMenus(repository, menuCd);
+		return 1;
+	}
+	
+	private static synchronized void deleteChildMenus(CommonRepository repository, String parentMenuCd)
+	{
+		repository.deleteRoleMenu(null, parentMenuCd);
+		repository.deleteMenu(parentMenuCd);
+		List<Menu> childMenus = repository.findMenusByParent(parentMenuCd);
+		for(Menu m : childMenus)
+		{
+			deleteChildMenus(repository, m.getMenuCd());
+		}
+	}
+	
+	/**
+	 * get all roles
+	 * @return
+	 */
+	public List<Role> findRoles()
+	{
+		return repository.findRoles();
+	}
+	
+	/**
+	 * get role
+	 * @param roleCd
+	 * @return
+	 */
+	public Role findRole(String roleCd)
+	{
+		return repository.findRole(roleCd);
+	}
+	
+	/**
+	 * get role menus
+	 * @param roleCd
+	 * @return
+	 */
+	public List<MenuHierarchy> findRoleMenu(String roleCd)
+	{
+		return repository.findRoleMenu(roleCd);
+	}
+	
+	/**
+	 * get dup rolecd count
+	 * @param roleCd
+	 * @return
+	 */
+	public int findRoleCd(String roleCd)
+	{
+		return repository.findRoleCd(roleCd);
+	}
+	
+	/**
+	 * 
+	 * @param p
+	 * @return
+	 */
+	public int insertRole(Role p)
+	{
+		if(p.isBasic())
+		{
+			repository.disableBasicRoles();
+		}
+		return repository.insertRole(p);
+	}
+	
+	public int updateRole(Role p)
+	{
+		Role r = repository.findRole(p.getRoleCd());
+		if(!r.isBasic() && p.isBasic())
+		{
+			repository.disableBasicRoles();
+		}
+		return repository.updateRole(p);
+	}
+	
+	public int deleteRole(String roleCd)
+	{
+		repository.deleteRoleUser(roleCd, null);
+		repository.deleteRoleMenu(roleCd, null);
+		return repository.deleteRole(roleCd);
+	}
+	
+	public int saveRoleMenu(RoleMenu p)
+	{
+		repository.deleteRoleMenu(p.getRoleCd(), null);
+		for(String menuCd : p.getMenuCd())
+		{
+			repository.insertRoleMenu(p.getRoleCd(), menuCd);
+		}
+		return 1;
+	}
+	
+}

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>광명시 사회적기업 성과관리시스템</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- MetisMenu CSS -->
+    <link href="../bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="../bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <style>
+
+        .barNum {
+            font-size: 9pt;
+            text-anchor: middle;
+        }
+        .axis text {
+            font-family: sans-serif;
+            font-size: 11px;
+        }
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: black;
+        }
+        .category {
+            font-size: 12pt;
+            text-anchor: middle;
+        }
+
+        .tip {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            z-index: 9999;
+            visibility: hidden;
+            border: 1px solid #666666;
+            background-color: #FFFFD4;
+            overflow: hidden;
+            padding: 8px;
+            text-align: left;
+            font-size: 9pt;
+            color: #111111;
+            border-radius: 4px;
+        }
+
+
+        .nav-tabs2 {
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .nav-tabs2 > li {
+            float: left;
+            margin-bottom: -1px;
+        }
+        .nav-tabs2 > li > a {
+            margin-right: 0px;
+            line-height: 1.42857143;
+            border: 0px solid transparent;
+            border-radius: 0px 0px 0 0;
+            background-color: transparent;
+            font-size: 13px;
+            color:#5c5c5c;
+        }
+        .nav-tabs2 > li > a:hover {
+            border-color: #eee #eee #ddd;
+            background-color: #eee;
+            border: 0px solid #ddd;
+        }
+        .nav-tabs2 > li > a:focus {
+            color: #555;
+            cursor: default;
+            background-color: #fff;
+            border: 0px solid #ddd;
+            border-bottom-color: transparent;
+        }
+
+        .nav-tabs2 > li.active > a,
+        .nav-tabs2 > li.active > a:hover,
+        .nav-tabs2 > li.active > a:focus {
+            color: #fff;
+            cursor: default;
+            background-color: #46b8da;
+            border: 0px solid #ddd;
+            border-bottom-color: transparent;
+            font-size: 13px;
+            font-family: 'NanumBarunGothicBold' , sans-serif;
+        }
+
+
+    </style>
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../js/jquery-1.11.1.min.js"></script>
+    <script src="../js/jquery.form.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../dist/js/sb-admin-2.js"></script>
+
+    <script src="../js/d3.min.js"></script>
+
+    <script src="../js/SimpleBarChart.js"></script>
+    <script src="../js/RadarChart.js"></script>
+    <script src="./common_js/SelectBuilder.js"></script>
+    <script src="../js/Pagenator.js"></script>
+    <script src="./my_js/corp_kpi.js"></script>
+</head>
+<body>
+</body>
+</html>

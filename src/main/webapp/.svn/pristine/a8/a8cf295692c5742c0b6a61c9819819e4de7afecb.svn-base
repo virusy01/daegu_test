@@ -1,0 +1,453 @@
+<!--
+ * @Desc 기본 텍스트필드
+ * @Author patrick.sung
+ * @Created 2016-03-28
+ -->
+
+<link rel="import" href="/bower_components/iron-input/iron-input.html"/>
+<link rel="import" href="/bower_components/iron-validatable-behavior/iron-validatable-behavior.html"/>
+<link rel="import" href="/bower_components/iron-form-element-behavior/iron-form-element-behavior.html" />
+<link rel="import" href="gp-text-field-style.html"/>
+
+<dom-module id="gp-text-field">
+    <template>
+        <style include="gp-text-field-style">
+            :host {
+                --text-field-border-color: #b8b8b8;
+
+                border: 1px solid var(--text-field-border-color);
+                height: 23px;
+                display: inline-flex;
+                vertical-align: top;
+            }
+
+            .blockArea {
+                height: 100%;
+                display: inline-block;
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+                vertical-align: middle;
+                white-space: nowrap;
+            }
+
+            .block {
+                font-size: 11px;
+                background-color: #eeeeee;
+                text-align: center;
+                line-height: 100%;
+                padding: 4px 6px;
+            }
+
+            .prefixBlock {
+                border-right: 1px solid var(--text-field-border-color);
+            }
+
+            .suffixBlock {
+                border-left: 1px solid var(--text-field-border-color);
+            }
+
+            input {
+                border: 0;
+                outline: none;
+                height: 100%;
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+                vertical-align: middle;
+                padding: 0 4px;
+                width: 100%;
+                ime-mode: var(--input-ime-mode, 'auto');
+            }
+
+            input[required] {
+                background: #fff url('img/comp_flag.png') no-repeat left top;
+            }
+
+            input[hover],
+            input[selected],
+            input[focused],
+            input:focus,
+            input:hover,
+            input:active {
+                border-color: #c00c3f !important;
+                outline-color: #c00c3f !important;
+            }
+
+            input[readonly] {
+                background-color: #f7f7f7;
+            }
+
+            .hidden {
+                display: none;
+            }
+        </style>
+
+        <span id="prefixBlock" class="block blockArea prefixBlock hidden"></span><input id="input" is="iron-input"
+                                                                                        allowed-pattern="[[allowedPattern]]"
+                                                                                        bind-value="{{bindValue}}"
+                                                                                        disabled$="{{disabled}}"
+                                                                                        autofocus$="[[autoFocus]]"
+                                                                                        required$="[[required]]"
+                                                                                        readonly$="{{readonly}}"/><span
+            id="clearBlock"
+            class$="blockArea hidden {{clearClass}}"></span><span id="suffixBlock"
+                                                                  class="block blockArea suffixBlock hidden"></span>
+    </template>
+
+    <script src="js/JavaScriptUtil.js"></script>
+    <script src="js/Parsers.js"></script>
+    <script src="js/InputMask.js"></script>
+    <script>
+        Polymer({
+            is: 'gp-text-field',
+
+            behaviors: [Polymer.IronValidatableBehavior, Polymer.IronFormElementBehavior],
+
+            properties: {
+                type: {
+                    type: String,
+                    value: 'text'
+                },
+                allow: String,
+                mask: String,
+                textAlign: {
+                    type: String,
+                    value: 'left'
+                },
+                allowedPattern: String,
+                hidden: {
+                    type: Boolean,
+                    value: false,
+                    observer: '_onToggleVisibility'
+                },
+                disabled: {
+                    type: Boolean,
+                    value: false,
+                    observer: '_onToggleDisabledReadonly'
+                },
+                readonly: {
+                    type: Boolean,
+                    value: false,
+                    observer: '_onToggleDisabledReadonly'
+                },
+                placeholder: String,
+                autoFocus: {
+                    type: Boolean,
+                    value: false
+                },
+                bindValue: {
+                    type: String,
+                    observer: '_onBindValueChange'
+                },
+                validator: String,
+                locale: {
+                    type: String,
+                    value: 'kr'
+                },
+                prefixText: String,
+                suffixText: String,
+                maxLength: Number,
+                showThousands: {
+                    type: Boolean,
+                    value: false
+                },
+                thousandsSeparator: {
+                    type: String,
+                    value: ','
+                },
+                decimalPlaces: {
+                    type: Number,
+                    value: 0
+                },
+                decimalSeparator: {
+                    type: String,
+                    value: '.'
+                },
+                dateFormat: {
+                    type: String,
+                    value: 'MM/dd yyyy'
+                },
+                required: {
+                    type: Boolean,
+                    value: false,
+                    observer: '_onRequiredChange'
+                },
+                allowNegative: {
+                    type: Boolean,
+                    value: false
+                },
+                autoUppercase: {
+                    type: Boolean,
+                    value: false
+                },
+                autoLowercase: {
+                    type: Boolean,
+                    value: false
+                },
+                enableIcon: {
+                    type: Boolean,
+                    value: false
+                },
+                iconClass: {
+                    type: String,
+                    value: 'iconMagnify'
+                },
+                clearClass: {
+                    type: String,
+                    value: 'iconClose'
+                },
+                imeMode: {
+                    type: String,
+                    observer: '_changeIME'
+                },
+                _maskObj: String,
+                _numberValue: Number,
+                name: {
+                    type: String,
+                    notify: true
+                },
+                value: {
+                    type: String,
+                    notify: true
+                }
+
+            },
+
+            ready: function () {
+                if (this.placeholder)
+                    this.$.input.setAttribute('placeholder', this.placeholder);
+
+                this.listen(this.$.input, 'keyup', '_onKeyupBindValueForTwoWay');
+
+                if (this.thousandsSeparator && this.thousandsSeparator.toLowerCase() == 'space')
+                    this.thousandsSeparator = ' ';
+            },
+
+            attached: function () {
+                this.setType();
+
+                if (this.mask)
+                    this.assignMask();
+
+                if (this.textAlign)
+                    this.alignText();
+
+                if (this.maxLength)
+                    this.limitLength();
+
+                if (this.prefixText)
+                    this.setPrefixBlock();
+
+                if (this.suffixText)
+                    this.setSuffixBlock();
+
+                if (!this.disabled && !this.readonly) {
+                    if (this.enableIcon)
+                        this.toggleIconAval(true);
+
+                    this.toggleClearIconAval(true);
+                }
+            },
+
+            _onMouseHoverHandle: function (e) {
+                if (!this.disabled && !this.readonly) {
+                    if (e.type == 'mouseover' && this.bindValue) {
+                        this.$.clearBlock.classList.remove('hidden');
+                    } else if (e.type == 'mouseout') {
+                        this.$.clearBlock.classList.add('hidden');
+                    }
+                }
+            },
+
+            _onClearBlockTap: function (e) {
+                if (!e.target.classList.contains('hidden')) {
+                    this.bindValue = '';
+                    this.fire('clear');
+                }
+            },
+
+            setType: function () {
+                switch (this.type) {
+                    case 'text':
+                        if (this.autoUppercase || this.autoLowercase)
+                            this.listen(this.$.input, 'input', '_onTextInputAutoCaseFormat');
+                    case 'password':
+                        this.restrict();
+                        this.$.input.setAttribute('type', this.type);
+                        break;
+                    case 'number':
+                        var parser = new NumberParser(this.decimalPlaces, this.decimalSeparator, this.showThousands ? this.thousandsSeparator : '', true);
+
+                        if (this._maskObj) {
+                            this._maskObj.parser.decimalDigits = this.decimalPlaces;
+                            this._maskObj.parser.decimalSeparator = this.decimalSeparator;
+                            this._maskObj.parser.groupSeparator = this.thousandsSeparator;
+                            this.bindValue = this._maskObj.parser.format(accounting.unformat(this.value));
+                        } else {
+                            this._maskObj = new NumberMask(parser, this.$.input);
+                            this._maskObj.leftToRight = true;
+                            this._maskObj.allowNegative = this.allowNegative;
+                            this._maskObj.update();
+                        }
+                        break;
+                    case 'date':
+                        this._maskObj = new DateMask(this.dateFormat, this.$.input);
+                        this._maskObj.update();
+                        break;
+                    case 'bn':
+                        this._maskObj = new InputMask('###-##-#####', this.$.input);
+                        this._maskObj.update();
+                        break;
+                }
+            },
+
+            restrict: function () {
+                if (this.allow) {
+                    var regExp = ' ';
+
+                    if (this.allow.indexOf('num') != -1) {
+                        regExp += '0-9';
+                    }
+
+                    if (this.allow.indexOf('en') != -1)
+                        regExp += 'a-zA-Z';
+
+                    if (this.allow.indexOf('kr') != -1)
+                        regExp += 'ㄱ-ㅎ가-힣';
+
+                    if (this.allow.indexOf('punc') != -1)
+                        regExp += '!”$%&’()@#*\+,\/;\[\\\]\^_`{|}~:\.<>\?=\'"\-';
+
+                    if (regExp) {
+                        regExp = '[' + regExp + ']';
+
+                        this.$.input.setAttribute('allowed-pattern', regExp);
+                        this.$.input.setAttribute('prevent-invalid-input', '');
+                    }
+                }
+            },
+
+            assignMask: function () {
+                this._maskObj = new InputMask(this.mask, this.$.input);
+                this._maskObj.update();
+            },
+
+            alignText: function () {
+                this.$.input.setAttribute('style', 'text-align:' + this.textAlign);
+            },
+
+            limitLength: function () {
+                if (!this._maskObj) {
+                    if (this.type != 'number') {
+                        this.$.input.maxLength = this.maxLength;
+                    } else {
+                        this.$.input.setAttribute('max', 9 * Math.pow(10, (this.maxLength - 1)));
+                    }
+                } else {
+                    this.$.input.maxLength = this.maxLength;
+                }
+            },
+
+            setPrefixBlock: function () {
+                this.$.prefixBlock.textContent = this.prefixText;
+                this.$.prefixBlock.classList.remove('hidden');
+            },
+
+            setSuffixBlock: function () {
+                this.$.suffixBlock.textContent = this.suffixText;
+                this.$.suffixBlock.classList.remove('hidden');
+            },
+
+            toggleIconAval: function (doSet) {
+                if (doSet) {
+                    this.$.suffixBlock.classList.remove('hidden');
+                    this.$.suffixBlock.classList.remove('block');
+                    this.$.suffixBlock.classList.remove('suffixBlock');
+                    this.$.suffixBlock.classList.add(this.iconClass);
+
+                    this.listen(this.$.suffixBlock, 'tap', '_onIconTap');
+                } else {
+                    this.$.suffixBlock.classList.add('hidden');
+                    this.unlisten(this.$.suffixBlock, 'tap', '_onIconTap');
+                }
+            },
+
+            toggleClearIconAval: function (doSet) {
+                if (doSet) {
+                    this.listen(this, 'mouseover', '_onMouseHoverHandle');
+                    this.listen(this, 'mouseout', '_onMouseHoverHandle');
+                    this.listen(this.$.clearBlock, 'tap', '_onClearBlockTap');
+                } else {
+                    this.unlisten(this, 'mouseover', '_onMouseHoverHandle');
+                    this.unlisten(this, 'mouseout', '_onMouseHoverHandle');
+                    this.unlisten(this.$.clearBlock, 'tap', '_onClearBlockTap');
+                }
+            },
+
+            _onIconTap: function () {
+                this.fire('icon-tap');
+            },
+
+            _onNumberInputLimitDecimal: function () {
+                if (new RegExp('[\\d*]?\\.\\d{' + (this.decimalPlaces + 1) + ',}$').test(this.$.input.value)) {
+                    this.$.input.value = this.$.input.value.substr(0, this.$.input.value.indexOf('.') + (this.decimalPlaces + 1));
+                }
+            },
+
+            _onKeyupBindValueForTwoWay: function (e) {
+                this.$.input.bindValue = this.value;
+            },
+
+            _onTextInputAutoCaseFormat: function (e) {
+                this.$.input.value = this.autoUppercase ? this.$.input.value.toUpperCase() : this.$.input.value.toLowerCase();
+            },
+
+            _onBindValueChange: function (value) {
+                if (this.type == 'number') {
+                    this.bindValue = value;
+                }
+                this.value = value;
+            },
+
+            update: function () {
+                this.setType();
+            },
+
+            _onToggleDisabledReadonly: function (value) {
+                if (this.enableIcon)
+                    this.toggleIconAval(!value);
+
+                this.toggleClearIconAval(!value);
+            },
+
+            focus: function () {
+                this.$.input.focus();
+            },
+
+            _changeIME: function(value) {
+                this.customStyle['--input-ime-mode'] = value;
+                this.updateStyles();
+            },
+
+            _onToggleVisibility: function(value) {
+                if (value)
+                    this.classList.add('hide');
+                else
+                    this.classList.remove('hide');
+            },
+
+            _onRequiredChange: function(value) {
+            	Polymer.updateStyles();
+            },
+
+            // get value() {
+            //     return this.$.input.value;
+            // },
+
+            get number() {
+                return this._maskObj ? this._maskObj.getAsNumber() : this.bindValue;
+            }
+        })
+    </script>
+</dom-module>

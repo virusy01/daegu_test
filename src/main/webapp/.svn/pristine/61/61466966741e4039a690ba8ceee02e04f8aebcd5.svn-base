@@ -1,0 +1,70 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-dialog/paper-dialog.html" />
+<link rel="import" href="/bower_components/neon-animation/animations/fade-in-animation.html" />
+<link rel="import" href="/bower_components/neon-animation/animations/fade-out-animation.html" />
+
+<dom-module id="dialog-alert">
+    <template>
+        <style>
+            paper-dialog {
+                font-size: 12px;
+            }
+
+            #alert-dialog {
+                padding: 20px;
+            }
+
+            #confirm-dialog {
+              padding: 20px 20px 10px 20px;
+            }
+
+            .buttons {
+              margin-top: 10px !important;
+            }
+        </style>
+
+        <paper-dialog id="alert-dialog" entry-animation="fade-in-animation" exit-animation="fade-out-animation" on-iron-overlay-opened="_onOpened" always-on-top no-overlap>
+            [[msg]]
+        </paper-dialog>
+
+        <paper-dialog id="confirm-dialog" entry-animation="fade-in-animation" exit-animation="fade-out-animation" on-iron-overlay-closed="_onConfirmClose" always-on-top no-overlap>
+            [[msg]]
+            <div class="buttons">
+                <paper-button dialog-confirm>확인</paper-button>
+                <paper-button dialog-dismiss>취소</paper-button>
+            </div>
+        </paper-dialog>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'dialog-alert',
+
+            properties: {
+                msg: String,
+                type: {
+                    type: String,
+                    observer: "_onTypeChanged",
+                    value: "alert"
+                },
+                dialog: Object
+            },
+
+            _onTypeChanged: function(type) {
+                this.dialog = this.$[type + "-dialog"];
+            },
+
+            _onOpened: function() {
+                setTimeout(function() {
+                    this.dialog.close();
+                }.bind(this), 1000);
+            },
+
+            _onConfirmClose: function(e) {
+                if (e.detail.confirmed)
+                    this.fire("confirm-ok");
+            }
+        })
+    </script>
+</dom-module>

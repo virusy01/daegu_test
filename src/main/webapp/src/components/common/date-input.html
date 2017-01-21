@@ -1,0 +1,125 @@
+<dom-module id="date-input">
+        <template>
+    <div id="container">
+	    <div class="input-group">
+		    <input id="dummy" is="iron-input" class="form-control input-sm" placeholder="{{placeholder}}" required="{{required}}" readonly />
+		    <span class="glyphicon form-control-feedback">
+			<iron-icon id="icon" icon="close" class="hide"></iron-icon>
+		    </span>
+		    <div id="addon" class="input-group-addon input-sm"><i class="fa fa-calendar" aria-hidden="true"></i></div>
+	    </div>
+	    <input id="input" is="iron-input" class="hide" bind-value="{{value}}"/> 
+        </div>
+    </template>
+
+        <script src="js/moment.js"></script>
+        <script src="js/pikaday.js"></script>
+        <script>
+                Polymer({
+                        is: 'date-input',
+
+                        behaviors: [Polymer.IronFormElementBehavior, Polymer.IronValidatableBehavior],
+
+                        properties: {
+                                name: String,
+                                type: {
+                                        type: String,
+                                        observer: '_assignType'
+                                },
+                                value: {
+                                        type: String,
+                                        notify: true
+                                },
+                                bindValue: {
+                                        type: String
+                                },
+                                placeholder: {
+                                        type: String
+                                },
+                                required: {
+                                        type: Boolean,
+                                        value: false
+                                },
+                                dateFormat: {
+                                        type: String,
+                                        value: "YYYY/MM/DD"
+                                },
+				readonly: {
+					type: Boolean,
+					value: false
+				},
+				transparent: {
+					type: Boolean,
+					value: false,
+				},
+                                _picker: Object,
+                                _isAttached: Boolean,
+				_didAssignDefault: {
+					type: Boolean,
+					value: false
+				},
+                        },
+
+			observers: [
+				'_setDate(bindValue, _isAttached, _didAssignDefault)'
+			],
+
+                        attached: function() {
+				if (this.transparent) {
+					this._makeTransparent();
+				}
+
+                                this._picker = new Pikaday({
+                                        field: this.$.dummy,
+                                        format: this.dateFormat,
+                                        onSelect: function() {
+                                                this.$.input.bindValue = this._picker.getDate();
+                                        }.bind(this)
+                                });
+                                this._isAttached = true;
+
+				if (this.readonly)
+					this._picker.destroy();
+                        },
+
+                        _setDate: function(date) {
+				if (!this._didAssignDefault && date) {
+					this._didAssignDefault = true;
+					this._picker.setMoment(moment(date));
+
+					if (this.readonly)
+						this._picker.destroy();
+				}
+                        },
+
+                        _getValidity: function() {
+                                if (this.required) {
+                                        this._toggleErrorGraphic(!!this.value ? false : true);
+                                        return !!this.value;
+                                }
+                                return true;
+                        },
+
+                        _toggleErrorGraphic: function(flag) {
+                                if (flag) {
+                                        this.$.container.classList.add("has-error");
+                                        this.$.container.classList.add("has-feedback");
+                                        this.$.icon.classList.remove("hide");
+                                } else {
+                                        this.$.container.classList.remove("has-error");
+                                        this.$.container.classList.remove("has-feedback");
+                                        this.$.icon.classList.add("hide");
+                                }
+                        },
+
+                        _invalidChanged: function() {
+                                this._toggleErrorGraphic(this.invalid ? true : false);
+                        },
+
+			_makeTransparent: function() {
+				this.$.dummy.classList.add('transparent-input');
+				this.$.addon.classList.add('transparent-input');			
+			},
+                })
+        </script>
+</dom-module>

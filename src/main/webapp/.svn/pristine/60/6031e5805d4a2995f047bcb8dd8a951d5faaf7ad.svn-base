@@ -1,0 +1,122 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/vaadin-combo-box/vaadin-combo-box.html" />
+<link rel="import" href="/bower_components/paper-input/paper-input.html" />
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+
+<dom-module id="header-search">
+    <template>
+        <style>
+            :host {
+                --iron-icon-height: 15px;
+                --iron-icon-width: 15px;
+                --paper-button: {
+                    background-color: #ff6138;
+                    color: white;
+                    font-size: 14px;
+                }
+            }
+
+            #searchForm {
+                margin-bottom: 20px;
+            }
+
+            #searchForm vaadin-combo-box {
+                width: 170px;
+                display: inline-block;
+                margin-right: 10px;
+                vertical-align: bottom;
+            }
+
+            #searchForm paper-input {
+                width: 200px;
+                margin-right: 10px;
+                vertical-align: bottom;
+                display: inline-block;
+            }
+
+            paper-button iron-icon {
+                margin-right: 5px;
+            }
+        </style>
+
+        <iron-ajax auto url="/api/common/comp_kind/code/" last-response="{{_codes.compKind}}"></iron-ajax>
+        <iron-ajax auto url="/api/common/corp_type/code/" last-response="{{_codes.corpType}}"></iron-ajax>
+        <iron-ajax auto url="/api/common/biz_sect/code/" last-response="{{_codes.bizSect}}"></iron-ajax>
+
+        <div id="searchForm">
+            <vaadin-combo-box id="compKind" label="기업분류" items="{{_codes.compKind}}" item-label-path="cdNm" item-value-path="cd" on-value-changed="_onCompKindChanged"></vaadin-combo-box>
+            <vaadin-combo-box id="corpType" label="법인형태" items="{{_codes.corpType}}" item-label-path="cdNm" item-value-path="cd" on-value-changed="_onCorpTypeChanged"></vaadin-combo-box>
+            <vaadin-combo-box id="bizSect" label="업종분류" items="{{_codes.bizSect}}" item-label-path="cdNm" item-value-path="cd" on-value-changed="_onBizSectChanged"></vaadin-combo-box>
+            <paper-input id="keyword" label="기업명/대표자명/사업자번호"></paper-input>
+            <paper-button on-tap="_onSearchTap" raised>
+                <iron-icon icon="search"></iron-icon>
+                조회
+            </paper-button>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: "header-search",
+
+            properties: {
+                keyword: {
+                    type: String,
+                    value: ""
+                },
+                compKind: {
+                    type: String,
+                    value: ""
+                },
+                corpType: {
+                    type: String,
+                    value: ""
+                },
+                bizSect: {
+                    type: String,
+                    value: ""
+                },
+                order: {
+                    type: String,
+                    value: ""
+                },
+                _codes: {
+                    type: Object,
+                    value: function() {
+                        return {
+                            compKind: [],
+                            corpType: [],
+                            bizSect: [],
+                        };
+                    }
+                },
+            },
+
+            _onSearchTap: function() {
+                this.keyword = this.$.keyword.value;
+
+                this.fire("search", {
+                    keyword: this.keyword,
+                    compKind: this.compKind,
+                    corpType: this.corpType,
+                    bizSect: this.bizSect,
+                    order: this.order
+                });
+            },
+
+            _onCompKindChanged: function(e) {
+                this.compKind = e.detail.value;
+            },
+
+            _onCorpTypeChanged: function(e) {
+                this.corpType = e.detail.value;
+            },
+
+            _onBizSectChanged: function(e) {
+                this.bizSect = e.detail.value;
+            },
+        })
+    </script>
+</dom-module>

@@ -1,0 +1,206 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/app-route/app-location.html">
+<link rel="import" href="/bower_components/app-route/app-route.html">
+<link rel="import" href="/bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="/bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="/bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="/bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="/bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="/bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="/bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="/bower_components/paper-menu/paper-submenu.html">
+<link rel="import" href="/bower_components/iron-image/iron-image.html" />
+<link rel="import" href="/bower_components/iron-icons/social-icons.html" />
+<link rel="import" href="/bower_components/vaadin-icons/vaadin-icons.html" />
+<link rel="import" href="my-icons.html">
+
+<dom-module id="my-app">
+
+    <template>
+
+        <style>
+            :host {
+                display: block;
+                --app-primary-color: #4285f4;
+                --app-secondary-color: black;
+                --app-drawer-content-container: {
+                    background-color: #B0BEC5;
+                }
+                --paper-menu-background-color: #B0BEC5;
+                --app-toolbar-font-size: 11px;
+                --iron-icon-width: 15px;
+                --iron-icon-height: 15px;
+            }
+
+            app-header {
+                background-color: var(--app-primary-color);
+                color: #fff;
+            }
+
+            app-header paper-icon-button {
+                --paper-icon-button-ink-color: white;
+            }
+
+            .drawer-list {
+                margin: 0 20px;
+            }
+
+            .drawer-list a {
+                display: block;
+                padding: 0 16px;
+                line-height: 40px;
+                text-decoration: none;
+                color: var(--app-secondary-color);
+            }
+
+            .drawer-list a.iron-selected {
+                color: black;
+                font-weight: bold;
+            }
+
+            .drawer-list a.subroute {
+                padding-left: 32px;
+            }
+
+            app-toolbar > div[title] {
+                font-size: 15px;
+            }
+
+            app-toolbar > div[spacer] {
+                margin-left: 15px !important;
+            }
+
+            app-drawer > app-toolbar {
+                background-color: #286de1;
+            }
+
+            paper-menu {
+                font-size: 13px;
+            }
+
+            iron-icon {
+              margin-right: 5px;
+            }
+
+            .submenu paper-item {
+              display: inline-block;
+              margin-left: 20px;
+            }
+        </style>
+
+        <app-location route="{{route}}"></app-location>
+        <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
+
+        <app-drawer-layout fullbleed>
+
+            <!-- Drawer content -->
+            <app-drawer>
+                <app-toolbar>
+                    <iron-image src="/images/logo.png"></iron-image>
+                </app-toolbar>
+                <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+                    <paper-menu>
+                        <paper-item>
+                            <a name="general-info" href="/general-info">
+                                <iron-icon icon="vaadin-icons:archive"></iron-icon>기업일반정보 조회</a>
+                        </paper-item>
+                        <paper-item>
+                            <a name="individual-kpi" href="/individual-kpi">
+                                <iron-icon icon="vaadin-icons:chart"></iron-icon>개별기업 성과지표 조회</a>
+                        </paper-item>
+                        <paper-item>
+                            <a name="overall-kpi" href="/overall-kpi">
+                                <iron-icon icon="vaadin-icons:clipboard"></iron-icon>전체 성과지표 조회</a>
+                        </paper-item>
+                        <paper-submenu>
+                            <paper-item class="menu-trigger">
+                                <a href="#">
+                                    <iron-icon icon="vaadin-icons:cog"></iron-icon>관리자</a>
+                            </paper-item>
+                            <paper-menu class="menu-content submenu">
+                                <paper-item>
+                                    <a name="create-corp" href="/create-corp">
+                                        <iron-icon icon="social:group-add"></iron-icon>기업 및 성과지표 등록</a>
+                                </paper-item>
+                                <paper-item>
+                                    <a name="create-user" href="/create-user">
+                                        <iron-icon icon="social:person-add"></iron-icon>사용자 등록</a>
+                                </paper-item>
+                            </paper-menu>
+                        </paper-submenu>
+                    </paper-menu>
+                </iron-selector>
+            </app-drawer>
+
+            <!-- Main content -->
+            <app-header-layout has-scrolling-region>
+
+                <app-header condenses reveals effects="waterfall">
+                    <app-toolbar>
+                        <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
+                        <div title>사회적기업 성과관리시스템</div>
+                        {{user.id}}님 로그인중입니다
+                        <div spacer></div>
+                        <paper-button>Logout</paper-button>
+                    </app-toolbar>
+                </app-header>
+
+                <iron-pages role="main" selected="[[page]]" attr-for-selected="name">
+                    <general-info name="general-info"></general-info>
+                    <biz-detail name="biz-detail" route="{{subroute}}"></biz-detail>
+                    <individual-kpi name="individual-kpi"></individual-kpi>
+                    <overall-kpi name="overall-kpi"></overall-kpi>
+                </iron-pages>
+
+            </app-header-layout>
+
+        </app-drawer-layout>
+
+    </template>
+
+    <script>
+        Polymer({
+
+            is: 'my-app',
+
+            properties: {
+
+                page: {
+                    type: String,
+                    reflectToAttribute: true,
+                    observer: '_pageChanged'
+                },
+
+            },
+
+            observers: [
+                '_routePageChanged(routeData.page)'
+            ],
+
+            _routePageChanged: function(page) {
+                this.page = page || 'general-info';
+            },
+
+            _pageChanged: function(page) {
+                // load page import on demand.
+                this.importHref(
+                    this.resolveUrl(page + '.html'), null, null, true);
+            }
+
+        });
+    </script>
+
+</dom-module>

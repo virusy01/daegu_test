@@ -1,0 +1,107 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/iron-validatable-behavior/iron-validatable-behavior.html" />
+<link rel="import" href="/bower_components/iron-form-element-behavior/iron-form-element-behavior.html">
+
+<link rel="import" href="../style/bootstrap-style.html" />
+
+<dom-module id="normal-select">
+    <template>
+        <style include="bootstrap-style">
+
+        </style>
+        <select id="select" class="form-control" on-change="_setValue">
+        </select>
+    </template>
+    <script>
+        Polymer({
+            is: 'normal-select',
+
+            behaviors: [Polymer.IronFormElementBehavior, Polymer.IronValidatableBehavior],
+
+            properties: {
+                name: String,
+                value: {
+                    type: String,
+                    notify: true,
+                    observer: '_reset'
+                },
+                selectedIndex: {
+                    type: Number,
+                    readonly: true,
+                    notify: true
+                },
+                items: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                nameFrom: {
+                    type: String,
+                    value: 'cdNm'
+                },
+                valueFrom: {
+                    type: String,
+                    value: 'cd'
+                },
+                _isAttached: Boolean,
+            },
+
+            observers: [
+                '_setItems(items, _isAttached)'
+            ],
+
+            attached: function() {
+                this._isAttached = true;
+            },
+
+            _setItems: function(items) {
+                var i, option;
+
+                this.$.select.innerHTML = "";
+
+                for (i = 0; i < items.length; i++) {
+                    option = document.createElement("option");
+                    option.value = items[i][this.valueFrom];
+                    if (this.value && this.value == option.value) {
+                        option.selected = true;
+                        this.selectedIndex = i;
+                        this.fire("selected-index-changed");
+                    }
+                    option.innerHTML = items[i][this.nameFrom];
+
+                    this.$.select.appendChild(option);
+                }
+
+                if (!this.value && items.length > 0) {
+                    this.value = items[0][this.valueFrom];
+                    this.selectedIndex = 0;
+                    this.fire("selected-index-changed");
+                }
+            },
+
+            _reset: function() {
+
+                this.$.select.innerHTML = "";
+
+                for (i = 0; i < this.items.length; i++) {
+                    option = document.createElement("option");
+                    option.value = this.items[i][this.valueFrom];
+                    if (this.value && this.value == option.value) {
+                        option.selected = true;
+                        this.selectedIndex = i;
+                        this.fire("selected-index-changed");
+                    }
+                    option.innerHTML = this.items[i][this.nameFrom];
+
+                    this.$.select.appendChild(option);
+                }
+            },
+
+            _setValue: function() {
+                this.value = this.$.select.value;
+                this.selectedIndex = this.$.select.selectedIndex;
+            }
+        })
+    </script>
+</dom-module>

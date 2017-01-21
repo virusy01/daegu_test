@@ -1,0 +1,148 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-card/paper-card.html" />
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html" />
+<link rel="import" href="/bower_components/vaadin-combo-box/vaadin-combo-box.html" />
+
+<link rel="import" href="../style/c3-chart-style.html" />
+
+<dom-module id="summary-rank-by-type">
+    <template>
+        <style include="c3-chart-style">
+            #searchForm {
+                margin-bottom: 20px;
+            }
+
+            #searchForm vaadin-combo-box {
+                width: 250px;
+                display: inline-block;
+                margin-right: 10px;
+                vertical-align: bottom;
+            }
+
+            #chart {
+                height: 700px;
+            }
+        </style>
+
+        <iron-ajax auto url="/api/common/comp_kind/code/" on-response="_addSelectAllToCompKind"></iron-ajax>
+        <iron-ajax auto url="/api/common/corp_type/code/" on-response="_addSelectAllToCorpType"></iron-ajax>
+        <iron-ajax auto url="/api/common/biz_sect/code/" on-response="_addSelectAllToBizSect"></iron-ajax>
+        <iron-ajax id="protocolGetKpiSummary" url="/api/corp/kpis" content-type="application/json" on-response="_drawChart"></iron-ajax>
+
+        <div id="searchForm">
+            <vaadin-combo-box id="compKind" label="기업분류" items="{{_codes.compKind}}" item-label-path="cdNm" item-value-path="cd" on-value-changed="_fetchData"></vaadin-combo-box>
+            <vaadin-combo-box id="corpType" label="법인형태" items="{{_codes.corpType}}" item-label-path="cdNm" item-value-path="cd" on-value-changed="_fetchData"></vaadin-combo-box>
+            <vaadin-combo-box id="bizSect" label="업종분류" items="{{_codes.bizSect}}" item-label-path="cdNm" item-value-path="cd" on-value-changed="_fetchData"></vaadin-combo-box>
+        </div>
+
+        <div id="chart"></div>
+
+    </template>
+
+    <script src="/scripts/d3.min.js"></script>
+    <script src="/scripts/c3.min.js"></script>
+    <script>
+        Polymer({
+            is: 'summary-rank-by-type',
+
+            properties: {
+                _codes: {
+                    type: Object,
+                    value: function() {
+                        return {
+                            compKind: [],
+                            corpType: [],
+                            bizSect: [],
+                        };
+                    }
+                },
+                _data: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+            },
+
+            attached: function() {
+                this._fetchData();
+            },
+
+            _fetchData: function() {
+                this.$.protocolGetKpiSummary.params = {
+                    compKind: this.$.compKind.value,
+                    corpType: this.$.corpType.value,
+                    bizSect: this.$.bizSect.value,
+                    evalYear: '2015'
+                };
+
+                this.$.protocolGetKpiSummary.generateRequest();
+            },
+
+            _addSelectAllToCompKind: function(e) {
+                this.set("_codes.compKind", this._addSelectAll(e.target.lastResponse));
+            },
+
+            _addSelectAllToCorpType: function(e) {
+                this.set("_codes.corpType", this._addSelectAll(e.target.lastResponse));
+            },
+
+            _addSelectAllToBizSect: function(e) {
+                this.set("_codes.bizSect", this._addSelectAll(e.target.lastResponse));
+            },
+
+            _addSelectAll: function(data) {
+                var array = [{
+                    cd: "",
+                    cdNm: "전체",
+                    grpCd: ""
+                }];
+
+                return array.concat(data);
+            },
+
+            _drawChart: function(e) {
+                this._data = e.target.lastResponse;
+
+                c3.generate({
+                    bindto: this.$.chart,
+                    padding: {
+                        left: 150
+                    },
+                    data: {
+                        json: this._data,
+                        keys: {
+                            x: 'corpNm',
+                            value: ['depth101', 'depth102', 'depth103', 'depth103', 'depth104', 'depth105', 'depth106', 'depth107', 'depth108', 'depth109', 'depth110']
+                        },
+                        type: 'bar',
+                        groups: [
+                            ['depth101', 'depth102', 'depth103', 'depth103', 'depth104', 'depth105', 'depth106', 'depth107', 'depth108', 'depth109', 'depth110']
+                        ],
+                        names: {
+                            depth101: '사회적 가치 창출',
+                            depth102: '경제적 가치 창출',
+                            depth103: '사회적자본 활용',
+                            depth104: '제품/서비스 품질관리',
+                            depth105: '제품/서비스 차별화 체계',
+                            depth106: '판로 확대 체계',
+                            depth107: '지배구조 체계',
+                            depth108: '조직몰입도',
+                            depth109: '사업역량',
+                            depth110: '구성원 인사관리'
+                        }
+                    },
+                    color: {
+                        pattern: ['#e74c3c', '#3498db', '#1f8a70', '#fd7400', '#ffe11a', '#bedb39', '#2c3e50', '#91aa9d', '#ff8598', '#703030']
+                    },
+                    axis: {
+                        rotated: true,
+                        x: {
+                            type: 'category'
+                        }
+                    }
+                });
+            }
+        })
+    </script>
+</dom-module>

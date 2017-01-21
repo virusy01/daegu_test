@@ -1,0 +1,45 @@
+<link rel="import" href="/bower_components/polymer/polymer.html" />
+<link rel="import" href="/bower_components/paper-dialog/paper-dialog.html" />
+<link rel="import" href="/bower_components/neon-animation/animations/fade-in-animation.html" />
+<link rel="import" href="/bower_components/neon-animation/animations/fade-out-animation.html" />
+
+<dom-module id="dialog-alert">
+    <template>
+        <style>
+            paper-dialog {
+                padding: 20px 20px;
+                font-size: 12px;
+                z-index: 10000;
+            }
+
+
+        </style>
+
+        <paper-dialog id="dialog" entry-animation="fade-in-animation" exit-animation="fade-out-animation" on-iron-overlay-opened="_onOpened" always-on-top no-overlap>
+            {{msg}}
+        </paper-dialog>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'dialog-alert',
+
+            properties: {
+                msg: String,
+                dialog: {
+                    type: Object,
+                    value: function() {
+                        return this.$.dialog;
+                    }
+                }
+            },
+
+            _onOpened: function() {
+                setTimeout(function() {
+                    this.dialog.close();
+                }.bind(this), 1000);
+            }
+        })
+    </script>
+</dom-module>

@@ -1,0 +1,32 @@
+<dom-module id="header-style">
+	<template>
+		<style>
+	:host {
+		--app-toolbar-font-size: 11px;
+	}
+
+	app-header {
+		background-color: #ff9800;
+		color: #fff;
+	}
+
+	app-header paper-button {
+		color: white;
+	}
+
+	app-toolbar div[title] {
+		font-size: 15px;
+	}
+
+	app-drawer app-toolbar {
+		background-color: #fd7400;
+	}
+
+	@media (max-width: 768px) {
+		.loginInfo {
+			display: none;
+		}
+	}
+		</style>
+	</template>
+</dom-module>

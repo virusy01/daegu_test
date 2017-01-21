@@ -1,0 +1,691 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sck.modules.corp.CorpRepository">
+	
+	<sql id="corpInfoColumns">
+		INFO.CORP_SEQ
+		, IFNULL(INFO.CORP_NM, '') AS CORP_NM
+		, IFNULL(INFO.CEO_NM, '') AS CEO_NM
+		, IFNULL(INFO.BIZ_NO, '') AS BIZ_NO
+		, INFO.BIZ_DT
+		, INFO.CORP_TYPE
+		, IFNULL(CASE WHEN INFO.CORP_TYPE = '06' THEN INFO.CORP_TYPE2 ELSE (SELECT CD_NM FROM CODE WHERE GRP_CD = 'CORP_TYPE' AND CD = INFO.CORP_TYPE) END, '') AS CORP_TYPE_NM
+		, INFO.COMP_KIND
+		, IFNULL((SELECT CD_NM FROM CODE WHERE GRP_CD = 'COMP_KIND' AND CD = INFO.COMP_KIND), '') AS COMP_KIND_NM
+		, INFO.BIZ_SECT
+		, IFNULL(CASE WHEN INFO.BIZ_SECT = '16' THEN INFO.BIZ_SECT2 ELSE (SELECT CD_NM FROM CODE WHERE GRP_CD = 'BIZ_SECT' AND CD = INFO.BIZ_SECT) END, '') AS BIZ_SECT_NM
+		, INFO.SOC_YN
+		, INFO.SOC_TYPE
+		, (SELECT CD_NM FROM CODE WHERE GRP_CD = 'SOC_TYPE' AND CD = INFO.SOC_TYPE) AS SOC_TYPE_NM
+		, INFO.SOC_CERT_END_DT
+	</sql>
+	
+	<sql id="corpEmployeeColumns">
+		EMP.CORP_SEQ
+		, EMP.EMP_SEQ
+		, EMP.CLS_DT
+		, EMP.EMP_NUM
+		, EMP.WEAK_NUM
+		, EMP.FULL_NUM
+		, EMP.PART_NUM
+		, EMP.CXX_SAL
+		, EMP.NORM_SAL
+		, EMP.CRE_DT
+		, EMP.MOD_DT
+	</sql>
+	
+	<sql id="corpFinanceColumns">
+		FINN.CORP_SEQ
+		, FINN.FINN_SEQ
+		, FINN.CLS_DT
+		, FORMAT(FINN.ASST_AMT,0) AS ASST_AMT
+		, FORMAT(FINN.DEPT_AMT,0) AS DEPT_AMT
+		, FORMAT(FINN.CAPIT_AMT,0) AS CAPIT_AMT
+		, FORMAT(FINN.SOLD_PUBL_AMT + FINN.SOLD_PRIV_AMT,0) AS SOLD_AMT
+		, FORMAT(FINN.SOLD_PUBL_AMT,0) AS SOLD_PUBL_AMT
+		, FORMAT(FINN.SOLD_PRIV_AMT,0) AS SOLD_PRIV_AMT
+		, FORMAT(FINN.SOLD_PUBL_AMT,0) AS SOLD_PUBL_AMT
+		, FORMAT(FINN.SOLD_ORG_COST,0) AS SOLD_ORG_COST
+		, FORMAT(FINN.SOLD_INCOM,0) AS SOLD_INCOM
+		, FORMAT(FINN.SALES_AMT,0) AS SALES_AMT
+		, FORMAT(FINN.SALES_INCOM,0) AS SALES_INCOM
+		, FORMAT(FINN.EXT_PROF,0) AS EXT_PROF
+		, FORMAT(FINN.NET_INCOM,0) AS NET_INCOM
+	</sql>
+	
+	<sql id="corpHelpColumns">
+		HELP.CORP_SEQ
+		, HELP.HELP_SEQ
+		, HELP.HELPER
+		, HELP.PRJ_NM
+		, HELP.HELP_ST_DT
+		, HELP.HELP_END_DT
+		, HELP.HELP_AMT
+	</sql>
+	
+	<select id="findCorpInfo" resultType="com.sck.model.Corp">
+		SELECT
+			<include refid="corpInfoColumns" />			
+		FROM CORP_INFO AS INFO
+		WHERE INFO.CORP_SEQ = #{p}
+	</select>
+	
+	<select id="findCorpEmployee" resultType="com.sck.model.CorpEmployee">
+		SELECT 
+			<include refid="corpEmployeeColumns" />	
+		FROM CORP_EMP AS EMP
+		WHERE EMP.CORP_SEQ = #{p} 
+		AND EMP.CLS_DT = (SELECT MAX(CLS_DT) FROM CORP_EMP WHERE CORP_SEQ = #{p})
+	</select>
+	
+	<select id="findCorpFinance" resultType="com.sck.model.CorpFinance">
+		SELECT 
+			<include refid="corpFinanceColumns" />	
+		FROM CORP_FINN AS FINN
+		WHERE FINN.CORP_SEQ = #{p}  
+		AND FINN.CLS_DT = (SELECT MAX(CLS_DT) FROM CORP_FINN WHERE CORP_SEQ = #{p})
+	</select>
+	
+	<select id="findCorpHelpLast3Years" resultType="com.sck.model.CorpHelp">
+		SELECT 
+			<include refid="corpHelpColumns" />	
+		FROM CORP_HELP AS HELP
+		WHERE HELP.CORP_SEQ = #{p}
+		AND HELP.HELP_ST_DT >= (SELECT DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 3 YEAR), '%Y-01-01'))
+		ORDER BY HELP.HELP_ST_DT DESC
+	</select>
+	
+	<select id="findCorpEmployeeLast5Years" resultType="com.sck.model.CorpEmployee">
+		SELECT 
+			<include refid="corpEmployeeColumns" />	
+		FROM CORP_EMP AS EMP
+		WHERE EMP.CORP_SEQ = #{p}
+		AND EMP.CLS_DT >= (SELECT DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 5 YEAR), '%Y-01-01'))
+		ORDER BY EMP.CLS_DT DESC
+	</select>
+	
+	<select id="findCorpFinanceLast10Year" resultType="com.sck.model.CorpFinance">
+		SELECT 
+			<include refid="corpFinanceColumns" />	
+		FROM CORP_FINN AS FINN
+		WHERE FINN.CORP_SEQ = #{p}
+		AND FINN.CLS_DT > DATE(DATE_SUB(NOW(), INTERVAL 10 YEAR))
+		ORDER BY FINN.CLS_DT DESC  
+	</select>
+	
+	<select id="countCorpInfos" resultType="int">
+		SELECT 
+			COUNT(INFO.CORP_SEQ) ROW_COUNT
+		FROM CORP_INFO AS INFO
+		WHERE INFO.DEL_YN = 'N'
+		<if test="p.corpNm != null and p.corpNm != ''">
+		AND (INFO.CORP_NM LIKE CONCAT('%',#{p.corpNm},'%') OR INFO.CEO_NM LIKE CONCAT('%',#{p.corpNm},'%') OR INFO.BIZ_NO LIKE CONCAT('%',#{p.corpNm},'%'))
+		</if>
+		<if test="p.corpType != null and p.corpType != ''">
+		AND INFO.CORP_TYPE = #{p.corpType}
+		</if>
+		<if test="p.compKind != null and p.compKind != ''">
+		AND INFO.COMP_KIND = #{p.compKind}
+		</if>
+		<if test="p.bizSect != null and p.bizSect != ''">
+		AND INFO.BIZ_SECT = #{p.bizSect}
+		</if>
+	</select>
+	
+	<select id="findCorpInfos" resultType="com.sck.model.Corp">
+		SELECT
+			<include refid="corpInfoColumns" />
+		FROM CORP_INFO AS INFO
+		WHERE INFO.DEL_YN = 'N'
+		<if test="p.corpNm != null and p.corpNm != ''">
+		AND (INFO.CORP_NM LIKE CONCAT('%',#{p.corpNm},'%') OR INFO.CEO_NM LIKE CONCAT('%',#{p.corpNm},'%') OR INFO.BIZ_NO LIKE CONCAT('%',#{p.corpNm},'%'))
+		</if>
+		<if test="p.corpType != null and p.corpType != ''">
+		AND INFO.CORP_TYPE = #{p.corpType}
+		</if>
+		<if test="p.compKind != null and p.compKind != ''">
+		AND INFO.COMP_KIND = #{p.compKind}
+		</if>
+		<if test="p.bizSect != null and p.bizSect != ''">
+		AND INFO.BIZ_SECT = #{p.bizSect}
+		</if>
+		ORDER by INFO.CORP_NM
+		<if test="page != null">
+		LIMIT #{page.limitStart}, #{page.limitEnd}
+		</if>
+	</select>
+	
+	
+	<insert id="insertCorpInfo">
+		INSERT INTO CORP_INFO
+		(
+			CORP_NM
+			, CEO_NM
+			, BIZ_NO
+			, BIZ_DT
+			, CORP_TYPE
+			, CORP_TYPE2
+			, COMP_KIND
+			, BIZ_SECT
+			, BIZ_SECT2
+			, SOC_YN
+			, SOC_TYPE
+			, SOC_CERT_END_DT
+			, CRE_DT
+		)
+		VALUES
+		(
+			#{p.corpNm}
+			, #{p.ceoNm}
+			, #{p.bizNo}
+			, #{p.bizDt}
+			, #{p.corpType}
+			, #{p.corpType2}
+			, #{p.compKind}
+			, #{p.bizSect}
+			, #{p.bizSect2}
+			, #{p.socYn}
+			, #{p.socType}
+			, #{p.socCertEndDt}
+			, now()
+		)
+	</insert>
+	
+	<update id="updateCorpInfo">
+		UPDATE CORP_INFO
+		SET
+			CORP_NM = #{p.corpNm}
+			, CEO_NM = #{p.ceoNm}
+			, BIZ_NO = #{p.bizNo}
+			, BIZ_DT = #{p.bizDt}
+			, CORP_TYPE = #{p.corpType}
+			, CORP_TYPE2 = #{p.corpType2}
+			, COMP_KIND = #{p.compKind}
+			, BIZ_SECT = #{p.bizSect}
+			, BIZ_SECT2 = #{p.bizSect2}
+			, SOC_YN = #{p.socYn}
+			, SOC_TYPE = #{p.socType}
+			, SOC_CERT_END_DT = #{p.socCertEndDt}
+			, MOD_DT = now()
+		WHERE CORP_SEQ = #{p.corpSeq}
+	</update>
+	
+	<delete id="deleteCorpInfo">
+		DELETE CORP_INFO
+		WHERE CORP_SEQ = #{p}
+	</delete>
+	
+	<insert id="insertCorpEmployee">
+		INSERT INTO CORP_EMP
+		(
+			CORP_SEQ
+			, CLS_DT
+			, EMP_NUM
+			, WEAK_NUM
+			, FULL_NUM
+			, PART_NUM
+			, CXX_SAL
+			, NORM_SAL
+			, CRE_DT
+		)
+		VALUES
+		(
+			#{p.corpSeq}
+			, #{p.clsDt}
+			, #{p.empNum}
+			, #{p.weakNum}
+			, #{p.fullNum}
+			, #{p.partNum}
+			, #{p.cxxSal}
+			, #{p.normSal}
+			, now()
+		)
+	</insert>
+	
+	<update id="updateCorpEmployee">
+		UPDATE CORP_EMP
+		SET
+			CLS_DT = #{p.clsDt}
+			, EMP_NUM = #{p.empNum}
+			, WEAK_NUM = #{p.weakNum}
+			, FULL_NUM = #{p.fullNum}
+			, PART_NUM = #{p.partNum}
+			, CXX_SAL = #{p.cxxSal}
+			, NORM_SAL = #{p.normSal}
+			, MOD_DT = now()
+		WHERE EMP_SEQ = #{p.empSeq}
+	</update>
+	
+	<delete id="deleteCorpEmployee">
+		DELETE FROM CORP_EMP
+		WHERE EMP_SEQ = #{p}
+	</delete>
+	
+	<insert id="insertCorpFinance">
+		INSERT INTO CORP_FINN
+		(
+			CORP_SEQ
+			, CLS_DT
+			, ASST_AMT
+			, DEPT_AMT
+			, CAPIT_AMT
+			, SOLD_PRIV_AMT
+			, SOLD_PUBL_AMT
+			, SOLD_ORG_COST
+			, SOLD_INCOM
+			, SALES_AMT
+			, SALES_INCOM
+			, EXT_PROF
+			, NET_INCOM
+			, CRE_DT
+		)
+		VALUES
+		(
+			#{p.corp_seq}
+			, #{p.clsDt}
+			, #{p.asstAmt}
+			, #{p.deptAmt}
+			, #{p.capitAmt}
+			, #{p.soldPrivAmt}
+			, #{p.soldPublAmt}
+			, #{p.soldOrgCost}
+			, #{p.soldIncom}
+			, #{p.salesAmt}
+			, #{p.salesIncom}
+			, #{p.extProf}
+			, #{p.netIncom}
+			, now()
+		)
+	</insert>
+	
+	<update id="updateCorpFinance">
+		UPDATE CORP_FINN
+		SET
+			CLS_DT = #{p.clsDt}
+			, ASST_AMT = #{p.asstAmt} 
+			, DEPT_AMT = #{p.deptAmt}
+			, CAPIT_AMT = #{p.capitAmt}
+			, SOLD_PRIV_AMT = #{p.soldPrivAmt}
+			, SOLD_PUBL_AMT = #{p.soldPublAmt}
+			, SOLD_ORG_COST = #{p.soldOrgCost}
+			, SOLD_INCOM = #{p.soldIncom}
+			, SALES_AMT = #{p.salesAmt}
+			, SALES_INCOM = #{p.salesIncom}
+			, EXT_PROF = #{p.extProf}
+			, NET_INCOM = #{p.netIncom}
+			, MOD_DT = now()
+		WHERE FINN_SEQ = #{p.finnSeq}
+	</update>
+	
+	<delete id="deleteCorpFinance">
+		DELETE FROM CORP_FINN
+		WHERE FINN_SEQ = #{p}
+	</delete>
+	
+	<insert id="insertCorpHelp">
+		INSERT INTO CORP_HELP
+		(
+			CORP_SEQ
+			, HELPER
+			, PRJ_NM
+			, HELP_ST_DT
+			, HELP_END_DT
+			, HELP_AMT
+			, CRE_DT
+		)
+		VALUES
+		(
+			#{p.corpSeq}
+			, #{p.helper}
+			, #{p.prjNm}
+			, #{p.helpStDt}
+			, #{p.helpEndDt}
+			, #{p.helpAmt}
+			, now()
+		)
+	</insert>
+	
+	<update id="updateCorpHelp">
+		UPDATE CORP_HELP
+		SET
+			HELPER = #{p.helper}
+			, PRJ_NM = #{p.prjNm}
+			, HELP_ST_DT = #{p.helpStDt}
+			, HELP_END_DT = #{p.helpEndDt}
+			, HELP_AMT = #{p.helpAmt}
+			, MOD_DT = now()
+		WHERE HELP_SEQ = #{p.helpSeq}
+	</update>
+	
+	<delete id="deleteCorpHelp">
+		DELETE FROM CORP_HELP
+		WHERE HELP_SEQ = #{p}
+	</delete>
+	
+	<select id="findKpiDepth1" resultType="com.sck.model.Kpi">
+		SELECT 
+			EVAL.EVAL_YEAR
+			, EVAL.DEPTH_1
+			, CODE.CD_NM AS DEPTH_1_NM
+			, SUM(SCORE) AS SCORE
+		FROM EVAL
+		INNER JOIN CODE ON CODE.GRP_CD = 'KPI_DEPTH_1' AND EVAL.DEPTH_1 = CODE.CD
+		INNER JOIN CORP_INFO AS CORP ON EVAL.CORP_SEQ = CORP.CORP_SEQ AND CORP.DEL_YN = 'N'
+		WHERE '1' = '1'
+		AND EVAL_YEAR = #{p}
+		GROUP BY EVAL_YEAR, DEPTH_1, DEPTH_1_NM
+		ORDER BY SCORE DESC
+	</select>
+	
+	<select id="findCorpKpiDepth1" resultType="com.sck.model.CorpKpi">
+		SELECT 
+			CORP.CORP_SEQ
+			, CORP.CORP_NM
+			, EVAL.EVAL_YEAR
+			, EVAL.DEPTH_1
+			, EVAL.SCORE
+		FROM CORP_INFO AS CORP
+		LEFT JOIN
+		(
+			SELECT 
+				CORP_SEQ
+			    , EVAL_YEAR
+			    , DEPTH_1
+			    , SUM(SCORE) AS SCORE
+		    FROM EVAL
+		    WHERE  EVAL_YEAR = #{evalYear} AND DEPTH_1 = #{depth1}
+		    GROUP BY CORP_SEQ, EVAL_YEAR, DEPTH_1
+		) AS EVAL ON CORP.CORP_SEQ = EVAL.CORP_SEQ
+		WHERE CORP.DEL_YN = 'N'
+		ORDER BY SCORE DESC
+	</select>
+	
+	<select id="findCorpKpiAllDepth1" resultType="com.sck.model.CorpKpiDepth1">
+		SELECT 
+			CORP.CORP_SEQ
+			, CORP.CORP_NM
+			, SUM(DEPTH_1_01) AS DEPTH_1_01
+			, SUM(DEPTH_1_02) AS DEPTH_1_02
+			, SUM(DEPTH_1_03) AS DEPTH_1_03
+			, SUM(DEPTH_1_04) AS DEPTH_1_04
+			, SUM(DEPTH_1_05) AS DEPTH_1_05
+			, SUM(DEPTH_1_06) AS DEPTH_1_06
+			, SUM(DEPTH_1_07) AS DEPTH_1_07
+			, SUM(DEPTH_1_08) AS DEPTH_1_08
+			, SUM(DEPTH_1_09) AS DEPTH_1_09
+			, SUM(DEPTH_1_10) AS DEPTH_1_10
+			, SUM(DEPTH_1_01) + SUM(DEPTH_1_02) + SUM(DEPTH_1_03) + SUM(DEPTH_1_04) + SUM(DEPTH_1_05) + SUM(DEPTH_1_06) + SUM(DEPTH_1_07) + SUM(DEPTH_1_08) + SUM(DEPTH_1_09) + SUM(DEPTH_1_10) AS DEPTH_1_SUM
+		FROM CORP_INFO AS CORP
+		LEFT JOIN
+		(
+			SELECT CORP_SEQ
+			, EVAL_DATE
+			, DEPTH_1
+			, CASE WHEN DEPTH_1 = '01' THEN SUM(SCORE) ELSE 0 END AS DEPTH_1_01
+			, CASE WHEN DEPTH_1 = '02' THEN SUM(SCORE) ELSE 0 END AS DEPTH_1_02
+			, CASE WHEN DEPTH_1 = '03' THEN SUM(SCORE) ELSE 0 END AS DEPTH_1_03
+			, CASE WHEN DEPTH_1 = '04' THEN SUM(SCORE) ELSE 0 END AS DEPTH_1_04
+			, CASE WHEN DEPTH_1 = '05' THEN SUM(SCORE) ELSE 0 END AS DEPTH_1_05
+			, CASE WHEN DEPTH_1 = '06' THEN SUM(SCORE) ELSE 0 END AS DEPTH_1_06
+			, CASE WHEN DEPTH_1 = '07' THEN SUM(SCORE) ELSE 0 END AS DEPTH_1_07
+			, CASE WHEN DEPTH_1 = '08' THEN SUM(SCORE) ELSE 0 END AS DEPTH_1_08
+			, CASE WHEN DEPTH_1 = '09' THEN SUM(SCORE) ELSE 0 END AS DEPTH_1_09
+			, CASE WHEN DEPTH_1 = '10' THEN SUM(SCORE) ELSE 0 END AS DEPTH_1_10
+			FROM EVAL
+			INNER JOIN CODE ON CODE.GRP_CD = 'KPI_DEPTH_1' AND EVAL.DEPTH_1 = CODE.CD
+			WHERE '1' = '1'
+			AND EVAL_YEAR = #{evalYear}
+			GROUP BY CORP_SEQ, EVAL_DATE, DEPTH_1, CODE.CD_NM
+			ORDER BY CORP_SEQ, DEPTH_1
+		) EVAL
+		ON EVAL.CORP_SEQ = CORP.CORP_SEQ
+		WHERE 1 = 1
+		AND (#{p.corpType} = '' OR CORP.CORP_TYPE = #{p.corpType}) AND (#{p.compKind} = '' OR CORP.COMP_KIND = #{p.compKind}) AND (#{p.bizSect} = '' OR CORP.BIZ_SECT = #{p.bizSect})
+		AND CORP.DEL_YN = 'N'
+		GROUP BY CORP_SEQ
+		ORDER BY DEPTH_1_SUM DESC
+	</select>
+	
+	<select id="findCorpKpiAllDepth2" resultType="com.sck.model.Kpi">
+			SELECT 
+				D2.CORP_SEQ
+			    , D2.DEPTH_1
+			    , D2.DEPTH_1_NM
+			    , D2.DEPTH_2
+			    , D2.DEPTH_2_NM
+			    , D2.MAX_SCORE
+			    , EV.EVAL_DATE
+			    , IFNULL(EV.SCORE, '') AS SCORE
+		    FROM
+		    (
+		        SELECT 
+		        	$CORPSEQ AS CORP_SEQ
+			        , SCO.DEPTH_1
+			        , SCO.DEPTH_2
+			        , D1.CD_NM AS DEPTH_1_NM
+			        , D2.CD_NM AS DEPTH_2_NM
+			        , SUM(MAX_SCORE) AS MAX_SCORE
+		        FROM SCORING AS SCO
+		        INNER JOIN CODE AS D1 ON D1.GRP_CD = 'KPI_DEPTH_1' AND SCO.DEPTH_1 = D1.CD
+		        INNER JOIN CODE AS D2 ON D2.GRP_CD = 'KPI_DEPTH_2' AND SCO.DEPTH_2 = D2.CD
+		        GROUP BY DEPTH_1, DEPTH_2
+		    ) AS D2
+		    LEFT JOIN
+		    (
+		        SELECT 
+		        	CORP_SEQ
+			        , EVAL_DATE
+			        , DEPTH_1
+			        , DEPTH_2
+			        , SCORE
+		        FROM EVAL
+		        WHERE CORP_SEQ = #{corpSeq}
+		        AND EVAL_YEAR = #{evalYear}
+		    ) AS EV ON D2.CORP_SEQ = EV.CORP_SEQ AND D2.DEPTH_2 = EV.DEPTH_2
+	</select>
+	
+	<select id="findCorpKpis" resultType="com.sck.model.Corp">
+		SELECT
+			<include refid="corpInfoColumns" />
+			, IFNULL(EVAL.SCORE) AS SCORE
+		FROM CORP_INFO AS INFO
+		LEFT JOIN 
+		(
+			SELECT 
+				CORP_SEQ, SUM(SCORE) AS SCORE 
+			FROM EVAL 
+			WHERE EVAL_YEAR =
+			<choose>
+				<when test="evalYear != null and evalYear != ''">
+					#{evalYear}
+				</when>
+				<otherwise>
+					(SELECT MAX(EVAL_YEAR) AS EVAL_YEAR FROM EVAL)
+				</otherwise>
+			</choose>
+		) AS EVAL ON INFO.CORP_SEQ = EVAL_CORP_SEQ
+		
+		WHERE INFO.DEL_YN = 'N'
+		<if test="p.corpNm != null and p.corpNm != ''">
+		AND (INFO.CORP_NM LIKE CONCAT('%',#{p.corpNm},'%') OR INFO.CEO_NM LIKE CONCAT('%',#{p.corpNm},'%') OR INFO.BIZ_NO LIKE CONCAT('%',#{p.corpNm},'%'))
+		</if>
+		<if test="p.corpType != null and p.corpType != ''">
+		AND INFO.CORP_TYPE = #{p.corpType}
+		</if>
+		<if test="p.compKind != null and p.compKind != ''">
+		AND INFO.COMP_KIND = #{p.compKind}
+		</if>
+		<if test="p.bizSect != null and p.bizSect != ''">
+		AND INFO.BIZ_SECT = #{p.bizSect}
+		</if>
+		ORDER by SCORE
+		<if test="page != null">
+		LIMIT #{page.limitStart}, #{page.limitEnd}
+		</if>
+	</select>
+	
+	<select id="findCurrentYearKpi" resultType="int">
+		SELECT
+			EVAL_SEQ
+		FROM EVAL
+		WHERE CORP_SEQ = #{p.corpSeq}
+		AND EVAL_YEAR = YEAR(now())
+		AND DEPTH_1 = #{p.depth1}
+		AND DEPTH_2 = #{p.depth2}
+	</select>
+	
+	<insert id="insertCorpKpi">
+		INSERT INTO EVAL
+		(
+			CORP_SEQ
+			, EVAL_YEAR
+			, EVAL_DATE
+			, DEPTH_1
+			, DEPTH_2
+			, SCORE
+			, CRE_DT
+		)
+		VALUES
+		(
+			#{p.corpSeq}
+			, year(now())
+			, now()
+			, #{p.depth1}
+			, #{p.depth2}
+			, #{p.score}
+			, now()
+		)
+	</insert>
+	
+	<update id="updateCorpKpi">
+		UPDATE EVAL
+		SET
+			SCORE = #{p.score}
+			, MOD_DT = now()
+		WHERE CORP_SEQ = #{p.corpSeq}
+		AND EVAL_YEAR = year(now())
+		AND DEPTH_1 = #{depth1}
+		AND DEPTH_2 = #{depth2}
+	</update>
+	
+	<select id="findCurrentYear" resultType="int">
+		SELECT YEAR(NOW()) 
+	</select>
+	
+	<select id="findMaxYear" resultType="int">
+		SELECT MAX(EVAL_YEAR) AS EVAL_YEAR FROM EVAL
+	</select>
+	
+	<select id="findCorpKpiDetailDepth1" resultType="com.sck.model.CorpKpiDetail">
+		SELECT 
+			D1.CORP_SEQ
+			, D1.DEPTH_1
+			, D1.DEPTH_1_NM
+			, D1.MAX_SCORE
+			, EV.EVAL_DATE
+			, IFNULL(EV.SCORE, '') AS SCORE
+		FROM
+		(
+			SELECT 
+				#{corpSeq} as CORP_SEQ
+				, SCO.DEPTH_1
+				, CODE.CD_NM as DEPTH_1_NM
+				, SUM(MAX_SCORE) as MAX_SCORE
+			FROM SCORING as SCO
+			INNER JOIN CODE ON CODE.GRP_CD = 'KPI_DEPTH_1' AND SCO.DEPTH_1 = CODE.CD
+			GROUP BY DEPTH_1
+		) AS D1
+		LEFT JOIN
+		(
+			SELECT 
+				CORP_SEQ
+				, EVAL_DATE
+				, DEPTH_1
+				, SUM(SCORE) AS SCORE
+			FROM EVAL
+			WHERE CORP_SEQ = #{corpSeq}
+			AND EVAL_YEAR = #{evalYear}
+			GROUP BY CORP_SEQ, EVAL_DATE, DEPTH_1
+		) AS EV ON D1.CORP_SEQ = EV.CORP_SEQ AND D1.DEPTH_1 = EV.DEPTH_1
+	</select>
+	
+	<select id="findAllCorpKpiDetailDepth1" resultType="com.sck.model.CorpKpi">
+		SELECT 
+			CORP.CORP_SEQ
+			, D1.EVAL_DATE
+			, D1.DEPTH_1
+			, IFNULL(D1.SCORE, '') AS SCORE
+		FROM CORP_INFO AS CORP
+		LEFT JOIN
+		(
+		    SELECT 
+		    	CORP_SEQ
+			    , EVAL_DATE
+			    , DEPTH_1
+			    , SUM(SCORE) AS SCORE
+		    FROM EVAL
+		    WHERE DEPTH_1 = #{depth1}
+		    AND EVAL_YEAR = #{evalYear}
+		    GROUP BY CORP_SEQ, EVAL_DATE, DEPTH_1
+		) AS D1 ON CORP.CORP_SEQ = D1.CORP_SEQ
+	</select>
+	
+	<select id="findAllCorpKpiDetailDepth2" resultType="com.sck.model.Kpi">
+		SELECT 
+			D2.CORP_SEQ
+			, D2.DEPTH_2
+			, D2.DEPTH_2_NM
+			, D2.MAX_SCORE
+			, EV.EVAL_DATE
+			, IFNULL(EV.SCORE, '') AS SCORE
+	    FROM
+	    (
+	        SELECT 
+	        	#{corpSeq} AS CORP_SEQ
+				, SCO.DEPTH_2
+				, CODE.CD_NM AS DEPTH_2_NM
+				, SUM(MAX_SCORE) AS MAX_SCORE
+	        FROM SCORING AS SCO
+	        INNER JOIN CODE ON CODE.GRP_CD = 'KPI_DEPTH_2' AND SCO.DEPTH_2 = CODE.CD
+	        AND DEPTH_1 = #{depth1}
+	        GROUP BY DEPTH_2
+	    ) AS D2
+	    LEFT JOIN
+	    (
+	        SELECT 
+	        	CORP_SEQ
+				, EVAL_DATE
+				, DEPTH_1
+				, DEPTH_2
+				, SCORE
+	        FROM EVAL
+	        WHERE CORP_SEQ = #{corpSeq}
+	        AND DEPTH_1 = #{depth1}
+	        AND EVAL_YEAR = #{evalYear}
+	    ) AS EV ON D2.CORP_SEQ = EV.CORP_SEQ AND D2.DEPTH_2 = EV.DEPTH_2
+	</select>
+	
+	<select id="findKpiDetailDepth1Avg" resultType="com.sck.model.Kpi">
+		SELECT
+			EVAL_DATE
+			, DEPTH_1
+			, AVG(SUM_1) AS AVG
+		FROM
+		(
+		  SELECT 
+			CORP_SEQ
+			, EVAL_DATE
+			, DEPTH_1
+			, SUM(SCORE) AS SUM_1
+		  FROM EVAL
+		  WHERE EVAL_YEAR = #{evalYear}
+		  GROUP BY CORP_SEQ, EVAL_DATE, DEPTH_1
+		) S
+		GROUP BY EVAL_DATE, DEPTH_1
+	</select>
+	
+	
+	
+	
+</mapper>

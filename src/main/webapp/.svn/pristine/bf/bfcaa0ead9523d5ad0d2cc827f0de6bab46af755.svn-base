@@ -1,0 +1,336 @@
+package com.sck.modules.corp;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.sck.model.Corp;
+import com.sck.model.CorpDetail;
+import com.sck.model.CorpEmployee;
+import com.sck.model.CorpFinance;
+import com.sck.model.CorpHelp;
+import com.sck.model.CorpKpi;
+import com.sck.model.CorpKpiDepth1;
+import com.sck.model.CorpKpiDetail;
+import com.sck.model.Kpi;
+import com.sck.model.Page;
+import com.sck.model.PageList;
+import com.sck.util.DataTransform;
+
+@Service
+public class CorpService
+{
+	@Autowired
+	private CorpRepository repository;
+	
+	public CorpDetail findCorpDetail(Integer corpSeq)
+	{
+		CorpDetail detail = new CorpDetail();
+		detail.setInfo(findCorpInfo(corpSeq));
+		detail.setEmployee(findCorpEmployee(corpSeq));
+		detail.setFinance(findCorpFinance(corpSeq));
+		detail.setHelp(findCorpHelpLast3Years(corpSeq));
+		return detail;
+	}
+	
+	public PageList findCorpInfos(int page, Corp param)
+	{
+		if(page == 0)
+		{
+			page = 1;
+		}
+		Page p = new Page(repository.countCorpInfos(param), page);
+		List<Corp> list = repository.findCorpInfos(param, p);
+		PageList result = new PageList(p, list);
+		return result;
+	}
+	
+	public List<Corp> findCorpInfos(Corp param)
+	{
+		List<Corp> list = repository.findCorpInfos(param, null);
+		return list;
+	}
+	
+	public Corp findCorpInfo(Integer corpSeq)
+	{
+		return repository.findCorpInfo(corpSeq);
+	}
+	
+	public int saveCorpInfos(List<Corp> params)
+	{
+		int r = 0;
+		for(Corp p : params)
+		{
+			r += saveCorpInfo(p);
+		}
+		return r;
+	}
+	
+	public int saveCorpInfo(Corp param)
+	{
+		int r = 0;
+		if(param.getCorpSeq() != null && param.getCorpSeq() > 0)
+		{
+			r = repository.updateCorpInfo(param);
+		}
+		else
+		{
+			r = repository.insertCorpInfo(param);
+		}
+		return r;
+	}
+	
+	public int deleteCorpInfo(Integer corpSeq)
+	{
+		return repository.deleteCorpInfo(corpSeq);
+	}
+	
+	public List<CorpEmployee> findCorpEmployeeLast5Years(Integer corpSeq)
+	{
+		return repository.findCorpEmployeeLast5Years(corpSeq);
+	}
+	
+	public CorpEmployee findCorpEmployee(Integer corpSeq)
+	{
+		return repository.findCorpEmployee(corpSeq);
+	}
+	
+	public int saveCorpEmployees(List<CorpEmployee> params)
+	{
+		int r = 0;
+		for(CorpEmployee p : params)
+		{
+			r += saveCorpEmployee(p);
+		}
+		return r;
+	}
+	
+	public int saveCorpEmployee(CorpEmployee param)
+	{
+		int r = 0;
+		if(param.getEmpSeq() != null && param.getEmpSeq() > 0)
+		{
+			r = repository.updateCorpEmployee(param);
+		}
+		else
+		{
+			r = repository.insertCorpEmployee(param);
+		}
+		return r;
+	}
+	
+	public int deleteCorpEmployee(Integer employeeSeq)
+	{
+		return repository.deleteCorpEmployee(employeeSeq);
+	}
+	
+	
+	public CorpFinance findCorpFinance(Integer corpSeq)
+	{
+		return repository.findCorpFinance(corpSeq);
+	}
+	
+	public List<CorpFinance> findCorpFinanceLast10Years(Integer corpSeq)
+	{
+		return repository.findCorpFinanceLast10Years(corpSeq);
+	}
+	
+	public int saveCorpFinances(List<CorpFinance> params)
+	{
+		int r = 0;
+		for(CorpFinance p : params)
+		{
+			r += saveCorpFinance(p);
+		}
+		return r;
+	}
+	
+	public int saveCorpFinance(CorpFinance param)
+	{
+		int r = 0;
+		if(param.getFinnSeq() != null && param.getFinnSeq() > 0)
+		{
+			r = repository.updateCorpFinance(param);
+		}
+		else
+		{
+			r = repository.insertCorpFinance(param);
+		}
+		return r;
+	}
+	
+	public int deleteCorpFinance(Integer finnSeq)
+	{
+		return repository.deleteCorpFinance(finnSeq);
+	}
+	
+	public List<CorpHelp> findCorpHelpLast3Years(Integer corpSeq)
+	{
+		return repository.findCorpHelpLast3Years(corpSeq);
+	}
+	
+	public int saveCorpHelps(List<CorpHelp> params)
+	{
+		int r = 0;
+		for(CorpHelp p : params)
+		{
+			r += saveCorpHelp(p);
+		}
+		return r;
+	}
+	
+	public int saveCorpHelp(CorpHelp param)
+	{
+		int r = 0;
+		if(param.getHelpSeq() != null && param.getHelpSeq() > 0)
+		{
+			r = repository.updateCorpHelp(param);
+		}
+		else
+		{
+			r = repository.insertCorpHelp(param);
+		}
+		return r;
+	}
+	
+	public int deleteCorpHelp(Integer helpSeq)
+	{
+		return repository.deleteCorpHelp(helpSeq);
+	}
+	
+	public List<CorpKpiDetail> findCorpKpiDetail(Integer corpSeq, Integer evalYear)
+	{
+		if(evalYear == null)
+		{
+			evalYear = repository.findMaxYear();
+		}
+		List<CorpKpiDetail> details = repository.findCorpKpiDetailDepth1(corpSeq, evalYear);
+		List<Kpi> avgs = repository.findKpiDetailDepth1Avg(evalYear);
+		String depth1 = null;
+		Integer score = 0;
+		Integer ranking = 1;
+		for(CorpKpiDetail detail : details)
+		{
+			depth1 = detail.getDepth1();
+			score = detail.getScore();
+			ranking = 1;
+			List<CorpKpi> depth1CorpKpis = repository.findAllCorpKpiDetailDepth1(evalYear, depth1);
+			for(CorpKpi p : depth1CorpKpis)
+			{
+				if(p.getCorpSeq() == corpSeq)
+				{
+					continue;
+				}
+				if(score < p.getScore())
+				{
+					ranking += 1;
+				}
+			}
+			for(Kpi p : avgs)
+			{
+				if(p.getDepth1().equals(depth1))
+				{
+					detail.setAvg(p.getAvg());
+					break;
+				}
+			}
+			detail.setCorpCount(depth1CorpKpis.size());
+			detail.setRanking(ranking);
+			
+			List<Kpi> depth2Rows = repository.findAllCorpKpiDetailDepth2(evalYear, corpSeq, depth1);
+			detail.setDepth2(depth2Rows);
+		}
+		return details;
+	}
+	
+	public PageList findCorpKpis(int page, String evalYear, Corp param)
+	{
+		if(page == 0)
+		{
+			page = 1;
+		}
+		Page p = new Page(repository.countCorpInfos(param), page);
+		List<Corp> list = repository.findCorpKpis(evalYear, param, p);
+		PageList result = new PageList(p, list);
+		return result;
+	}
+	
+	public List<Corp> findCorpKpis(String evalYear, Corp param)
+	{
+		List<Corp> list = repository.findCorpKpis(evalYear, param, null);
+		return list;
+	}
+	
+	public int saveCorpKpis(List<CorpKpi> params)
+	{
+		int r = 0;
+		for(CorpKpi p : params)
+		{
+			r += saveCorpKpi(p);
+		}
+		return r;
+	}
+	
+	public int saveCorpKpi(CorpKpi param)
+	{
+		int r = 0;
+		Integer evalSeq = repository.findCurrentYearKpi(param);
+		if(evalSeq != null)
+		{
+			r = repository.updateCorpKpi(param);
+		}
+		else
+		{
+			r = repository.insertCorpKpi(param);
+		}
+		return r;
+	}
+	
+	public List<Kpi> findKpiDepth1(Integer evalYear)
+	{
+		if(evalYear == null)
+		{
+			evalYear = repository.findMaxYear();
+		}
+		return repository.findKpiDepth1(evalYear);
+	}
+	
+	public List<CorpKpi> findCorpKpiDepth1(Integer evalYear, String depth1)
+	{
+		if(evalYear == null)
+		{
+			evalYear = repository.findMaxYear();
+		}
+		if(depth1 == null || depth1.equals(""))
+		{
+			depth1 = "01";
+		}
+		return repository.findCorpKpiDepth1(evalYear, depth1);
+	}
+	
+	public List<CorpKpiDepth1> findCorpKpiAllDepth(Integer evalYear, Corp param)
+	{
+		if(evalYear == null)
+		{
+			evalYear = repository.findMaxYear();
+		}
+		List<CorpKpiDepth1> depth1 = repository.findCorpKpiAllDepth1(evalYear, param);
+		for(CorpKpiDepth1 row : depth1)
+		{
+			row.setDepth2(repository.findCorpKpiAllDepth2(row.getCorpSeq(), evalYear));
+		}
+		return depth1;
+	}
+	
+	public List<Map> findKpiScoreByCorp(Integer corpSeq)
+	{
+		List<Map> list = repository.findKpiScoreByCorp(corpSeq);
+		DataTransform transform = new DataTransform();
+		list = transform.toPivot(list, "DEPTH_1", "DEPTH_1_NM", "EVAL_YEAR", "SCORE",new String[]{"CORP_SEQ"});
+		return list; 
+				
+	}
+	
+}
