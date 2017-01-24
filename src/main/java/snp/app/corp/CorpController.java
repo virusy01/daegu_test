@@ -256,4 +256,10 @@ public class CorpController
                                                  @RequestParam(name = "KPI_KIND") String kpiKind){
         return service.findOpTrend(RequestParams.map(), kpiKind);
     }
+
+	// pie chart 데모1
+	@RequestMapping(value="/yearly-report/chartDemo1", method= RequestMethod.GET)
+	public List<Map<String, Object>>chartDemo1(@RequestParam(name = "CORP_KIND") String corpKind){
+		return service.chartDemo1(corpKind);
+	}
 }

@@ -3,33 +3,25 @@
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="snp.app.hq.HqRepository">
-	<!-- 센터 목록 -->
+	<!-- 기업 목록 -->
 	<select id="findCorps" resultType="hashmap">
 		SELECT
 			    CORP_SEQ
-			  , CENTER_NM
-			  , UP_INSTITUTE_NM
+			  , CORP_NM
 			  , OPEN_DT
-			  , TEL_NO
-			  , FAX_NO
-			  , ADDRESS
-			  , CEO_NM
-			  , CEO_MOBILE_NO
-			  , MANAGER_NM
-			  , MANAGER_MOBILE_NO
-			  , CORP_TYPE
-			  , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'CORP_TYPE' AND CD = CORP_TYPE) AS CORP_TYPE_NM
-			  , SE_CERT_YN
-			  , SE_CERT_REV_NO
-			  , SE_NM
-			  , SE_DT
-			  , JOB_SUPP_BEGIN_DT
-			  , JOB_SUPP_END_DT
+			  , SE_YN
+			  , ORG_TYPE
+			  , BEFORE_TYPE
+			  , LEG_TYPE1
+			  , LEG_TYPE2
+			  , MAIN_TYPE
+			  , SECTOR
+			  , REGION
 			  , REG_ID
 			  , REG_DT
 		      , MOD_ID
 			  , MOD_DT
-		 FROM CORP_INFO
+		 FROM CORP_INFO_SE
 	</select>
 
 	<!-- 월간실적(비용현황)-->

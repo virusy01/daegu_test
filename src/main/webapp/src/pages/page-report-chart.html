@@ -33,10 +33,9 @@
 	<table id="tableKPI" class="table-kpi table-bordered">
 		<thead>
 			<tr>
-				<th>성과지표</th>
-				<th>세부 성과지표</th>
-				<th>측정 방법</th>
-				<th>지표집계</th>
+				<th>대분류</th>
+				<th>중분류</th>
+				<th>소분류</th>
 				<th>평가등급</th>
 			</tr>
 		</thead>
@@ -162,43 +161,44 @@ Polymer({
 
 			td = document.createElement('td');
 
-			if (this._options['k' + row.L3_KPI_CD])
-				td.innerHTML = this._options['k' + row.L3_KPI_CD][row.RESULT];
-			else
-				td.innerHTML = accounting.formatNumber(row.RESULT);
-			Polymer.dom(tr).appendChild(td);
-
-
 			td = document.createElement('td');
 			td.setAttribute('class', 'pointer');
 			td.setAttribute('row', row.L3_KPI_CD);
 			Polymer.dom(tr).appendChild(td);
 
-			switch (row.STATUS) {
-				case 'B':
-				case 'W':
-				case 'G':
-					var legend = document.createElement('div');
-					legend.setAttribute('class', this._grade[row.STATUS]);
-					Polymer.dom(td).appendChild(legend);
-					this.listen(td, 'tap', '_showPieChart');
-					break;
-				case 'NA':
-					var btn = document.createElement('button');
-					btn.setAttribute('type', 'button');
-					btn.setAttribute('class', 'btn btn-xs btn-success');
-					btn.innerHTML = '비교';
-					Polymer.dom(td).appendChild(btn);
-					<!--td.innerHTML = '비교';-->
-					this.listen(td, 'tap', '_showBarChart');
-					break;
-				default:
-					var legend = document.createElement('div');
-					legend.setAttribute('class', this._grade['B']);
-					Polymer.dom(td).appendChild(legend);
-					break;
-			}
-			
+            switch (row.L3_KPI_CD) {
+                case '010101':
+                case '010201':
+                case '010101':
+                case '020101':
+                case '020102':
+                case '030101':
+                    var legend = document.createElement('div');
+                    legend.setAttribute('class', this._grade['W']);
+                    Polymer.dom(td).appendChild(legend);
+                    break;
+                case '010105':
+                case '010203':
+                case '010210':
+                case '020104':
+                case '030102':
+                case '040103':
+                case '040202':
+                case '040301':
+                case '040501':
+                case '040505':
+                    var legend = document.createElement('div');
+                    legend.setAttribute('class', this._grade['B']);
+                    Polymer.dom(td).appendChild(legend);
+                    break;
+                default:
+                    var legend = document.createElement('div');
+                    legend.setAttribute('class', this._grade['G']);
+                    Polymer.dom(td).appendChild(legend);
+                    break;
+            }
+
+
 			Polymer.dom(table).appendChild(tr);
 
 			prevRowNum = row.L1_KPI_CD;

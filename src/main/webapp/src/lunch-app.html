@@ -96,37 +96,62 @@
 			    </template>
 
         <template is="dom-if" if="{{!_corpSeq}}">
-			    <a href="/app/center-status/list/" name="center-status" class="menu">
+			<div class="menu">
+				<iron-icon icon="folder"></iron-icon>
+				기업 현황관리
+			</div>
+			    <a href="/app/center-status/list/" name="center-status" class="menu submenu">
 				    <iron-icon icon="assignment"></iron-icon>
-				    센터별 현황조회
+				    사회적기업
 			    </a>
-			    <a href="/app/overall-status/income/" name="overall-status" class="menu">
-				    <iron-icon icon="assignment"></iron-icon>
-				    전체 현황조회
-			    </a>
-			    <a href="/app/center-kpi/list/" name="center-kpi" class="menu">
-				    <iron-icon icon="list"></iron-icon>
-				    센터별 성과지표 조회
-			    </a>
-			    <a href="/app/overall-kpi/list/" name="overall-kpi" class="menu">
-				    <iron-icon icon="list"></iron-icon>
-				    전체 성과지표 조회
-			    </a>
+				<a href="/app/center-status/list/" name="center-status" class="menu submenu">
+					<iron-icon icon="assignment"></iron-icon>
+					협동조합
+				</a>
+				<a href="/app/center-status/list/" name="center-status" class="menu submenu">
+					<iron-icon icon="assignment"></iron-icon>
+					마을기업
+				</a>
+
+			<div class="menu">
+				<iron-icon icon="folder"></iron-icon>
+				기업 성과관리
+			</div>
+				<a href="/app/center-kpi/list/" name="center-kpi" class="menu submenu">
+					<iron-icon icon="assessment"></iron-icon>
+					사회적기업
+				</a>
+				<a href="/app/center-kpi/list/" name="center-kpi" class="menu submenu">
+					<iron-icon icon="assessment"></iron-icon>
+					협동조합
+				</a>
+				<a href="/app/center-kpi/list/" name="center-kpi" class="menu submenu">
+					<iron-icon icon="assessment"></iron-icon>
+					마을기업
+				</a>
+			<div class="menu">
+				<iron-icon icon="folder"></iron-icon>
+				성과지표 분석
+			</div>
+				<a href="/app/report-graph" name="report-graph" class="menu submenu">
+					<iron-icon icon="timeline"></iron-icon>
+					성과지표 등급별 분석
+				</a>
+				<a href="/app/center-status/list/" name="center-status" class="menu submenu">
+					<iron-icon icon="timeline"></iron-icon>
+					성과지표 항목별 분석
+				</a>
+				<a href="/app/center-status/list/" name="center-status" class="menu submenu">
+					<iron-icon icon="timeline"></iron-icon>
+					성과지표 지역별 분석
+				</a>
 			    <a href="#" name="general" class="menu">
 				    <iron-icon icon="settings"></iron-icon>
 				    관리
 			    </a>
 			    <a href="/app/center-id/" name="center-id" class="menu submenu">
 				    <iron-icon icon="perm-identity"></iron-icon>
-				    센터 아이디 관리
-			    </a>
-			    <a href="/app/menu-management/" name="menu-management" class="menu submenu">
-				    <iron-icon icon="menu"></iron-icon>
-				    메뉴 관리
-			    </a>
-			    <a href="/app/add-kpi/" name="add-kpi" class="menu submenu">
-				    <iron-icon icon="add"></iron-icon>
-				    성과지표 등록
+				    사용자 관리
 			    </a>
 			    </template>
         </iron-selector>
@@ -138,7 +163,7 @@
                 <app-header condenses reveals effects="waterfall">
                         <app-toolbar>
                                 <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
-                                <div title>행복도시락 사업관리지원시스템</div>
+                                <div title>대구사회적경제지원센터 사업관리지원시스템</div>
                                 <div class="loginInfo">
                                         [[_userName]]님 로그인중입니다
                                         <div class="login-delimeter"></div>
@@ -157,17 +182,17 @@
                                                 <iron-pages role="main" selected="[[page]]" attr-for-selected="name">
                                                         <page-general name="general"></page-general>
                                                         <page-employment name="employment"></page-employment>
-							<page-monthly-report name="monthly-report" route="{{route}}"></page-monthly-report>
-							<page-yearly-report name="yearly-report" route="{{route}}"></page-yearly-report>
+														<page-monthly-report name="monthly-report" route="{{route}}"></page-monthly-report>
+														<page-yearly-report name="yearly-report" route="{{route}}"></page-yearly-report>
                                                         <page-center-status name="center-status" route="{{route}}"></page-center-status>
                                                         <page-overall-status name="overall-status" route="{{route}}"></page-overall-status>
-							<page-center-kpi name="center-kpi" route="{{route}}"></page-center-kpi>
-							<page-overall-kpi name="overall-kpi"></page-overall-kpi>
-							<page-center-id name="center-id" route="{{route}}"></page-center-id>
-							<page-menu-management name="menu-management" route="{{route}}"></page-menu-management>
-							<page-add-kpi name="add-kpi"></page-add-kpi>
-							<page-report-graph name="report-graph"></page-report-graph>
-							<page-report-chart name="report-chart"></page-report-chart>
+														<page-center-kpi name="center-kpi" route="{{route}}"></page-center-kpi>
+														<page-overall-kpi name="overall-kpi"></page-overall-kpi>
+														<page-center-id name="center-id" route="{{route}}"></page-center-id>
+														<page-menu-management name="menu-management" route="{{route}}"></page-menu-management>
+														<page-add-kpi name="add-kpi"></page-add-kpi>
+														<page-report-graph name="report-graph"></page-report-graph>
+														<page-report-chart name="report-chart"></page-report-chart>
                                                 </iron-pages>
                                         </div>
                                 </div>

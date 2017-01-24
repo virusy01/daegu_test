@@ -5,17 +5,8 @@
 <mapper namespace="snp.app.corp.CorpRepository">
     <select id="findKpi_010101" resultType="hashmap">
 		<![CDATA[
-/* • 자부담 공공급식 가치=급식수×6,400원*1 (품질개선 상수)
-   양호 : 3억이상, 2~3억 : 주의, 2억미만 : 위험 */
 		SELECT
-		IFNULL(SUM(SELF_PAY) * 6400, 0) AS RESULT
-		, CASE WHEN IFNULL(SUM(SELF_PAY) * 6400, 0) >= 300000000 THEN 'G'
-		       WHEN IFNULL(SUM(SELF_PAY) * 6400, 0) >= 200000000  AND IFNULL(SUM(SELF_PAY) * 6400, 0) < 300000000 THEN 'W'
-		       ELSE 'B' END AS STATUS
-		FROM M_INCOME_PUBLIC_MEALS
-		WHERE CORP_SEQ = #{p.CORP_SEQ}
-		  AND YEAR = #{p.YEAR}
-		GROUP BY YEAR
+		'G' AS STATUS
 		]]>
 	</select>
 
