@@ -128,10 +128,16 @@ public interface CorpRepository
 	List<Map<String, Object>> findOpBizStudyTime(@Param("p") Map<String, Object> params, @Param("u") User user);
 
 
-	// pie chart demo1
-	List<Map<String, Object>>chartDemo0(@Param("u") User user);
-	List<Map<String, Object>>chartDemo1(@Param("u") User user);
-	List<Map<String, Object>>chartDemo2(@Param("u") User user);
-	List<Map<String, Object>>chartDemo3(@Param("u") User user);
+	// 성과지표 등급별 분석 데모용
+	List<Map<String, Object>>chartDemo10(@Param("u") User user);
+	List<Map<String, Object>>chartDemo11(@Param("u") User user);
+	List<Map<String, Object>>chartDemo12(@Param("u") User user);
+	List<Map<String, Object>>chartDemo13(@Param("u") User user);
+
+	// 성과지표 등급별 분석 데모용
+	List<Map<String, Object>>chartDemo2(@Param("p") Map<String, Object> params,@Param("u") User user);
+
+	// 성과지표 등급별 분석 데모용
+	List<Map<String, Object>>chartDemo3(@Param("p") Map<String, Object> params,@Param("u") User user);
 }
 	

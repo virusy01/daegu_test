@@ -257,9 +257,21 @@ public class CorpController
         return service.findOpTrend(RequestParams.map(), kpiKind);
     }
 
-	// pie chart 데모1
-	@RequestMapping(value="/yearly-report/chartDemo1", method= RequestMethod.GET)
+	// 성과지표 등급별 분석 데모용
+	@RequestMapping(value="/analytics/chartDemo1", method= RequestMethod.GET)
 	public List<Map<String, Object>>chartDemo1(@RequestParam(name = "CORP_KIND") String corpKind){
 		return service.chartDemo1(corpKind);
+	}
+
+	// 성과지표 항목별 분석 데모용
+	@RequestMapping(value="/analytics/chartDemo2", method= RequestMethod.GET)
+	public List<Map<String, Object>>chartDemo2(@RequestParam(name = "CORP_KIND") String corpKind){
+		return service.chartDemo2(RequestParams.map(),corpKind);
+	}
+
+	// 성과지표 지역별 분석 데모용
+	@RequestMapping(value="/analytics/chartDemo3", method= RequestMethod.GET)
+	public List<Map<String, Object>>chartDemo3(@RequestParam(name = "CORP_KIND") String corpKind){
+		return service.chartDemo3(RequestParams.map(),corpKind);
 	}
 }

@@ -541,25 +541,33 @@ public class CorpService {
 	}
 
 
-	// pie chart demo1
+	// 성과지표 등급별 분석 데모용
 	public List<Map<String, Object>>chartDemo1(String corpKind) {
 		List<Map<String, Object>> result;
 		switch (corpKind) {
 			case "0":
-				result = repository.chartDemo0(Security.user()); //전체
+				result = repository.chartDemo10(Security.user()); //전체
 				break;
 			case "1":
-				result = repository.chartDemo1(Security.user()); //사회적기업
+				result = repository.chartDemo11(Security.user()); //사회적기업
 				break;
 			case "2":
-				result = repository.chartDemo2(Security.user()); //협동조합
+				result = repository.chartDemo12(Security.user()); //협동조합
 				break;
 			default:
-				result = repository.chartDemo3(Security.user()); //마을기업
+				result = repository.chartDemo13(Security.user()); //마을기업
 				break;
 		}
 
 		return result;
 	}
+	// 성과지표 항목별 분석 데모용
+	public List<Map<String, Object>>chartDemo2(Map<String, Object> params,String corpKind) {
+		return repository.chartDemo2(params,Security.user());
+	}
 
+	// 성과지표 지역별 분석 데모용
+	public List<Map<String, Object>>chartDemo3(Map<String, Object> params,String corpKind) {
+		return repository.chartDemo3(params,Security.user());
+	}
 }
