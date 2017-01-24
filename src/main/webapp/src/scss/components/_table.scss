@@ -6,9 +6,9 @@
 .table {
 	thead th {
 		@extend %default-th;
-		background-color: #fc7000;
+		background-color: #b67036;
 		color: white;
-		border: 1px solid #db6100 !important;
+		border: 1px solid #965e30 !important;
 	}
 
 	tbody {
@@ -56,9 +56,9 @@ td {
 		
 		th {
 			@extend %default-th;
-			background-color: #fc7000;
+			background-color: #b67036;
 			color: white;
-			border: 1px solid #db6100 !important;
+			border: 1px solid #965e30 !important;
 		}
 	}
 
@@ -87,9 +87,9 @@ td {
 		
 		th {
 			@extend %default-th;
-			background-color: #fc7000;
+			background-color: #b67036;
 			color: white;
-			border: 1px solid #db6100 !important;
+			border: 1px solid #965e30 !important;
 		}
 	}
 
