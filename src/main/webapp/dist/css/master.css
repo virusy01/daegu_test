@@ -6181,9 +6181,9 @@ paper-checkbox {
   cursor: pointer; }
 
 .legend-danger, .legend-warning, .legend-good {
-  width: 12px;
-  height: 12px;
-  border-radius: 12px;
+  width: 13px;
+  height: 13px;
+  border-radius: 13px;
   border: 1px solid #e3e3e3;
   margin: 0 auto; }
 
@@ -6191,10 +6191,10 @@ paper-checkbox {
   background-color: red; }
 
 .legend-warning {
-  background-color: yellow; }
+  background-color: orange; }
 
 .legend-good {
-  background-color: green; }
+  background-color: blue; }
 
 .vertically-scrollable {
   overflow-x: auto; }
@@ -6244,9 +6244,9 @@ paper-checkbox {
   vertical-align: middle !important; }
 
 .table thead th {
-  background-color: #fc7000;
+  background-color: #4db14e;
   color: white;
-  border: 1px solid #db6100 !important; }
+  border: 1px solid #8fe490 !important; }
 
 .table tbody th {
   background-color: #eaeaea; }
@@ -6274,9 +6274,9 @@ td {
   height: 34px; }
 
 .table-kpi thead th {
-  background-color: #fc7000;
+  background-color: #4db14e;
   color: white;
-  border: 1px solid #db6100 !important; }
+  border: 1px solid #8fe490 !important; }
 
 .table-kpi tr td {
   padding: 5px; }
@@ -6301,9 +6301,9 @@ td {
   .table-overall-kpi thead tr {
     height: 34px; }
   .table-overall-kpi thead th {
-    background-color: #fc7000;
+    background-color: #4db14e;
     color: white;
-    border: 1px solid #db6100 !important; }
+    border: 1px solid #8fe490 !important; }
   .table-overall-kpi tr td {
     padding: 5px; }
   .table-overall-kpi tr:first-child td {
