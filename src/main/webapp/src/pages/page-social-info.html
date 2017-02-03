@@ -1,27 +1,27 @@
 <link rel="import" href="/bower_components/app-route/app-route.html">
 <link rel="import" href="/bower_components/iron-pages/iron-pages.html">
 
-<dom-module id="page-center-status">
+<dom-module id="page-social-info">
 <template>
 	<app-route route="{{route}}"
-		   pattern="/app/center-status/:mode/:id"
+		   pattern="/app/social-info/:mode/:id"
 		   data="{{routeData}}"
 		   active>
 	</app-route>
 
 	<div class="page-header">
-		<h2>사회적기업 현황조회 <small>SocialEnterprise Status</small></h2>
+		<h2>사회적기업 현황조회 <small>SocialEnterprise Information</small></h2>
 	</div>
 
-	<iron-pages id="center-status" selected="[[mode]]" attr-for-selected="name">
-		<center-status-list name="list"></center-status-list>
-		<center-status-view name="view" id="{{routeData.id}}"></center-status-view>
+	<iron-pages id="social-info" selected="[[mode]]" attr-for-selected="name">
+		<social-info-list name="list"></social-info-list>
+		<social-info-view name="view" id="{{routeData.id}}"></social-info-view>
 	</iron-pages>
 
 </template>
 <script>
 Polymer({
-	is: 'page-center-status',
+	is: 'page-social-info',
 
 	properties: {
 		mode: {
@@ -41,7 +41,7 @@ Polymer({
 	},
 
 	_importHTML: function(newValue) {
-		this.importHref(this.resolveUrl('center-status/center-status-' + newValue + '.html'), null, null, true);
+		this.importHref(this.resolveUrl('corp-info/social-info-' + newValue + '.html'), null, null, true);
 	},
 });
 </script>

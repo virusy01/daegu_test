@@ -1,0 +1,251 @@
+<!--
+	@license
+	Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+	This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+	The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+	The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+	Code distributed by Google as part of the polymer project is also
+	subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="/bower_components/polymer/polymer.html">
+
+<link rel="import" href="/bower_components/app-route/app-location.html">
+<link rel="import" href="/bower_components/app-route/app-route.html">
+
+<link rel="import" href="/bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="/bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="/bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="/bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="/bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="/bower_components/app-layout/app-toolbar/app-toolbar.html">
+
+<link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/bower_components/paper-button/paper-button.html" />
+<link rel="import" href="/bower_components/paper-menu/paper-menu.html" />
+<link rel="import" href="/bower_components/paper-menu/paper-submenu.html" />
+
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="/bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="/bower_components/iron-icons/iron-icons.html" />
+<link rel="import" href="/bower_components/iron-image/iron-image.html" />
+
+<link rel="import" href="/src/components/common/loading-spinner.html" />
+
+<link rel="import" href="styles/base/common.html" />
+<link rel="import" href="styles/components/header.html" />
+
+<dom-module id="daegu-app">
+
+	<template>
+		<style include="common-style"></style>
+		<style include="header-style"></style>
+		<style>
+			:host {
+				display: block;
+				--app-drawer-content-container: {
+					background-color: #d5d5d5;
+				}
+			}
+		</style>
+
+		<app-location id="appLocation" route="{{route}}"></app-location>
+		<app-route
+			route="{{route}}"
+			pattern="/app/:page"
+			data="{{routeData}}"
+			tail="{{subroute}}">
+		</app-route>
+
+		<loading-spinner></loading-spinner>
+		<app-drawer-layout fullbleed>
+
+			<!-- Drawer content -->
+			<app-drawer>
+				<app-toolbar><iron-image src="img/logo.png"></iron-image></app-toolbar>
+
+				<iron-selector selected="[[page]]" attr-for-selected="name">
+
+					<template is="dom-if" if="{{!_corpSeq}}">
+						<div class="menu">
+							<iron-icon icon="folder"></iron-icon>
+							기업 현황관리
+						</div>
+							<a href="/app/social-info/list/" name="social-info" class="menu submenu">
+								<iron-icon icon="assignment"></iron-icon>
+								사회적기업
+							</a>
+							<a href="/app/center-status/list/" name="center-status" class="menu submenu">
+								<iron-icon icon="assignment"></iron-icon>
+								협동조합
+							</a>
+							<a href="/app/center-status/list/" name="center-status" class="menu submenu">
+								<iron-icon icon="assignment"></iron-icon>
+								마을기업
+							</a>
+
+						<div class="menu">
+							<iron-icon icon="folder"></iron-icon>
+							기업 성과관리
+						</div>
+							<a href="/app/center-kpi/list/" name="center-kpi" class="menu submenu">
+								<iron-icon icon="assessment"></iron-icon>
+								사회적기업
+							</a>
+							<a href="/app/center-kpi/list/" name="center-kpi" class="menu submenu">
+								<iron-icon icon="assessment"></iron-icon>
+								협동조합
+							</a>
+							<a href="/app/center-kpi/list/" name="center-kpi" class="menu submenu">
+								<iron-icon icon="assessment"></iron-icon>
+								마을기업
+							</a>
+						<div class="menu">
+							<iron-icon icon="folder"></iron-icon>
+							성과지표 분석
+						</div>
+							<a href="/app/analytics-all" name="analytics-all" class="menu submenu">
+								<iron-icon icon="timeline"></iron-icon>
+								기업 유형별 성과지표 분석
+							</a>
+							<a href="/app/analytics-radar" name="analytics-radar" class="menu submenu">
+								<iron-icon icon="timeline"></iron-icon>
+								성과항목 그룹별 분석
+							</a>
+						</div>
+							<a href="/app/analytics-grade" name="analytics-grade" class="menu submenu">
+								<iron-icon icon="timeline"></iron-icon>
+								성과지표 등급별 분석
+							</a>
+							<a href="/app/analytics-kpi" name="analytics-kpi" class="menu submenu">
+								<iron-icon icon="timeline"></iron-icon>
+									성과지표 항목별 분석
+								</a>
+							<a href="/app/analytics-region" name="analytics-region" class="menu submenu">
+								<iron-icon icon="timeline"></iron-icon>
+									성과지표 지역별 분석
+							</a>
+							<a href="#" name="general" class="menu">
+								<iron-icon icon="settings"></iron-icon>
+								관리
+							</a>
+							<a href="/app/center-id/" name="center-id" class="menu submenu">
+								<iron-icon icon="perm-identity"></iron-icon>
+								사용자 관리
+							</a>
+						</template>
+				</iron-selector>
+			</app-drawer>
+
+			<!-- Main content -->
+			<app-header-layout has-scrolling-region>
+
+					<app-header condenses reveals effects="waterfall">
+							<app-toolbar>
+									<paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
+									<div title>대구사회적경제지원센터 사업관리지원시스템</div>
+									<div class="loginInfo">
+											[[_userName]]님 로그인중입니다
+											<div class="login-delimeter"></div>
+									</div>
+									<paper-button on-tap="_logout">
+											<iron-icon icon="exit-to-app"></iron-icon>
+											Logout
+									</paper-button>
+							</app-toolbar>
+					</app-header>
+
+					<div class="container-fluid">
+							<div class="row">
+									<div class="col-xs-12">
+											<div class="card">
+													<iron-pages role="main" selected="[[page]]" attr-for-selected="name">
+
+														<page-social-info name="social-info" route="{{route}}"></page-social-info>
+
+
+															<page-general name="general"></page-general>
+															<page-employment name="employment"></page-employment>
+															<page-monthly-report name="monthly-report" route="{{route}}"></page-monthly-report>
+															<page-yearly-report name="yearly-report" route="{{route}}"></page-yearly-report>
+
+															<page-overall-status name="overall-status" route="{{route}}"></page-overall-status>
+															<page-center-kpi name="center-kpi" route="{{route}}"></page-center-kpi>
+															<page-overall-kpi name="overall-kpi"></page-overall-kpi>
+															<page-center-id name="center-id" route="{{route}}"></page-center-id>
+															<page-menu-management name="menu-management" route="{{route}}"></page-menu-management>
+															<page-add-kpi name="add-kpi"></page-add-kpi>
+															<page-report-graph name="report-graph"></page-report-graph>
+															<page-report-chart name="report-chart"></page-report-chart>
+															<page-analytics-all name="analytics-all"></page-analytics-all>
+															<page-analytics-all name="analytics-all"></page-analytics-all>
+															<page-analytics-radar name="analytics-radar"></page-analytics-radar>
+															<page-analytics-grade name="analytics-grade"></page-analytics-grade>
+															<page-analytics-kpi name="analytics-kpi"></page-analytics-kpi>
+															<page-analytics-region name="analytics-region"></page-analytics-region>
+
+													</iron-pages>
+											</div>
+									</div>
+							</div>
+					</div>
+			</app-header-layout>
+
+			</app-drawer-layout>
+
+	</template>
+
+        <script>
+                Polymer({
+
+                        is: 'daegu-app',
+
+                        properties: {
+
+                                page: {
+                                        type: String,
+                                        reflectToAttribute: true,
+                                        observer: '_pageChanged'
+                                },
+                                _userName: {
+                                        type: Number,
+                                        value: function() {
+                                                return sessionStorage.userName;
+                                        }
+                                },
+                                _corpSeq: {
+                                        type: Number,
+                                        value: function() {
+                                                return sessionStorage.corpSeq > 0 ? sessionStorage.corpSeq : 0;
+                                        }
+                                },
+
+                        },
+
+                        observers: [
+                                '_routePageChanged(routeData.page)'
+                        ],
+
+                        attached: function() {
+                                if (this.$.appLocation.path == '/')
+                                        this.$.appLocation.path = '/app/social-info/list/';
+                        },
+
+                        _routePageChanged: function(page) {
+                                this.page = page || (this._corpSeq ? 'general' : 'center-status');
+                        },
+
+                        _pageChanged: function(page) {
+                                // load page import on demand.
+                                this.importHref(
+                                        this.resolveUrl('pages/page-' + page + '.html'), null, null, true);
+                        },
+
+                        _logout: function(e) {
+                                sessionStorage.clear();
+                                location.href = '/logout';
+                        },
+
+                });
+        </script>
+
+</dom-module>
