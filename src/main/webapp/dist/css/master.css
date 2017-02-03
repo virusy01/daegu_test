@@ -6161,11 +6161,11 @@ a:link, a:visited, a:active, a:hover {
   right: 0 !important; }
 
 .btn-primary {
-  background-color: #ff7504;
-  border-color: #ed6b00; }
+  background-color: #4db14e;
+  border-color: #4da14e; }
   .btn-primary:hover, .btn-primary:active, .btn-primary:focus {
-    background-color: #ed6b00 !important;
-    border-color: #da6200 !important; }
+    background-color: green !important;
+    border-color: green !important; }
 
 /*
  *polymer components reset
@@ -6244,9 +6244,9 @@ paper-checkbox {
   vertical-align: middle !important; }
 
 .table thead th {
-  background-color: #fc7000;
+  background-color: #4db14e;
   color: white;
-  border: 1px solid #db6100 !important; }
+  border: 1px solid #4db14e !important; }
 
 .table tbody th {
   background-color: #eaeaea; }
@@ -6274,9 +6274,9 @@ td {
   height: 34px; }
 
 .table-kpi thead th {
-  background-color: #fc7000;
+  background-color: #4db14e;
   color: white;
-  border: 1px solid #db6100 !important; }
+  border: 1px solid #4db14e !important; }
 
 .table-kpi tr td {
   padding: 5px; }
