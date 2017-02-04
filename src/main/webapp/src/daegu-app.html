@@ -87,7 +87,7 @@
 							<iron-icon icon="folder"></iron-icon>
 							기업 성과관리
 						</div>
-							<a href="/app/center-kpi/list/" name="center-kpi" class="menu submenu">
+							<a href="/app/social-kpi/list/" name="social-kpi" class="menu submenu">
 								<iron-icon icon="assessment"></iron-icon>
 								사회적기업
 							</a>
@@ -163,6 +163,8 @@
 														<page-social-info name="social-info" route="{{route}}"></page-social-info>
 
 
+														<page-social-kpi name="social-kpi" route="{{route}}"></page-social-kpi>
+
 															<page-general name="general"></page-general>
 															<page-employment name="employment"></page-employment>
 															<page-monthly-report name="monthly-report" route="{{route}}"></page-monthly-report>
@@ -231,7 +233,7 @@
                         },
 
                         _routePageChanged: function(page) {
-                                this.page = page || (this._corpSeq ? 'general' : 'center-status');
+                                this.page = page || 'social-info';
                         },
 
                         _pageChanged: function(page) {

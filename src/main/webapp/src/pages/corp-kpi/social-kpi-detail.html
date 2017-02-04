@@ -4,7 +4,7 @@
 <link rel="import" href="/src/pages/popup/popup-bar-chart.html">
 <link rel="import" href="/src/pages/popup/popup-pie-chart.html">
 
-<dom-module id="page-report-chart">
+<dom-module id="social-kpi-detail">
 <template>
 	<iron-location id="location"></iron-location>
 
@@ -52,7 +52,7 @@
 </template>
 <script>
 Polymer({
-	is: 'page-report-chart',
+	is: 'social-kpi-detail',
 
 	behaviors: [Lunch.LoaderBehavior],
 
@@ -242,7 +242,7 @@ Polymer({
 	},
 
 	_toList: function(e) {
-		this.$.location.path = '/app/center-kpi/list/';
+		this.$.location.path = '/app/social-kpi/list/';
 	},	
 });
 </script>

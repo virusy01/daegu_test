@@ -10,8 +10,18 @@ import java.util.Map;
 @Repository
 public interface HqRepository
 {
-	// 센터 기본정보
-	List<Map<String, Object>> findCorps();
+	// 사회적기업 기업 리스트
+	List<Map<String, Object>> findSocialList();
+
+	// 사회적기업 상세정보
+	Map<String, Object> findSocialInfo(@Param("CORP_SEQ") int corpSeq, @Param("u") User user);
+	int insertSocialInfo(@Param("p") Map<String, Object> params, @Param("u") User user);
+	int updateSocialInfo(@Param("p") Map<String, Object> params, @Param("u") User user);
+	int deleteSocialInfo(@Param("CORP_SEQ") int corpSeq, @Param("u") User user);
+
+
+
+
 
 	// 정산보고/비용현황
 	List<Map<String, Object>> findCosts(@Param("p") Map<String, Object> params, @Param("u") User user);

@@ -1,11 +1,11 @@
 <link rel="import" href="/bower_components/app-route/app-route.html">
 <link rel="import" href="/bower_components/iron-pages/iron-pages.html">
-<link rel="import" href="/src/pages/page-report-chart.html">
+<link rel="import" href="/src/pages/corp-kpi/social-kpi-detail.html">
 
-<dom-module id="page-center-kpi">
+<dom-module id="page-social-kpi">
 <template>
 	<app-route route="{{route}}"
-		   pattern="/app/center-kpi/:mode/:id"
+		   pattern="/app/social-kpi/:mode/:id"
 		   data="{{routeData}}"
 		   active>
 	</app-route>
@@ -15,14 +15,14 @@
 	</div>
 
 	<iron-pages id="center-status" selected="[[mode]]" attr-for-selected="name">
-		<center-kpi-list name="list"></center-kpi-list>
-		<page-report-chart name="view" id="{{routeData.id}}" admin-mode="true"></page-report-chart>
+		<social-kpi-list name="list"></social-kpi-list>
+		<social-kpi-detail name="view" id="{{routeData.id}}" admin-mode="true"></social-kpi-detail>
 	</iron-pages>
 
 </template>
 <script>
 Polymer({
-	is: 'page-center-kpi',
+	is: 'page-social-kpi',
 
 	properties: {
 		mode: {
@@ -43,7 +43,7 @@ Polymer({
 
 	_importHTML: function(newValue) {
 		if (newValue != 'view')
-			this.importHref(this.resolveUrl('center-kpi/center-kpi-' + newValue + '.html'), null, null, true);
+			this.importHref(this.resolveUrl('corp-kpi/social-kpi-' + newValue + '.html'), null, null, true);
 	},
 });
 </script>

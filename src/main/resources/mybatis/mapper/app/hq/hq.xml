@@ -3,26 +3,538 @@
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="snp.app.hq.HqRepository">
-	<!-- 기업 목록 -->
-	<select id="findCorps" resultType="hashmap">
+	<!-- 사회적기업 목록 -->
+	<select id="findSocialList" resultType="hashmap">
 		SELECT
-			    CORP_SEQ
-			  , CORP_NM
-			  , OPEN_DT
-			  , SE_YN
-			  , ORG_TYPE
-			  , BEFORE_TYPE
-			  , LEG_TYPE1
-			  , LEG_TYPE2
-			  , MAIN_TYPE
-			  , SECTOR
-			  , REGION
-			  , REG_ID
-			  , REG_DT
-		      , MOD_ID
-			  , MOD_DT
-		 FROM CORP_INFO_SE
+		 CORP_SEQ
+		, CORP_NM
+		, OPEN_DT
+		, SE_YN
+		, ORG_TYPE
+		, BEFORE_TYPE
+		, LEG_TYPE1
+		, LEG_TYPE2
+		, MAIN_TYPE
+		, SECTOR
+		, REGION
+		FROM CORP_INFO_SE
 	</select>
+
+	<!-- 사회적기업 상세정보 -->
+	<select id="findSocialInfo" resultType="hashmap">
+		SELECT
+		 CORP_NM
+		, OPEN_DT
+		, SE_YN
+		, ORG_TYPE
+		, BEFORE_TYPE
+		, LEG_TYPE1
+		, LEG_TYPE2
+		, MAIN_TYPE
+		, SECTOR
+		, HISTORY
+		, REGION
+		, LIFE_CHG
+		, LOCAL_SOL
+		, CITY_ENL
+		, WEAK_CHG
+		, WEAK_ENL
+		, PROD_NM
+		, PROD_PCT
+		, SERVICE_NM
+		, SERVICE_PCT
+		, IN_TOT1
+		, IN_SEE1
+		, IN_TOT2
+		, IN_SEE2
+		, IN_TOT3
+		, IN_SEE3
+		, OUT_TOT1
+		, OUT_SEE1
+		, OUT_TOT2
+		, OUT_SEE2
+		, OUT_TOT3
+		, OUT_SEE3
+		, SAILS_PCT1
+		, SAILS_PCT2
+		, SAILS_PCT3
+		, SAILS_PCT4
+		, SAILS_PCT5
+		, TOT_PAR
+		, TOT_EMP
+		, MALE_CNT
+		, FMALE_CNT
+		, REG_EMP_CNT
+		, REG_WEEK_TIME
+		, REG_MONTH_PAY
+		, REG_EMP_TIME
+		, COM_EMP_CNT
+		, COM_WEEK_TIME
+		, COM_MONTH_PAY
+		, COM_EMP_TIME
+		, CONTRACT_EMP_CNT
+		, CONTRACT_WEEK_TIME
+		, CONTRACT_MONTH_PAY
+		, CONTRACT_EMP_TIME
+		, TIME_EMP_CNT
+		, TIME_WEEK_TIME
+		, TIME_MONTH_PAY
+		, TIME_EMP_TIME
+		, SPE_EMP_CNT
+		, SPE_WEEK_TIME
+		, SPE_MONTH_PAY
+		, SPE_EMP_TIME
+		, VOL_EMP_CNT
+		, VOL_WEEK_TIME
+		, AVG_YEAR
+		, WEAK_TOT_EMP
+		, WEAK_MALE_CNT
+		, WEAK_FMALE_CNT
+		, WEAK_REG_EMP_CNT
+		, WEAK_REG_WEEK_TIME
+		, WEAK_REG_MONTH_PAY
+		, WEAK_REG_EMP_TIME
+		, WEAK_COM_EMP_CNT
+		, WEAK_COM_WEEK_TIME
+		, WEAK_COM_MONTH_PAY
+		, WEAK_COM_EMP_TIME
+		, WEAK_CONTRACT_EMP_CNT
+		, WEAK_CONTRACT_WEEK_TIME
+		, WEAK_CONTRACT_MONTH_PAY
+		, WEAK_CONTRACT_EMP_TIME
+		, WEAK_TIME_EMP_CNT
+		, WEAK_TIME_WEEK_TIME
+		, WEAK_TIME_MONTH_PAY
+		, WEAK_TIME_EMP_TIME
+		, WEAK_SPE_EMP_CNT
+		, WEAK_SPE_WEEK_TIME
+		, WEAK_SPE_MONTH_PAY
+		, WEAK_SPE_EMP_TIME
+		, WEAK_VOL_EMP_CNT
+		, WEAK_VOL_WEEK_TIME
+		, WEAK_AVG_YEAR
+		, WEAK_TYPE1_CNT
+		, WEAK_TYPE2_CNT
+		, WEAK_TYPE3_CNT
+		, WEAK_TYPE4_CNT
+		, WEAK_TYPE5_CNT
+		, WEAK_TYPE6_CNT
+		, WEAK_TYPE7_CNT
+		, FIRST_REASON
+		, SECOND_REASON
+		, ETC_REASON
+		, CORP_ASSET
+		, CORP_CAPITAL
+		, CORP_DEBT
+		, CORP_SALES
+		, CORP_SALES_PROFIT
+		, CORP_LABOR_COST
+		, CORP_TAX
+		, CORP_OP_PROFIT
+		, CORP_NET_INCOM
+		, GOV_SUP_ASSET
+		, GOV_SUP_COST
+		, SPONSOR_DONATE
+		, FUNDS_REVENUE
+		, FUNDS_DONATE
+		, FUNDS_SUPP
+		, FUNDS_LOAN
+		, FUNDS_ETC
+		FROM CORP_INFO_SE
+		WHERE CORP_SEQ = #{CORP_SEQ}
+	</select>
+
+	<insert id="insertSocialInfo">
+		INSERT INTO CORP_INFO_SE
+		(
+		 CORP_NM
+		, OPEN_DT
+		, SE_YN
+		, ORG_TYPE
+		, BEFORE_TYPE
+		, LEG_TYPE1
+		, LEG_TYPE2
+		, MAIN_TYPE
+		, SECTOR
+		, HISTORY
+		, REGION
+		, LIFE_CHG
+		, LOCAL_SOL
+		, CITY_ENL
+		, WEAK_CHG
+		, WEAK_ENL
+		, PROD_NM
+		, PROD_PCT
+		, SERVICE_NM
+		, SERVICE_PCT
+		, IN_TOT1
+		, IN_SEE1
+		, IN_TOT2
+		, IN_SEE2
+		, IN_TOT3
+		, IN_SEE3
+		, OUT_TOT1
+		, OUT_SEE1
+		, OUT_TOT2
+		, OUT_SEE2
+		, OUT_TOT3
+		, OUT_SEE3
+		, SAILS_PCT1
+		, SAILS_PCT2
+		, SAILS_PCT3
+		, SAILS_PCT4
+		, SAILS_PCT5
+		, TOT_PAR
+		, TOT_EMP
+		, MALE_CNT
+		, FMALE_CNT
+		, REG_EMP_CNT
+		, REG_WEEK_TIME
+		, REG_MONTH_PAY
+		, REG_EMP_TIME
+		, COM_EMP_CNT
+		, COM_WEEK_TIME
+		, COM_MONTH_PAY
+		, COM_EMP_TIME
+		, CONTRACT_EMP_CNT
+		, CONTRACT_WEEK_TIME
+		, CONTRACT_MONTH_PAY
+		, CONTRACT_EMP_TIME
+		, TIME_EMP_CNT
+		, TIME_WEEK_TIME
+		, TIME_MONTH_PAY
+		, TIME_EMP_TIME
+		, SPE_EMP_CNT
+		, SPE_WEEK_TIME
+		, SPE_MONTH_PAY
+		, SPE_EMP_TIME
+		, VOL_EMP_CNT
+		, VOL_WEEK_TIME
+		, AVG_YEAR
+		, WEAK_TOT_EMP
+		, WEAK_MALE_CNT
+		, WEAK_FMALE_CNT
+		, WEAK_REG_EMP_CNT
+		, WEAK_REG_WEEK_TIME
+		, WEAK_REG_MONTH_PAY
+		, WEAK_REG_EMP_TIME
+		, WEAK_COM_EMP_CNT
+		, WEAK_COM_WEEK_TIME
+		, WEAK_COM_MONTH_PAY
+		, WEAK_COM_EMP_TIME
+		, WEAK_CONTRACT_EMP_CNT
+		, WEAK_CONTRACT_WEEK_TIME
+		, WEAK_CONTRACT_MONTH_PAY
+		, WEAK_CONTRACT_EMP_TIME
+		, WEAK_TIME_EMP_CNT
+		, WEAK_TIME_WEEK_TIME
+		, WEAK_TIME_MONTH_PAY
+		, WEAK_TIME_EMP_TIME
+		, WEAK_SPE_EMP_CNT
+		, WEAK_SPE_WEEK_TIME
+		, WEAK_SPE_MONTH_PAY
+		, WEAK_SPE_EMP_TIME
+		, WEAK_VOL_EMP_CNT
+		, WEAK_VOL_WEEK_TIME
+		, WEAK_AVG_YEAR
+		, WEAK_TYPE1_CNT
+		, WEAK_TYPE2_CNT
+		, WEAK_TYPE3_CNT
+		, WEAK_TYPE4_CNT
+		, WEAK_TYPE5_CNT
+		, WEAK_TYPE6_CNT
+		, WEAK_TYPE7_CNT
+		, FIRST_REASON
+		, SECOND_REASON
+		, ETC_REASON
+		, CORP_ASSET
+		, CORP_CAPITAL
+		, CORP_DEBT
+		, CORP_SALES
+		, CORP_SALES_PROFIT
+		, CORP_LABOR_COST
+		, CORP_TAX
+		, CORP_OP_PROFIT
+		, CORP_NET_INCOM
+		, GOV_SUP_ASSET
+		, GOV_SUP_COST
+		, SPONSOR_DONATE
+		, FUNDS_REVENUE
+		, FUNDS_DONATE
+		, FUNDS_SUPP
+		, FUNDS_LOAN
+		, FUNDS_ETC
+		, REG_ID
+		, REG_DT
+		)
+		VALUES
+		(
+		  #{p.COPR_SEQ}
+		, #{p.CORP_NM}
+		, #{p.OPEN_DT, typeHandler=snp.spring.mybatis.DateHandler}
+		, #{p.SE_YN}
+		, #{p.ORG_TYPE}
+		, #{p.BEFORE_TYPE}
+		, #{p.LEG_TYPE1}
+		, #{p.LEG_TYPE2}
+		, #{p.MAIN_TYPE}
+		, #{p.SECTOR}
+		, #{p.HISTORY}
+		, #{p.REGION}
+		, #{p.LIFE_CHG}
+		, #{p.LOCAL_SOL}
+		, #{p.CITY_ENL}
+		, #{p.WEAK_CHG}
+		, #{p.WEAK_ENL}
+		, #{p.PROD_NM}
+		, #{p.PROD_PCT}
+		, #{p.SERVICE_NM}
+		, #{p.SERVICE_PCT}
+		, #{p.IN_TOT1}
+		, #{p.IN_SEE1}
+		, #{p.IN_TOT2}
+		, #{p.IN_SEE2}
+		, #{p.IN_TOT3}
+		, #{p.IN_SEE3}
+		, #{p.OUT_TOT1}
+		, #{p.OUT_SEE1}
+		, #{p.OUT_TOT2}
+		, #{p.OUT_SEE2}
+		, #{p.OUT_TOT3}
+		, #{p.OUT_SEE3}
+		, #{p.SAILS_PCT1}
+		, #{p.SAILS_PCT2}
+		, #{p.SAILS_PCT3}
+		, #{p.SAILS_PCT4}
+		, #{p.SAILS_PCT5}
+		, #{p.TOT_PAR}
+		, #{p.TOT_EMP}
+		, #{p.MALE_CNT}
+		, #{p.FMALE_CNT}
+		, #{p.REG_EMP_CNT}
+		, #{p.REG_WEEK_TIME}
+		, #{p.REG_MONTH_PAY}
+		, #{p.REG_EMP_TIME}
+		, #{p.COM_EMP_CNT}
+		, #{p.COM_WEEK_TIME}
+		, #{p.COM_MONTH_PAY}
+		, #{p.COM_EMP_TIME}
+		, #{p.CONTRACT_EMP_CNT}
+		, #{p.CONTRACT_WEEK_TIME}
+		, #{p.CONTRACT_MONTH_PAY}
+		, #{p.CONTRACT_EMP_TIME}
+		, #{p.TIME_EMP_CNT}
+		, #{p.TIME_WEEK_TIME}
+		, #{p.TIME_MONTH_PAY}
+		, #{p.TIME_EMP_TIME}
+		, #{p.SPE_EMP_CNT}
+		, #{p.SPE_WEEK_TIME}
+		, #{p.SPE_MONTH_PAY}
+		, #{p.SPE_EMP_TIME}
+		, #{p.VOL_EMP_CNT}
+		, #{p.VOL_WEEK_TIME}
+		, #{p.AVG_YEAR}
+		, #{p.WEAK_TOT_EMP}
+		, #{p.WEAK_MALE_CNT}
+		, #{p.WEAK_FMALE_CNT}
+		, #{p.WEAK_REG_EMP_CNT}
+		, #{p.WEAK_REG_WEEK_TIME}
+		, #{p.WEAK_REG_MONTH_PAY}
+		, #{p.WEAK_REG_EMP_TIME}
+		, #{p.WEAK_COM_EMP_CNT}
+		, #{p.WEAK_COM_WEEK_TIME}
+		, #{p.WEAK_COM_MONTH_PAY}
+		, #{p.WEAK_COM_EMP_TIME}
+		, #{p.WEAK_CONTRACT_EMP_CNT}
+		, #{p.WEAK_CONTRACT_WEEK_TIME}
+		, #{p.WEAK_CONTRACT_MONTH_PAY}
+		, #{p.WEAK_CONTRACT_EMP_TIME}
+		, #{p.WEAK_TIME_EMP_CNT}
+		, #{p.WEAK_TIME_WEEK_TIME}
+		, #{p.WEAK_TIME_MONTH_PAY}
+		, #{p.WEAK_TIME_EMP_TIME}
+		, #{p.WEAK_SPE_EMP_CNT}
+		, #{p.WEAK_SPE_WEEK_TIME}
+		, #{p.WEAK_SPE_MONTH_PAY}
+		, #{p.WEAK_SPE_EMP_TIME}
+		, #{p.WEAK_VOL_EMP_CNT}
+		, #{p.WEAK_VOL_WEEK_TIME}
+		, #{p.WEAK_AVG_YEAR}
+		, #{p.WEAK_TYPE1_CNT}
+		, #{p.WEAK_TYPE2_CNT}
+		, #{p.WEAK_TYPE3_CNT}
+		, #{p.WEAK_TYPE4_CNT}
+		, #{p.WEAK_TYPE5_CNT}
+		, #{p.WEAK_TYPE6_CNT}
+		, #{p.WEAK_TYPE7_CNT}
+		, #{p.FIRST_REASON}
+		, #{p.SECOND_REASON}
+		, #{p.ETC_REASON}
+		, #{p.CORP_ASSET}
+		, #{p.CORP_CAPITAL}
+		, #{p.CORP_DEBT}
+		, #{p.CORP_SALES}
+		, #{p.CORP_SALES_PROFIT}
+		, #{p.CORP_LABOR_COST}
+		, #{p.CORP_TAX}
+		, #{p.CORP_OP_PROFIT}
+		, #{p.CORP_NET_INCOM}
+		, #{p.GOV_SUP_ASSET}
+		, #{p.GOV_SUP_COST}
+		, #{p.SPONSOR_DONATE}
+		, #{p.FUNDS_REVENUE}
+		, #{p.FUNDS_DONATE}
+		, #{p.FUNDS_SUPP}
+		, #{p.FUNDS_LOAN}
+		, #{p.FUNDS_ETC}
+		, #{u.userId}
+		, now()
+		)
+	</insert>
+
+	<update id="updateSocialInfo">
+		UPDATE CORP_INFO_SE
+		SET
+	    CORP_NM           = #{p.CORP_NM}
+	    , OPEN_DT           = #{p.OPEN_DT, typeHandler=snp.spring.mybatis.DateHandler}
+		, SE_YN            = #{p.SE_YN}
+		, ORG_TYPE            = #{p.ORG_TYPE}
+		, BEFORE_TYPE           = #{p.BEFORE_TYPE}
+		, LEG_TYPE1            = #{p.LEG_TYPE1}
+		, LEG_TYPE2     = #{p.LEG_TYPE2}
+		, MAIN_TYPE        = #{p.MAIN_TYPE}
+		, SECTOR 		= #{p.SECTOR}
+		, HISTORY 		= #{p.HISTORY}
+		, REGION         = #{p.REGION}
+		, LIFE_CHG		= #{p.LIFE_CHG}
+		, LOCAL_SOL		= #{p.LOCAL_SOL}
+		, CITY_ENL		= #{p.CITY_ENL}
+		, WEAK_CHG		= #{p.WEAK_CHG}
+		, WEAK_ENL		= #{p.WEAK_ENL}
+		, PROD_NM		= #{p.PROD_NM}
+		, PROD_PCT		= #{p.PROD_PCT}
+		, SERVICE_NM		= #{p.SERVICE_NM}
+		, SERVICE_PCT		= #{p.SERVICE_PCT}
+		, IN_TOT1		= #{p.IN_TOT1}
+		, IN_SEE1		= #{p.IN_SEE1}
+		, IN_TOT2		= #{p.IN_TOT2}
+		, IN_SEE2		= #{p.IN_SEE2}
+		, IN_TOT3		= #{p.IN_TOT3}
+		, IN_SEE3		= #{p.IN_SEE3}
+		, OUT_TOT1 		= #{p.OUT_TOT1}
+		, OUT_SEE1		= #{p.OUT_SEE1}
+		, OUT_TOT2		= #{p.OUT_TOT2}
+		, OUT_SEE2		= #{p.OUT_SEE2}
+		, OUT_TOT3		= #{p.OUT_TOT3}
+		, OUT_SEE3		= #{p.OUT_SEE3}
+		, SAILS_PCT1		= #{p.SAILS_PCT1}
+		, SAILS_PCT2		= #{p.SAILS_PCT2}
+		, SAILS_PCT3		= #{p.SAILS_PCT3}
+		, SAILS_PCT4		= #{p.SAILS_PCT4}
+		, SAILS_PCT5		= #{p.SAILS_PCT5}
+		, TOT_PAR		= #{p.TOT_PAR}
+		, TOT_EMP		= #{p.TOT_EMP}
+		, MALE_CNT		= #{p.MALE_CNT}
+		, FMALE_CNT		= #{p.FMALE_CNT}
+		, REG_EMP_CNT		= #{p.REG_EMP_CNT}
+		, REG_WEEK_TIME		= #{p.REG_WEEK_TIME}
+		, REG_MONTH_PAY		= #{p.REG_MONTH_PAY}
+		, REG_EMP_TIME		= #{p.REG_EMP_TIME}
+		, COM_EMP_CNT		= #{p.COM_EMP_CNT}
+		, COM_WEEK_TIME		= #{p.COM_WEEK_TIME}
+		, COM_MONTH_PAY		= #{p.COM_MONTH_PAY}
+		, COM_EMP_TIME		= #{p.COM_EMP_TIME}
+		, CONTRACT_EMP_CNT		= #{p.CONTRACT_EMP_CNT}
+		, CONTRACT_WEEK_TIME		= #{p.CONTRACT_WEEK_TIME}
+		, CONTRACT_MONTH_PAY		= #{p.CONTRACT_MONTH_PAY}
+		, CONTRACT_EMP_TIME		= #{p.CONTRACT_EMP_TIME}
+		, TIME_EMP_CNT		= #{p.TIME_EMP_CNT}
+		, TIME_WEEK_TIME		= #{p.TIME_WEEK_TIME}
+		, TIME_MONTH_PAY		= #{p.TIME_MONTH_PAY}
+		, TIME_EMP_TIME		= #{p.TIME_EMP_TIME}
+		, SPE_EMP_CNT		= #{p.SPE_EMP_CNT}
+		, SPE_WEEK_TIME		= #{p.SPE_WEEK_TIME}
+		, SPE_MONTH_PAY		= #{p.SPE_MONTH_PAY}
+		, SPE_EMP_TIME		= #{p.SPE_EMP_TIME}
+		, VOL_EMP_CNT		= #{p.VOL_EMP_CNT}
+		, VOL_WEEK_TIME		= #{p.VOL_WEEK_TIME}
+		, AVG_YEAR		= #{p.AVG_YEAR}
+		, WEAK_TOT_EMP		= #{p.WEAK_TOT_EMP}
+		, WEAK_MALE_CNT		= #{p.WEAK_MALE_CNT}
+		, WEAK_FMALE_CNT		= #{p.WEAK_FMALE_CNT}
+		, WEAK_REG_EMP_CNT		= #{p.WEAK_REG_EMP_CNT}
+		, WEAK_REG_WEEK_TIME		= #{p.WEAK_REG_WEEK_TIME}
+		, WEAK_REG_MONTH_PAY		= #{p.WEAK_REG_MONTH_PAY}
+		, WEAK_REG_EMP_TIME		= #{p.WEAK_REG_EMP_TIME}
+		, WEAK_COM_EMP_CNT		= #{p.WEAK_COM_EMP_CNT}
+		, WEAK_COM_WEEK_TIME		= #{p.WEAK_COM_WEEK_TIME}
+		, WEAK_COM_MONTH_PAY		= #{p.WEAK_COM_MONTH_PAY}
+		, WEAK_COM_EMP_TIME		= #{p.WEAK_COM_EMP_TIME}
+		, WEAK_CONTRACT_EMP_CNT		= #{p.WEAK_CONTRACT_EMP_CNT}
+		, WEAK_CONTRACT_WEEK_TIME		= #{p.WEAK_CONTRACT_WEEK_TIME}
+		, WEAK_CONTRACT_MONTH_PAY		= #{p.WEAK_CONTRACT_MONTH_PAY}
+		, WEAK_CONTRACT_EMP_TIME		= #{p.WEAK_CONTRACT_EMP_TIME}
+		, WEAK_TIME_EMP_CNT		= #{p.WEAK_TIME_EMP_CNT}
+		, WEAK_TIME_WEEK_TIME		= #{p.WEAK_TIME_WEEK_TIME}
+		, WEAK_TIME_MONTH_PAY		= #{p.WEAK_TIME_MONTH_PAY}
+		, WEAK_TIME_EMP_TIME		= #{p.WEAK_TIME_EMP_TIME}
+		, WEAK_SPE_EMP_CNT		= #{p.WEAK_SPE_EMP_CNT}
+		, WEAK_SPE_WEEK_TIME		= #{p.WEAK_SPE_WEEK_TIME}
+		, WEAK_SPE_MONTH_PAY		= #{p.WEAK_SPE_MONTH_PAY}
+		, WEAK_SPE_EMP_TIME		= #{p.WEAK_SPE_EMP_TIME}
+		, WEAK_VOL_EMP_CNT		= #{p.WEAK_VOL_EMP_CNT}
+		, WEAK_VOL_WEEK_TIME		= #{p.WEAK_VOL_WEEK_TIME}
+		, WEAK_AVG_YEAR		= #{p.WEAK_AVG_YEAR}
+		, WEAK_TYPE1_CNT		= #{p.WEAK_TYPE1_CNT}
+		, WEAK_TYPE2_CNT		= #{p.WEAK_TYPE2_CNT}
+		, WEAK_TYPE3_CNT		= #{p.WEAK_TYPE3_CNT}
+		, WEAK_TYPE4_CNT		= #{p.WEAK_TYPE4_CNT}
+		, WEAK_TYPE5_CNT		= #{p.WEAK_TYPE5_CNT}
+		, WEAK_TYPE6_CNT		= #{p.WEAK_TYPE6_CNT}
+		, WEAK_TYPE7_CNT		= #{p.WEAK_TYPE7_CNT}
+		, FIRST_REASON		= #{p.FIRST_REASON}
+		, SECOND_REASON		= #{p.SECOND_REASON}
+		, ETC_REASON		= #{p.ETC_REASON}
+		, CORP_ASSET		= #{p.CORP_ASSET}
+		, CORP_CAPITAL		= #{p.CORP_CAPITAL}
+		, CORP_DEBT		= #{p.CORP_DEBT}
+		, CORP_SALES		= #{p.CORP_SALES}
+		, CORP_SALES_PROFIT 		= #{p.CORP_SALES_PROFIT}
+		, CORP_LABOR_COST		= #{p.CORP_LABOR_COST}
+		, CORP_TAX		= #{p.CORP_TAX}
+		, CORP_OP_PROFIT		= #{p.CORP_OP_PROFIT}
+		, CORP_NET_INCOM		= #{p.CORP_NET_INCOM}
+		, GOV_SUP_ASSET		= #{p.GOV_SUP_ASSET}
+		, GOV_SUP_COST		= #{p.GOV_SUP_COST}
+		, SPONSOR_DONATE		= #{p.SPONSOR_DONATE}
+		, FUNDS_REVENUE		= #{p.FUNDS_REVENUE}
+		, FUNDS_DONATE		= #{p.FUNDS_DONATE}
+		, FUNDS_SUPP		= #{p.FUNDS_SUPP}
+		, FUNDS_LOAN		= #{p.FUNDS_LOAN}
+		, FUNDS_ETC		= #{p.FUNDS_ETC}
+		, MOD_ID            = #{u.userId}
+		, MOD_DT            = now()
+		WHERE CORP_SEQ = #{p.CORP_SEQ}
+	</update>
+
+	<delete id="deleteSocialInfo">
+		DELETE FROM CORP_INFO_SE
+		WHERE CORP_SEQ = #{CORP_SEQ}
+	</delete>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	<!-- 월간실적(비용현황)-->
 	<select id="findCosts" resultType="hashmap">
