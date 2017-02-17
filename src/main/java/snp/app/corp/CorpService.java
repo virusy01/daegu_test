@@ -291,7 +291,7 @@ public class CorpService {
 			String level3Code = (String) kpiItem.get("L3_KPI_CD");
 			Map<String, Object> detailResult = getKpiDetail(level3Code, params);
 			if (detailResult != null) {
-				kpiItem.putAll(detailResult);
+				//kpiItem.putAll(detailResult);
 			}
 		});
 
@@ -300,31 +300,31 @@ public class CorpService {
 
 	public Map<String, Object> getKpiDetail(String level3Code, Map<String, Object> params) {
 		Map<String, Object> detailResult = null;
-		switch (level3Code){
-			// 사회적 가치 창출 - 공공급식 품질개선 가치 -  • 자부담 공공급식 가치=급식수×6,400원*1 (품질개선 상수)
+		switch (level3Code) {
+
 			case "010101":
 				detailResult = repository.findKpi_010101(params, Security.user());
 				break;
 			case "010102":
-				detailResult = repository.findKpi_010102(params, Security.user());
+				//detailResult = repository.findKpi_010102(params, Security.user());
 				break;
 			case "010201":
-				detailResult = repository.findKpi_010201(params, Security.user());
+				//detailResult = repository.findKpi_010201(params, Security.user());
 				break;
 			case "010301":
-				detailResult = repository.findKpi_010301(params, Security.user());
+				//detailResult = repository.findKpi_010301(params, Security.user());
 				break;
 			case "010401":
-				detailResult = repository.findKpi_010401(params, Security.user());
+				//detailResult = repository.findKpi_010401(params, Security.user());
 				break;
 			case "010402":
-				detailResult = repository.findKpi_010402(params, Security.user());
+				//detailResult = repository.findKpi_010402(params, Security.user());
 				break;
 			case "020101":
 				break;
 			// 경제적 가치 창출 - 매출액 -  • 년간 매출액 평균
 			case "030101":
-				detailResult = repository.findKpi_030101(params, Security.user());
+				//detailResult = repository.findKpi_030101(params, Security.user());
 				break;
 			case "030201":
 				break;
@@ -375,10 +375,10 @@ public class CorpService {
 	// 성과지표조회
 	public List<Map<String, Object>> findKpiCompare(Map<String, Object> params, String level3Code) {
 		List<Map<String, Object>> result = null;
-		switch (level3Code){
+		switch (level3Code) {
 			// 사회적 가치 창출 - 공공급식 품질개선 가치 -  • 자부담 공공급식 가치=급식수×6,400원*1 (품질개선 상수)
 			case "010101":
-				result = repository.findKpi_010101_compare(params, Security.user());
+				//result = repository.findKpi_010101_compare(params, Security.user());
 				break;
 			case "010102":
 				//detailResult = repository.findKpi_010102(params, Security.user());
@@ -396,7 +396,7 @@ public class CorpService {
 				break;
 			// 경제적 가치 창출 - 매출액 -  • 년간 매출액 평균
 			case "030101":
-				result = repository.findKpi_030101_compare(params, Security.user());
+				//result = repository.findKpi_030101_compare(params, Security.user());
 				break;
 			case "030201":
 				break;
@@ -464,20 +464,20 @@ public class CorpService {
 			Map<String, Object> newParam = new HashMap<>();
 			Iterator<String> keyIterator = param.keySet().iterator();
 			// HashMap은 key가 정렬되지 않았으므로 pivot 데이터 이외의 key값을 먼저 분리해낸다.
-			while(keyIterator.hasNext()){
+			while (keyIterator.hasNext()) {
 				String key = keyIterator.next();
 				// 피벗 데이터(x축)는 key-value값 분리
-				if ("YEAR".equals(key) || "CORP_SEQ".equals(key) || "CENTER_NM".equals(key)){
+				if ("YEAR".equals(key) || "CORP_SEQ".equals(key) || "CENTER_NM".equals(key)) {
 					newParam.put(key, param.get(key));
 				}
 			}
 
 			// 피벗데이터를 만날때마다 데이터를 등록한다(CORP_SEQ, KPI_CD, RESULT)
 			keyIterator = param.keySet().iterator();
-			while(keyIterator.hasNext()){
+			while (keyIterator.hasNext()) {
 				String key = keyIterator.next();
 				// 피벗 데이터(x축)는 key-value값 분리
-				if (!"YEAR".equals(key) && !"CORP_SEQ".equals(key) && !"CENTER_NM".equals(key)){
+				if (!"YEAR".equals(key) && !"CORP_SEQ".equals(key) && !"CENTER_NM".equals(key)) {
 					newParam.put("KPI_CD", key);
 					newParam.put("RESULT", param.get(key));
 					repository.deleteManualKpi(newParam, Security.user());
@@ -490,20 +490,20 @@ public class CorpService {
 			Iterator<String> keyIterator = param.keySet().iterator();
 
 			// HashMap은 key가 정렬되지 않았으므로 pivot 데이터 이외의 key값을 먼저 분리해낸다.
-			while(keyIterator.hasNext()){
+			while (keyIterator.hasNext()) {
 				String key = keyIterator.next();
 				// 피벗 데이터(x축)는 key-value값 분리
-				if ("YEAR".equals(key) || "CORP_SEQ".equals(key) || "CENTER_NM".equals(key)){
+				if ("YEAR".equals(key) || "CORP_SEQ".equals(key) || "CENTER_NM".equals(key)) {
 					newParam.put(key, param.get(key));
 				}
 			}
 
 			// 피벗데이터를 만날때마다 데이터를 등록한다(CORP_SEQ, KPI_CD, RESULT)
 			keyIterator = param.keySet().iterator();
-			while(keyIterator.hasNext()){
+			while (keyIterator.hasNext()) {
 				String key = keyIterator.next();
 				// 피벗 데이터(x축)는 key-value값 분리
-				if (!"YEAR".equals(key) && !"CORP_SEQ".equals(key) && !"CENTER_NM".equals(key)){
+				if (!"YEAR".equals(key) && !"CORP_SEQ".equals(key) && !"CENTER_NM".equals(key)) {
 					newParam.put("KPI_CD", key);
 					newParam.put("RESULT", param.get(key));
 					repository.insertManualKpi(newParam, Security.user());
@@ -532,11 +532,42 @@ public class CorpService {
 			case "4":
 				result = repository.findOpBizStudyCount(params, Security.user());
 				break;
-			default : // "5"
+			default: // "5"
 				result = repository.findOpBizStudyTime(params, Security.user());
 				break;
 		}
 
 		return result;
+	}
+
+
+	// 성과지표 등급별 분석 데모용
+	public List<Map<String, Object>>chartDemo1(String corpKind) {
+		List<Map<String, Object>> result;
+		switch (corpKind) {
+			case "0":
+				result = repository.chartDemo10(Security.user()); //전체
+				break;
+			case "1":
+				result = repository.chartDemo11(Security.user()); //사회적기업
+				break;
+			case "2":
+				result = repository.chartDemo12(Security.user()); //협동조합
+				break;
+			default:
+				result = repository.chartDemo13(Security.user()); //마을기업
+				break;
+		}
+
+		return result;
+	}
+	// 성과지표 항목별 분석 데모용
+	public List<Map<String, Object>>chartDemo2(Map<String, Object> params,String corpKind) {
+		return repository.chartDemo2(params,Security.user());
+	}
+
+	// 성과지표 지역별 분석 데모용
+	public List<Map<String, Object>>chartDemo3(Map<String, Object> params,String corpKind) {
+		return repository.chartDemo3(params,Security.user());
 	}
 }

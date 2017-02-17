@@ -17,13 +17,49 @@ public class HqController
 
 	
 	/**
-	 * 기업정보 목록
+	 * 사회적기업정보 기본정보 목록
 	 * @return
 	 */
-	@RequestMapping(value="/corps")
-	public List<Map<String, Object>> findCorpInfo(){
-		return service.findCorps();
+	@RequestMapping(value="/socialList")
+	public List<Map<String, Object>> findSocialList(){
+		return service.findSocialList();
 	}
+
+	/**
+	 * 사회적기업정보 상세정보
+	 * @return
+	 */
+	@RequestMapping(value="/socialInfo/{CORP_SEQ}")
+	public Map<String, Object> findSocialInfo(@PathVariable("CORP_SEQ") Integer corpSeq){
+		return service.findSocialInfo(corpSeq);
+	}
+
+	/**
+	 * 사회적기업 정보 저장
+	 * corp_info_save.php
+	 * @param params
+	 * @return
+	 */
+	@RequestMapping(value="/socialInfo", method= RequestMethod.POST)
+	public int saveSocialInfo(@RequestBody Map<String, Object> params)
+	{
+		return service.saveSocialInfo(params);
+	}
+
+	/**
+	 * 사회적기업 정보 삭제
+	 * corp_info_del.php
+	 * @param corpSeq
+	 * @return
+	 */
+	@RequestMapping(value="/info/{CORP_SEQ}", method= RequestMethod.DELETE)
+	public int deleteSocialInfo(@PathVariable("CORP_SEQ") Integer corpSeq)
+	{
+		return service.deleteSocialInfo(corpSeq);
+	}
+
+
+
 	
 	// 정산보고/비용현황
 	@RequestMapping(value="/monthly-report/costs", method= RequestMethod.GET)

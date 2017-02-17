@@ -22,12 +22,53 @@ public class HqService
 
 	@Autowired
 	private CorpService corpService;
-	
-	public List<Map<String, Object>> findCorps()
+
+	// 사회적기업 리스트
+	public List<Map<String, Object>> findSocialList()
 	{
-		return repository.findCorps();
+		return repository.findSocialList();
 	}
-	
+
+	// 사회적기업 상세 정보
+	public Map<String, Object> findSocialInfo(int corpSeq) {
+		return repository.findSocialInfo(corpSeq, Security.user());
+	}
+
+	public int saveSocialInfo(Map<String, Object> params) {
+		int r;
+		Integer corpSeq = (Integer) params.get("CORP_SEQ");
+		if (corpSeq != null) {
+			//repository.deleteCorpInfo(corpSeq, Security.user());
+			r = repository.updateSocialInfo(params, Security.user());
+		} else {
+			r = repository.insertSocialInfo(params, Security.user());
+		}
+		return r;
+	}
+
+	public int deleteSocialInfo(int corpSeq) {
+		return repository.deleteSocialInfo(corpSeq, Security.user());
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	// 정산보고/비용현황

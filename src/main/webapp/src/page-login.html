@@ -19,7 +19,7 @@
 	}
                 
 	.panel-default>.panel-heading {
-		background-color: #fd7400;
+		background-color: #8fe490;
 		padding-bottom: 15px;
 		text-align: center;
 	}
@@ -32,21 +32,21 @@
 			<div id="alert" class="alert alert-danger hidden" role="alert">
 				로그인 정보를 확인해주세요.
 			</div>
-                        <form is="iron-form" name="loginForm" 
-				action="/api/auth/login" 
-				method="post" 
-				on-iron-form-response="_formResponse"
-				on-iron-form-error="_formError">
-                                <div class="form-group">
-                                        <label for="loginId">아이디</label>
-					<normal-input name="userId" required></normal-input>
-                                </div>
-                                <div class="form-group">
-                                        <label for="loginPassword">비밀번호</label>
-					<normal-input name="password" type="password" required></normal-input>
-                                </div>
-                                <button type="submit" class="btn btn-success">로그인</button>
-                        </form>
+                <form is="iron-form" name="loginForm"
+                    action="/api/auth/login"
+                    method="post"
+                    on-iron-form-response="_formResponse"
+                    on-iron-form-error="_formError">
+                    <div class="form-group">
+                        <label for="loginId">아이디</label>
+                         <normal-input name="userId" required></normal-input>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">비밀번호</label>
+                        <normal-input name="password" type="password" required></normal-input>
+                    </div>
+                        <button type="submit" class="btn btn-primary">로그인</button>
+                </form>
                 </div>
         </div>
 

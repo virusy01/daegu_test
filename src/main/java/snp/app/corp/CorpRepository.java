@@ -83,18 +83,17 @@ public interface CorpRepository
 
 	// 성과지표 조회
 	List<Map<String, Object>> findKpi(@Param("p") Map<String, Object> params, @Param("u") User user);
-	/* • 자부담 공공급식 가치=급식수×6,400원*1 (품질개선 상수)
-	   양호 : 3억이상, 2~3억 : 주의, 2억미만 : 위험 */
+
 	Map<String, Object> findKpi_010101(@Param("p") Map<String, Object> params, @Param("u") User user);
-	Map<String, Object> findKpi_010102(@Param("p") Map<String, Object> params, @Param("u") User user);
-	Map<String, Object> findKpi_010201(@Param("p") Map<String, Object> params, @Param("u") User user);
-	Map<String, Object> findKpi_010301(@Param("p") Map<String, Object> params, @Param("u") User user);
-	Map<String, Object> findKpi_010401(@Param("p") Map<String, Object> params, @Param("u") User user);
-	Map<String, Object> findKpi_010402(@Param("p") Map<String, Object> params, @Param("u") User user);
+	//Map<String, Object> findKpi_010102(@Param("p") Map<String, Object> params, @Param("u") User user);
+	//Map<String, Object> findKpi_010201(@Param("p") Map<String, Object> params, @Param("u") User user);
+	//Map<String, Object> findKpi_010301(@Param("p") Map<String, Object> params, @Param("u") User user);
+	//Map<String, Object> findKpi_010401(@Param("p") Map<String, Object> params, @Param("u") User user);
+	//Map<String, Object> findKpi_010402(@Param("p") Map<String, Object> params, @Param("u") User user);
 
 
 	/* • 3년간 매출액 평균  */
-	Map<String, Object> findKpi_030101(@Param("p") Map<String, Object> params, @Param("u") User user);
+	//Map<String, Object> findKpi_030101(@Param("p") Map<String, Object> params, @Param("u") User user);
 
 	// 성과지표 조회 중 아이콘 클릭시 상세조회
     List<Map<String, Object>> findKpi_010101_compare(@Param("p") Map<String, Object> params, @Param("u") User user);
@@ -128,5 +127,17 @@ public interface CorpRepository
 	// 운영실적 추이(매출액, 인당생산성, 사업개발/자문활용 횟수, 사업개발/자문활용 금액, 교육/학습 횟수, 교육/학습 시간 - 6가지)
 	List<Map<String, Object>> findOpBizStudyTime(@Param("p") Map<String, Object> params, @Param("u") User user);
 
+
+	// 성과지표 등급별 분석 데모용
+	List<Map<String, Object>>chartDemo10(@Param("u") User user);
+	List<Map<String, Object>>chartDemo11(@Param("u") User user);
+	List<Map<String, Object>>chartDemo12(@Param("u") User user);
+	List<Map<String, Object>>chartDemo13(@Param("u") User user);
+
+	// 성과지표 등급별 분석 데모용
+	List<Map<String, Object>>chartDemo2(@Param("p") Map<String, Object> params,@Param("u") User user);
+
+	// 성과지표 등급별 분석 데모용
+	List<Map<String, Object>>chartDemo3(@Param("p") Map<String, Object> params,@Param("u") User user);
 }
 	

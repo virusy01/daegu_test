@@ -1061,7 +1061,6 @@
         , L2.KPI_NM AS L2_KPI_NM
         , L3.KPI_CD AS L3_KPI_CD
         , L3.KPI_NM AS L3_KPI_NM
-        , MA.RESULT
         , null        AS STATUS
         FROM
         (
@@ -1075,10 +1074,6 @@
         (
           SELECT * FROM KPI WHERE LEVEL = 3
         ) L3 ON (L2.KPI_CD = L3.P_KPI_CD)
-        LEFT JOIN
-        (
-          SELECT * FROM Y_MANUAL_KPI WHERE CORP_SEQ = #{p.CORP_SEQ} AND YEAR = #{p.YEAR}
-        ) MA ON (L3.KPI_CD = MA.KPI_CD)
         ORDER BY L3.LEVEL, L3.DISP_ORD
 
     </select>
@@ -1195,4 +1190,59 @@
 		GROUP BY YEAR
 		ORDER BY YEAR DESC
 	</select>
+
+	<!-- 성과지표 등급별 분석 데모용-->
+	<select id="chartDemo10" resultType="hashmap">
+		SELECT COL2 as STATUS, COL3 as COUNT
+		FROM DEMO_TBL
+		WHERE SEQ = 1 and COL1= '0'
+	</select>
+
+	<!-- 성과지표 항목별 분석 데모용 -->
+	<select id="chartDemo11" resultType="hashmap">
+		SELECT COL2 as STATUS, COL3 as COUNT
+		FROM DEMO_TBL
+		WHERE SEQ = 1 and COL1= '1'
+	</select>
+
+	<!-- pie chart DEMO2 -->
+	<select id="chartDemo12" resultType="hashmap">
+		SELECT COL2 as STATUS, COL3 as COUNT
+		FROM DEMO_TBL
+		WHERE SEQ = 1 and COL1= '2'
+	</select>
+
+	<!-- pie chart DEMO3-->
+	<select id="chartDemo13" resultType="hashmap">
+		SELECT COL2 as STATUS, COL3 as COUNT
+		FROM DEMO_TBL
+		WHERE SEQ = 1 and COL1= '3'
+	</select>
+
+	<!-- 성과지표 항목별 분석 데모용-->
+	<select id="chartDemo2" resultType="hashmap">
+	SELECT a.*
+	FROM (
+		SELECT COL2 as RESULT
+		FROM DEMO_TBL
+		WHERE SEQ = 2 and COL1= #{p.CORP_KIND}
+		ORDER BY COL3
+	) a
+	UNION	ALL
+	SELECT b.*
+	FROM (
+	   SELECT avg(COL2) as RESULT
+		FROM DEMO_TBL
+		WHERE SEQ = 2 and COL1= #{p.CORP_KIND}
+	  ) b
+	</select>
+
+	<!-- 성과지표 지역별 분석 데모용-->
+	<select id="chartDemo3" resultType="hashmap">
+		SELECT COL2 as RESULT
+		FROM DEMO_TBL
+		WHERE SEQ = 3 and COL1= #{p.CORP_KIND}
+		ORDER BY COL3
+	</select>
+
 </mapper>

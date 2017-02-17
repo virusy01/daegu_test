@@ -5,7 +5,7 @@
 	
 	<select id="findCodes" resultType="hashmap">
 		/* common.xml findCodes */
-		SELECT 
+		SELECT
 			GRP_CD,
 			CD,
 			CD_NM

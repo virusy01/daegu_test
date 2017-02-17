@@ -6161,11 +6161,11 @@ a:link, a:visited, a:active, a:hover {
   right: 0 !important; }
 
 .btn-primary {
-  background-color: #ff7504;
-  border-color: #ed6b00; }
+  background-color: #4db14e;
+  border-color: #4da14e; }
   .btn-primary:hover, .btn-primary:active, .btn-primary:focus {
-    background-color: #ed6b00 !important;
-    border-color: #da6200 !important; }
+    background-color: green !important;
+    border-color: green !important; }
 
 /*
  *polymer components reset
@@ -6181,9 +6181,9 @@ paper-checkbox {
   cursor: pointer; }
 
 .legend-danger, .legend-warning, .legend-good {
-  width: 13px;
-  height: 13px;
-  border-radius: 13px;
+  width: 12px;
+  height: 12px;
+  border-radius: 12px;
   border: 1px solid #e3e3e3;
   margin: 0 auto; }
 
@@ -6191,10 +6191,10 @@ paper-checkbox {
   background-color: red; }
 
 .legend-warning {
-  background-color: orange; }
+  background-color: yellow; }
 
 .legend-good {
-  background-color: blue; }
+  background-color: green; }
 
 .vertically-scrollable {
   overflow-x: auto; }
@@ -6246,7 +6246,7 @@ paper-checkbox {
 .table thead th {
   background-color: #4db14e;
   color: white;
-  border: 1px solid #8fe490 !important; }
+  border: 1px solid #4db14e !important; }
 
 .table tbody th {
   background-color: #eaeaea; }
@@ -6276,7 +6276,7 @@ td {
 .table-kpi thead th {
   background-color: #4db14e;
   color: white;
-  border: 1px solid #8fe490 !important; }
+  border: 1px solid #4db14e !important; }
 
 .table-kpi tr td {
   padding: 5px; }
@@ -6301,9 +6301,9 @@ td {
   .table-overall-kpi thead tr {
     height: 34px; }
   .table-overall-kpi thead th {
-    background-color: #4db14e;
+    background-color: #fc7000;
     color: white;
-    border: 1px solid #8fe490 !important; }
+    border: 1px solid #db6100 !important; }
   .table-overall-kpi tr td {
     padding: 5px; }
   .table-overall-kpi tr:first-child td {
