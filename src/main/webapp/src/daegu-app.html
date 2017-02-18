@@ -65,7 +65,6 @@
 
 				<iron-selector selected="[[page]]" attr-for-selected="name">
 
-					<template is="dom-if" if="{{!_corpSeq}}">
 						<div class="menu">
 							<iron-icon icon="folder"></iron-icon>
 							기업 현황관리
@@ -74,7 +73,7 @@
 								<iron-icon icon="assignment"></iron-icon>
 								사회적기업
 							</a>
-							<a href="/app/center-status/list/" name="center-status" class="menu submenu">
+							<a href="/app/cooperation-info/list/" name="cooperation-info" class="menu submenu">
 								<iron-icon icon="assignment"></iron-icon>
 								협동조합
 							</a>
@@ -91,7 +90,7 @@
 								<iron-icon icon="assessment"></iron-icon>
 								사회적기업
 							</a>
-							<a href="/app/center-kpi/list/" name="center-kpi" class="menu submenu">
+							<a href="/app/cooperation-kpi/list/" name="cooperation-kpi" class="menu submenu">
 								<iron-icon icon="assessment"></iron-icon>
 								협동조합
 							</a>
@@ -132,7 +131,6 @@
 								<iron-icon icon="perm-identity"></iron-icon>
 								사용자 관리
 							</a>
-						</template>
 				</iron-selector>
 			</app-drawer>
 
@@ -161,29 +159,18 @@
 													<iron-pages role="main" selected="[[page]]" attr-for-selected="name">
 
 														<page-social-info name="social-info" route="{{route}}"></page-social-info>
+														<page-cooperation-info name="cooperation-info" route="{{route}}"></page-cooperation-info>
 
 
 														<page-social-kpi name="social-kpi" route="{{route}}"></page-social-kpi>
 
-															<page-general name="general"></page-general>
-															<page-employment name="employment"></page-employment>
-															<page-monthly-report name="monthly-report" route="{{route}}"></page-monthly-report>
-															<page-yearly-report name="yearly-report" route="{{route}}"></page-yearly-report>
 
-															<page-overall-status name="overall-status" route="{{route}}"></page-overall-status>
-															<page-center-kpi name="center-kpi" route="{{route}}"></page-center-kpi>
-															<page-overall-kpi name="overall-kpi"></page-overall-kpi>
-															<page-center-id name="center-id" route="{{route}}"></page-center-id>
-															<page-menu-management name="menu-management" route="{{route}}"></page-menu-management>
-															<page-add-kpi name="add-kpi"></page-add-kpi>
-															<page-report-graph name="report-graph"></page-report-graph>
-															<page-report-chart name="report-chart"></page-report-chart>
-															<page-analytics-all name="analytics-all"></page-analytics-all>
-															<page-analytics-all name="analytics-all"></page-analytics-all>
-															<page-analytics-radar name="analytics-radar"></page-analytics-radar>
-															<page-analytics-grade name="analytics-grade"></page-analytics-grade>
-															<page-analytics-kpi name="analytics-kpi"></page-analytics-kpi>
-															<page-analytics-region name="analytics-region"></page-analytics-region>
+														<page-analytics-all name="analytics-all"></page-analytics-all>
+														<page-analytics-all name="analytics-all"></page-analytics-all>
+														<page-analytics-radar name="analytics-radar"></page-analytics-radar>
+														<page-analytics-grade name="analytics-grade"></page-analytics-grade>
+														<page-analytics-kpi name="analytics-kpi"></page-analytics-kpi>
+														<page-analytics-region name="analytics-region"></page-analytics-region>
 
 													</iron-pages>
 											</div>
