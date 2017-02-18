@@ -1,0 +1,53 @@
+<link rel="import" href="/bower_components/app-route/app-route.html">
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+
+<dom-module id="page-cooperation-info">
+    <template>
+        <app-route route="{{route}}"
+                   pattern="/app/cooperation-info/:mode/:id"
+                   data="{{routeData}}"
+                   active>
+        </app-route>
+
+        <div class="page-header">
+            <h2>협동조합 현황조회 <small>Cooperation Information</small></h2>
+        </div>
+
+        <iron-pages id="social-info" selected="[[mode]]" attr-for-selected="name">
+            <cooperation-info-list name="list"></cooperation-info-list>
+            <cooperation-info-view name="view" id="{{id}}"></cooperation-info-view>
+        </iron-pages>
+
+    </template>
+    <script>
+        Polymer({
+            is: 'page-cooperation-info',
+
+            properties: {
+                mode: {
+                    type: String,
+                    value: 'list',
+                    observer: '_importHTML'
+                },
+                id: Number,
+            },
+
+            observers: [
+                '_determineMode(routeData.mode)',
+                '_idChanged(routeData.id)',
+            ],
+
+            _determineMode: function(value) {
+                this.mode = value || 'list';
+            },
+
+            _idChanged: function(value) {
+                this.id = parseInt(value);
+            },
+
+            _importHTML: function(newValue) {
+                this.importHref(this.resolveUrl('corp-info/cooperation-info-' + newValue + '.html'), null, null, true);
+            },
+        });
+    </script>
+</dom-module>
