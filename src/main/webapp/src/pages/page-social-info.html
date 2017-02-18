@@ -15,7 +15,7 @@
 
 	<iron-pages id="social-info" selected="[[mode]]" attr-for-selected="name">
 		<social-info-list name="list"></social-info-list>
-		<social-info-view name="view" id="{{routeData.id}}"></social-info-view>
+		<social-info-view name="view" id="{{id}}"></social-info-view>
 	</iron-pages>
 
 </template>
@@ -34,13 +34,18 @@ Polymer({
 
 	observers: [
 		'_determineMode(routeData.mode)',
+        '_idChanged(routeData.id)',
 	],
 
 	_determineMode: function(value) {
 		this.mode = value || 'list'; 
 	},
 
-	_importHTML: function(newValue) {
+    _idChanged: function(value) {
+        this.id = parseInt(value);
+    },
+
+    _importHTML: function(newValue) {
 		this.importHref(this.resolveUrl('corp-info/social-info-' + newValue + '.html'), null, null, true);
 	},
 });
