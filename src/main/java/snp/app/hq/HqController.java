@@ -15,7 +15,26 @@ public class HqController
 	@Autowired
 	private HqService service;
 
-	
+	@RequestMapping(value="/{corpType}/type", method= RequestMethod.GET)
+	public List<Map<String, Object>> findCorpList(@PathVariable("corpType") String corpType)
+	{
+		return service.findCorpList(corpType);
+	}
+
+	//
+	@RequestMapping(value="/corpInfo", method= RequestMethod.GET)
+	public Map<String, Object>findCorpInfo(@RequestParam(name = "CORP_SEQ") int corpSeq,
+												   @RequestParam(name = "CORP_TYPE") int corpType) {
+		return service.findCorpInfo(RequestParams.map());
+	}
+
+	@RequestMapping(value="/corpInfo", method= RequestMethod.POST)
+	public int saveCorpInfo(@RequestBody Map<String, Object> params)
+	{
+		return service.saveCorpInfo(params);
+	}
+
+
 	/**
 	 * 사회적기업정보 기본정보 목록
 	 * @return
@@ -23,6 +42,11 @@ public class HqController
 	@RequestMapping(value="/socialList")
 	public List<Map<String, Object>> findSocialList(){
 		return service.findSocialList();
+	}
+
+	@RequestMapping(value="/corpInfo")
+	public Map<String, Object> findCorpInfo(@PathVariable("CORP_SEQ") Integer corpSeq){
+		return service.findSocialInfo(corpSeq);
 	}
 
 	/**

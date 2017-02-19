@@ -28,7 +28,7 @@
 
 
 		<iron-ajax id="getSocialInfo" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
-				   url$="/api/hq/socialInfo/[[_corpSeq]]"
+				   url="/api/hq/corpInfo/"
 				   on-request="_startLoader"
 				   on-response="_stopLoader"
 				   last-response="{{_data}}">
@@ -36,7 +36,7 @@
 		<form id="socialForm" is="iron-form"
 			  content-type="application/json"
 			  method="post"
-			  action="/api/hq/socialInfo"
+			  action="/api/hq/corpInfo"
 			  on-iron-form-presubmit="_parseDataBeforeSubmit"
 			  on-iron-form-response="_submitResponse"
 			  class="form-horizontal">
@@ -953,6 +953,7 @@
 
             properties: {
 
+                corpType: Number,
                 readId: {
                     type: Number,
                     observer: '_callAPI'
@@ -1020,7 +1021,14 @@
             },
 
             _getSocialInfo: function(value) {
-                this._corpSeq = value;
+
+                this.corpType = 1;
+                this.$.getSocialInfo.params = {
+                    CORP_SEQ: value,
+                    CORP_TYPE: this.corpType,
+
+                };
+
                 this.$.getSocialInfo.generateRequest();
             },
 

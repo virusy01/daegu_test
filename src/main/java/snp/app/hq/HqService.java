@@ -23,6 +23,31 @@ public class HqService
 	@Autowired
 	private CorpService corpService;
 
+	public List<Map<String, Object>> findCorpList(String corpType)
+	{
+		return repository.findCorpList(corpType);
+	}
+
+	public Map<String, Object> findCorpInfo(Map<String, Object> params)
+	{
+		return repository.findCorpInfo(params, Security.user());
+	}
+
+	public int saveCorpInfo(Map<String, Object> params) {
+		int r;
+		Integer corpSeq = (Integer) params.get("CORP_SEQ");
+		if (corpSeq != null) {
+			//repository.deleteCorpInfo(corpSeq, Security.user());
+			r = repository.updateCorpInfo(params, Security.user());
+		} else {
+			r = repository.insertCorpInfo(params, Security.user());
+		}
+		return r;
+	}
+
+
+
+
 	// 사회적기업 리스트
 	public List<Map<String, Object>> findSocialList()
 	{

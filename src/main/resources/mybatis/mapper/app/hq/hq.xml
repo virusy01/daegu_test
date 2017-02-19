@@ -3,6 +3,575 @@
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="snp.app.hq.HqRepository">
+
+    <!-- 기업 목록 -->
+    <select id="findCorpList" resultType="hashmap">
+        SELECT
+         CASE CORP_TYPE WHEN '1' THEN '사회적기업'
+                        WHEN '2' THEN '협동조합'
+                        ELSE '마을기업' END AS CORP_TYPE
+        ,CORP_SEQ
+        , CORP_NM
+        , DATE_FORMAT(OPEN_DT, '%Y') AS OPEN_DT
+        , SE_YN
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'SE_YN' AND CD = SE_YN) AS SE_YN_NM
+        , ORG_TYPE
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'ORG_TYPE' AND CD = ORG_TYPE) AS ORG_TYPE_NM
+        , REGION
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'REGION' AND CD = REGION) AS REGION_NM
+        FROM CORP_INFO
+        WHERE CORP_TYPE = #{p}
+    </select>
+
+    <!-- 기업 상세정보 -->
+    <select id="findCorpInfo" resultType="hashmap">
+        SELECT
+        CORP_TYPE   /* 기업유형 */
+        ,CORP_SEQ   /* 기업 SEQ */
+        , CORP_NM		/*기업명*/
+        , OPEN_DT		/*f1 설립년도*/
+        , SE_YN			/*f2 인증여부*/
+        , ORG_TYPE		/*f3 조직형태*/
+        , BEFORE_TYPE	/*f4 사,마:이전 조직형태  협:조합원구성 */
+        , LEG_TYPE1		/*f5 법적 유형 1*/
+        , LEG_TYPE2		/*f6 법적 유형 2*/
+        , MAIN_TYPE		/*f7 주요 활동 업종 분야*/
+        , SECTOR		/*f8 업종*/
+        , HISTORY		/*f9 대표자 과거 경력*/
+        , REGION		/*f10 회사 소재지*/
+ 		, MAIN_VALUE1	/*f11 핵심 사회적 가치 1 */
+		, MAIN_VALUE2	/*f12 핵심 사회적 가치 1 */
+        , LIFE_CHG		/*f13 사:핵심 사회적가치 중요도 1, 협: 지역사회 기여목적*/
+        , LOCAL_SOL		/*f14 사:핵심 사회적가치 중요도 2  협: 해결하고자하는 지역문제*/
+        , CITY_ENL		/*f15 핵심 사회적가치 중요도 3*/
+        , WEAK_CHG		/*f16 핵심 사회적가치 중요도 4*/
+        , WEAK_ENL		/*f17 핵심 사회적가치 중요도 5*/
+        , PROD_NM1		/*f22 주요제품명 1*/
+        , PROD_NM2		/*f23 주요제품명 1*/
+        , PROD_NM3		/*f24 주요제품명 1*/
+        , PROD_NM1_PCT	/*f25 주요제품명1 %*/
+        , PROD_NM2_PCT	/*f26 주요제품명2 %*/
+        , PROD_NM3_PCT	/*f27 주요제품명3 %*/
+        , PROD_ETC_PCT	/*f28 기타 생산제품 %*/
+        , SERVICE_NM1		/*f22 주요 서비스명 1*/
+        , SERVICE_NM2		/*f23 주요 서비스명 1*/
+        , SERVICE_NM3		/*f24 주요 서비스명 1*/
+        , SERVICE_NM1_PCT	/*f25 주요 서비스명1 %*/
+        , SERVICE_NM2_PCT	/*f26 주요 서비스명 %*/
+        , SERVICE_NM3_PCT	/*f27 주요 서비스명 %*/
+        , SERVICE_ETC_PCT	/*f28 기타 서비스명 %*/
+        , IN_TOT1		/*f36 원재료 구입처 대구 */
+        , IN_SEE1		/*f44 원재료 구입처 사회적경제기업 */
+        , IN_TOT2		/*f37 원재료 구입처 경북 */
+        , IN_SEE2		/*f45 원재료 구입처 사회적경제기업 */
+        , IN_TOT3		/*f38 원재료 구입처 기타 */
+        , IN_SEE3		/*f46 원재료 구입처 사회적경제기업 (전체-대구-경북) */
+        , OUT_TOT1		/*f52 상품 판매처 대구 */
+        , OUT_SEE1		/*f60 원재료 구입처 사회적경제기업 */
+        , OUT_TOT2		/*f53 상품 판매처 경북 */
+        , OUT_SEE2		/*f61 원재료 구입처 사회적경제기업 */
+        , OUT_TOT3		/*f59 상품 판매처 기타 */
+        , OUT_SEE3		/*f67 원재료 구입처 사회적경제기업 (전체-대구-경북)*/
+        , SAILS_PCT1	/*f92 고객비중 - 민간기업 */
+        , SAILS_PCT2	/*f93 고객비중 - 민간소비자 */
+        , SAILS_PCT3	/*f94 고객비중 - 공공기관 */
+        , SAILS_PCT4	/*f95 고객비중 - 취약계층 대상자 */
+        , SAILS_PCT5	/*f96 고객비중 - 기타 */
+        , TOT_PAR		/*g1 전체 참여자수 */
+        , TOT_EMP		/*g2 전체 근로자수 */
+        , MALE_CNT		/*g3 남자 */
+        , FMALE_CNT		/*g4 여자 */
+        , REG_EMP_CNT	/*g5 정규직 근로자수 */
+        , REG_WEEK_TIME	/*g6 정규직 주당평균 근로시간 */
+        , REG_MONTH_PAY	/*g7 정규직 월 평균임금 */
+        , REG_EMP_TIME	/*g8 정규직 평균 근속기간 */
+        , COM_EMP_CNT		/*g9 상용직 근로자수 */
+        , COM_WEEK_TIME		/*g10 상용직 주당평균 근로시간 */
+        , COM_MONTH_PAY		/*g11 상용직 월 평균임금 */
+        , COM_EMP_TIME		/*g12 상용직 평균 근속기간 */
+        , CONTRACT_EMP_CNT	/*g13 계약직(임시직) 근로자수 */
+        , CONTRACT_WEEK_TIME/*g14 계약직(임시직) 주당평균 근로시간 */
+        , CONTRACT_MONTH_PAY/*g15 계약직(임시직) 월 평균임금 */
+        , CONTRACT_EMP_TIME	/*g16 계약직(임시직) 평균 근속기간 */
+        , TIME_EMP_CNT		/*g17 시간제(파트타임) 근로자수 */
+        , TIME_WEEK_TIME	/*g18 시간제(파트타임) 주당평균 근로시간 */
+        , TIME_MONTH_PAY	/*g19 시간제(파트타임) 월 평균임금 */
+        , TIME_EMP_TIME		/*g20 시간제(파트타임) 평균 근속기간 */
+        , SPE_EMP_CNT		/*g21 특수고용직 근로자수 */
+        , SPE_WEEK_TIME		/*g22 특수고용직 주당평균 근로시간 */
+        , SPE_MONTH_PAY		/*g23 특수고용직 월 평균임금 */
+        , SPE_EMP_TIME		/*g24 특수고용직 평균 근속기간 */
+        , VOL_EMP_CNT		/*g25 자원봉사자 근로자수 */
+        , VOL_WEEK_TIME		/*g26 자원봉사자 주당평균 근로시간 */
+        , AVG_YEAR		/*g27 평균 연령 */
+        , WEAK_TOT_EMP	/*g28 취약계층 근로자수 */
+        , WEAK_MALE_CNT	/*g29	취약계층 남자수 */
+        , WEAK_FMALE_CNT	/*g30	취약계층 여자수 */
+        , WEAK_REG_EMP_CNT		/*g31 정규직 근로자수 */
+        , WEAK_REG_WEEK_TIME	/*g32 정규직 주당평균 근로시간 */
+        , WEAK_REG_MONTH_PAY	/*g33 정규직 월 평균임금 */
+        , WEAK_REG_EMP_TIME		/*g34 정규직 평균 근속기간 */
+        , WEAK_COM_EMP_CNT		/*g35 상용직 근로자수 */
+        , WEAK_COM_WEEK_TIME	/*g36 상용직 주당평균 근로시간 */
+        , WEAK_COM_MONTH_PAY	/*g37 상용직 월 평균임금 */
+        , WEAK_COM_EMP_TIME		/*g38 상용직 평균 근속기간 */
+        , WEAK_CONTRACT_EMP_CNT	/*g39 계약직(임시직) 근로자수 */
+        , WEAK_CONTRACT_WEEK_TIME	/*g40 계약직(임시직) 주당평균 근로시간 */
+        , WEAK_CONTRACT_MONTH_PAY	/*g41 계약직(임시직) 월 평균임금 */
+        , WEAK_CONTRACT_EMP_TIME	/*g42 계약직(임시직) 평균 근속기간 */
+        , WEAK_TIME_EMP_CNT		/*g43 시간제(파트타임) 근로자수 */
+        , WEAK_TIME_WEEK_TIME	/*g44 시간제(파트타임) 주당평균 근로시간 */
+        , WEAK_TIME_MONTH_PAY	/*g45 시간제(파트타임) 월 평균임금 */
+        , WEAK_TIME_EMP_TIME	/*g46 시간제(파트타임) 평균 근속기간 */
+        , WEAK_SPE_EMP_CNT		/*g47 특수고용직 근로자수 */
+        , WEAK_SPE_WEEK_TIME	/*g48 특수고용직 주당평균 근로시간 */
+        , WEAK_SPE_MONTH_PAY	/*g49 특수고용직 월 평균임금 */
+        , WEAK_SPE_EMP_TIME		/*g50 특수고용직 평균 근속기간 */
+        , WEAK_AVG_YEAR			/*g51 평균 연령 */
+        , WEAK_TYPE1_CNT	/*g52 취약계층 고령자 고용인원 */
+        , WEAK_TYPE2_CNT	/*g53 취약계층 장애인 고용인원 */
+        , WEAK_TYPE3_CNT	/*g54 취약계층 저소득 고용인원 */
+        , WEAK_TYPE4_CNT	/*g55 취약계층 경력단절여성 고용인원 */
+        , WEAK_TYPE5_CNT	/*g56 취약계층 장기실업 고용인원 */
+        , WEAK_TYPE6_CNT	/*g57 취약계층 결혼이민 고용인원 */
+        , WEAK_TYPE7_CNT	/*g58 취약계층 기타 고용인원 */
+        , FIRST_REASON		/*h1 인력관리 애로사항 첫번째 */
+        , SECOND_REASON		/*h2 인력관리 애로사항 두번째 */
+        , ETC_REASON		/* 기타사항이 있을때 - 인터페이스 고민?? */
+        , CORP_ASSET		/*h3 자산 */
+        , CORP_CAPITAL		/*h4 자본 */
+        , CORP_DEBT			/*h5 부채 */
+        , CORP_SALES		/*h6 매출액 */
+        , CORP_SALES_PROFIT	/*h7 매출 총이익 */
+        , CORP_LABOR_COST	/*h8 노무비 */
+        , CORP_TAX			/*h9 법인세 */
+        , CORP_OP_PROFIT	/*h10 영업이익 */
+        , CORP_NET_INCOM	/*h14 당기순이익 */
+        , GOV_SUP_ASSET		/*h12 정부지원금 - 건물 등 자산취득 관련 지원금 */
+        , GOV_SUP_COST		/*h11 징부지원금 - 인건비 등 비용관련 지원금 */
+        , SPONSOR_DONATE	/*h13 각종 후원금, 기부금 */
+        , FUNDS_REVENUE		/*h15 자금조달비중 - 수익활동 */
+        , FUNDS_DONATE		/*h16 기부금 */
+        , FUNDS_SUPP		/*h17 정부지원금 */
+        , FUNDS_LOAN		/*h18 대출(차입) */
+        , FUNDS_ETC			/*h19 기타 */
+        FROM CORP_INFO
+        WHERE CORP_SEQ = #{p.CORP_SEQ} AND CORP_TYPE = #{p.CORP_TYPE}
+    </select>
+
+
+    <insert id="insertCorpInfo">
+        INSERT INTO CORP_INFO
+        (
+        CORP_NM		/*기업명*/
+        , OPEN_DT		/*f1 설립년도*/
+        , SE_YN			/*f2 인증여부*/
+        , ORG_TYPE		/*f3 조직형태*/
+        , BEFORE_TYPE	/*f4 이전 조직형태*/
+        , LEG_TYPE1		/*f5 법적 유형 1*/
+        , LEG_TYPE2		/*f6 법적 유형 2*/
+        , MAIN_TYPE		/*f7 주요 활동 업종 분야*/
+        , SECTOR		/*f8 업종*/
+        , HISTORY		/*f9 대표자 과거 경력*/
+        , REGION		/*f10 회사 소재지*/
+        , LIFE_CHG		/*f13 핵심 사회적가치 중요도 1*/
+        , LOCAL_SOL		/*f14핵심 사회적가치 중요도 2*/
+        , CITY_ENL		/*f15 핵심 사회적가치 중요도 3*/
+        , WEAK_CHG		/*f16 핵심 사회적가치 중요도 4*/
+        , WEAK_ENL		/*f17 핵심 사회적가치 중요도 5*/
+        , PROD_NM1		/*f22 주요제품명 1*/
+        , PROD_NM2		/*f23 주요제품명 1*/
+        , PROD_NM3		/*f24 주요제품명 1*/
+        , PROD_NM1_PCT	/*f25 주요제품명1 %*/
+        , PROD_NM2_PCT	/*f26 주요제품명2 %*/
+        , PROD_NM3_PCT	/*f27 주요제품명3 %*/
+        , PROD_ETC_PCT	/*f28 기타 생산제품 %*/
+        , SERVICE_NM1		/*f22 주요 서비스명 1*/
+        , SERVICE_NM2		/*f23 주요 서비스명 1*/
+        , SERVICE_NM3		/*f24 주요 서비스명 1*/
+        , SERVICE_NM1_PCT	/*f25 주요 서비스명1 %*/
+        , SERVICE_NM2_PCT	/*f26 주요 서비스명 %*/
+        , SERVICE_NM3_PCT	/*f27 주요 서비스명 %*/
+        , SERVICE_ETC_PCT	/*f28 기타 서비스명 %*/
+        , IN_TOT1		/*f36 원재료 구입처 대구 */
+        , IN_SEE1		/*f44 원재료 구입처 사회적경제기업 */
+        , IN_TOT2		/*f37 원재료 구입처 경북 */
+        , IN_SEE2		/*f45 원재료 구입처 사회적경제기업 */
+        , IN_TOT3		/*f38 원재료 구입처 기타 */
+        , IN_SEE3		/*f46 원재료 구입처 사회적경제기업 (전체-대구-경북) */
+        , OUT_TOT1		/*f52 상품 판매처 대구 */
+        , OUT_SEE1		/*f60 원재료 구입처 사회적경제기업 */
+        , OUT_TOT2		/*f53 상품 판매처 경북 */
+        , OUT_SEE2		/*f61 원재료 구입처 사회적경제기업 */
+        , OUT_TOT3		/*f59 상품 판매처 기타 */
+        , OUT_SEE3		/*f67 원재료 구입처 사회적경제기업 (전체-대구-경북)*/
+        , SAILS_PCT1	/*f92 고객비중 - 민간기업 */
+        , SAILS_PCT2	/*f93 고객비중 - 민간소비자 */
+        , SAILS_PCT3	/*f94 고객비중 - 공공기관 */
+        , SAILS_PCT4	/*f95 고객비중 - 취약계층 대상자 */
+        , SAILS_PCT5	/*f96 고객비중 - 기타 */
+        , TOT_PAR		/*g1 전체 참여자수 */
+        , TOT_EMP		/*g2 전체 근로자수 */
+        , MALE_CNT		/*g3 남자 */
+        , FMALE_CNT		/*g4 여자 */
+        , REG_EMP_CNT	/*g5 정규직 근로자수 */
+        , REG_WEEK_TIME	/*g6 정규직 주당평균 근로시간 */
+        , REG_MONTH_PAY	/*g7 정규직 월 평균임금 */
+        , REG_EMP_TIME	/*g8 정규직 평균 근속기간 */
+        , COM_EMP_CNT		/*g9 상용직 근로자수 */
+        , COM_WEEK_TIME		/*g10 상용직 주당평균 근로시간 */
+        , COM_MONTH_PAY		/*g11 상용직 월 평균임금 */
+        , COM_EMP_TIME		/*g12 상용직 평균 근속기간 */
+        , CONTRACT_EMP_CNT	/*g13 계약직(임시직) 근로자수 */
+        , CONTRACT_WEEK_TIME/*g14 계약직(임시직) 주당평균 근로시간 */
+        , CONTRACT_MONTH_PAY/*g15 계약직(임시직) 월 평균임금 */
+        , CONTRACT_EMP_TIME	/*g16 계약직(임시직) 평균 근속기간 */
+        , TIME_EMP_CNT		/*g17 시간제(파트타임) 근로자수 */
+        , TIME_WEEK_TIME	/*g18 시간제(파트타임) 주당평균 근로시간 */
+        , TIME_MONTH_PAY	/*g19 시간제(파트타임) 월 평균임금 */
+        , TIME_EMP_TIME		/*g20 시간제(파트타임) 평균 근속기간 */
+        , SPE_EMP_CNT		/*g21 특수고용직 근로자수 */
+        , SPE_WEEK_TIME		/*g22 특수고용직 주당평균 근로시간 */
+        , SPE_MONTH_PAY		/*g23 특수고용직 월 평균임금 */
+        , SPE_EMP_TIME		/*g24 특수고용직 평균 근속기간 */
+        , VOL_EMP_CNT		/*g25 자원봉사자 근로자수 */
+        , VOL_WEEK_TIME		/*g26 자원봉사자 주당평균 근로시간 */
+        , AVG_YEAR		/*g27 평균 연령 */
+        , WEAK_TOT_EMP	/*g28 취약계층 근로자수 */
+        , WEAK_MALE_CNT	/*g29	취약계층 남자수 */
+        , WEAK_FMALE_CNT	/*g30	취약계층 여자수 */
+        , WEAK_REG_EMP_CNT		/*g31 정규직 근로자수 */
+        , WEAK_REG_WEEK_TIME	/*g32 정규직 주당평균 근로시간 */
+        , WEAK_REG_MONTH_PAY	/*g33 정규직 월 평균임금 */
+        , WEAK_REG_EMP_TIME		/*g34 정규직 평균 근속기간 */
+        , WEAK_COM_EMP_CNT		/*g35 상용직 근로자수 */
+        , WEAK_COM_WEEK_TIME	/*g36 상용직 주당평균 근로시간 */
+        , WEAK_COM_MONTH_PAY	/*g37 상용직 월 평균임금 */
+        , WEAK_COM_EMP_TIME		/*g38 상용직 평균 근속기간 */
+        , WEAK_CONTRACT_EMP_CNT	/*g39 계약직(임시직) 근로자수 */
+        , WEAK_CONTRACT_WEEK_TIME	/*g40 계약직(임시직) 주당평균 근로시간 */
+        , WEAK_CONTRACT_MONTH_PAY	/*g41 계약직(임시직) 월 평균임금 */
+        , WEAK_CONTRACT_EMP_TIME	/*g42 계약직(임시직) 평균 근속기간 */
+        , WEAK_TIME_EMP_CNT		/*g43 시간제(파트타임) 근로자수 */
+        , WEAK_TIME_WEEK_TIME	/*g44 시간제(파트타임) 주당평균 근로시간 */
+        , WEAK_TIME_MONTH_PAY	/*g45 시간제(파트타임) 월 평균임금 */
+        , WEAK_TIME_EMP_TIME	/*g46 시간제(파트타임) 평균 근속기간 */
+        , WEAK_SPE_EMP_CNT		/*g47 특수고용직 근로자수 */
+        , WEAK_SPE_WEEK_TIME	/*g48 특수고용직 주당평균 근로시간 */
+        , WEAK_SPE_MONTH_PAY	/*g49 특수고용직 월 평균임금 */
+        , WEAK_SPE_EMP_TIME		/*g50 특수고용직 평균 근속기간 */
+        , WEAK_AVG_YEAR			/*g51 평균 연령 */
+        , WEAK_TYPE1_CNT	/*g52 취약계층 고령자 고용인원 */
+        , WEAK_TYPE2_CNT	/*g53 취약계층 장애인 고용인원 */
+        , WEAK_TYPE3_CNT	/*g54 취약계층 저소득 고용인원 */
+        , WEAK_TYPE4_CNT	/*g55 취약계층 경력단절여성 고용인원 */
+        , WEAK_TYPE5_CNT	/*g56 취약계층 장기실업 고용인원 */
+        , WEAK_TYPE6_CNT	/*g57 취약계층 결혼이민 고용인원 */
+        , WEAK_TYPE7_CNT	/*g58 취약계층 기타 고용인원 */
+        , FIRST_REASON		/*h1 인력관리 애로사항 첫번째 */
+        , SECOND_REASON		/*h2 인력관리 애로사항 두번째 */
+        , ETC_REASON		/* 기타사항이 있을때 - 인터페이스 고민?? */
+        , CORP_ASSET		/*h3 자산 */
+        , CORP_CAPITAL		/*h4 자본 */
+        , CORP_DEBT			/*h5 부채 */
+        , CORP_SALES		/*h6 매출액 */
+        , CORP_SALES_PROFIT	/*h7 매출 총이익 */
+        , CORP_LABOR_COST	/*h8 노무비 */
+        , CORP_TAX			/*h9 법인세 */
+        , CORP_OP_PROFIT	/*h10 영업이익 */
+        , CORP_NET_INCOM	/*h14 당기순이익 */
+        , GOV_SUP_ASSET		/*h12 정부지원금 - 건물 등 자산취득 관련 지원금 */
+        , GOV_SUP_COST		/*h11 징부지원금 - 인건비 등 비용관련 지원금 */
+        , SPONSOR_DONATE	/*h13 각종 후원금, 기부금 */
+        , FUNDS_REVENUE		/*h15 자금조달비중 - 수익활동 */
+        , FUNDS_DONATE		/*h16 기부금 */
+        , FUNDS_SUPP		/*h17 정부지원금 */
+        , FUNDS_LOAN		/*h18 대출(차입) */
+        , FUNDS_ETC			/*h19 기타 */
+        )
+        VALUES
+        (
+        #{p.COPR_SEQ}
+        , #{p.CORP_NM}
+        , #{p.OPEN_DT, typeHandler=snp.spring.mybatis.DateHandler}
+        , #{p.SE_YN}
+        , #{p.ORG_TYPE}
+        , #{p.BEFORE_TYPE}
+        , #{p.LEG_TYPE1}
+        , #{p.LEG_TYPE2}
+        , #{p.MAIN_TYPE}
+        , #{p.SECTOR}
+        , #{p.HISTORY}
+        , #{p.REGION}
+        , #{p.LIFE_CHG}
+        , #{p.LOCAL_SOL}
+        , #{p.CITY_ENL}
+        , #{p.WEAK_CHG}
+        , #{p.WEAK_ENL}
+        , #{p.PROD_NM1}
+        , #{p.PROD_NM2}
+        , #{p.PROD_NM3}
+        , #{p.PROD_NM1_PCT}
+        , #{p.PROD_NM2_PCT}
+        , #{p.PROD_NM3_PCT}
+        , #{p.PROD_ETC_PCT}
+        , #{p.SERVICE_NM1}
+        , #{p.SERVICE_NM2}
+        , #{p.SERVICE_NM3}
+        , #{p.SERVICE_NM1_PCT}
+        , #{p.SERVICE_NM2_PCT}
+        , #{p.SERVICE_NM3_PCT}
+        , #{p.SERVICE_ETC_PCT}
+        , #{p.IN_TOT1}
+        , #{p.IN_SEE1}
+        , #{p.IN_TOT2}
+        , #{p.IN_SEE2}
+        , #{p.IN_TOT3}
+        , #{p.IN_SEE3}
+        , #{p.OUT_TOT1}
+        , #{p.OUT_SEE1}
+        , #{p.OUT_TOT2}
+        , #{p.OUT_SEE2}
+        , #{p.OUT_TOT3}
+        , #{p.OUT_SEE3}
+        , #{p.SAILS_PCT1}
+        , #{p.SAILS_PCT2}
+        , #{p.SAILS_PCT3}
+        , #{p.SAILS_PCT4}
+        , #{p.SAILS_PCT5}
+        , #{p.TOT_PAR}
+        , #{p.TOT_EMP}
+        , #{p.MALE_CNT}
+        , #{p.FMALE_CNT}
+        , #{p.REG_EMP_CNT}
+        , #{p.REG_WEEK_TIME}
+        , #{p.REG_MONTH_PAY}
+        , #{p.REG_EMP_TIME}
+        , #{p.COM_EMP_CNT}
+        , #{p.COM_WEEK_TIME}
+        , #{p.COM_MONTH_PAY}
+        , #{p.COM_EMP_TIME}
+        , #{p.CONTRACT_EMP_CNT}
+        , #{p.CONTRACT_WEEK_TIME}
+        , #{p.CONTRACT_MONTH_PAY}
+        , #{p.CONTRACT_EMP_TIME}
+        , #{p.TIME_EMP_CNT}
+        , #{p.TIME_WEEK_TIME}
+        , #{p.TIME_MONTH_PAY}
+        , #{p.TIME_EMP_TIME}
+        , #{p.SPE_EMP_CNT}
+        , #{p.SPE_WEEK_TIME}
+        , #{p.SPE_MONTH_PAY}
+        , #{p.SPE_EMP_TIME}
+        , #{p.VOL_EMP_CNT}
+        , #{p.VOL_WEEK_TIME}
+        , #{p.AVG_YEAR}
+        , #{p.WEAK_TOT_EMP}
+        , #{p.WEAK_MALE_CNT}
+        , #{p.WEAK_FMALE_CNT}
+        , #{p.WEAK_REG_EMP_CNT}
+        , #{p.WEAK_REG_WEEK_TIME}
+        , #{p.WEAK_REG_MONTH_PAY}
+        , #{p.WEAK_REG_EMP_TIME}
+        , #{p.WEAK_COM_EMP_CNT}
+        , #{p.WEAK_COM_WEEK_TIME}
+        , #{p.WEAK_COM_MONTH_PAY}
+        , #{p.WEAK_COM_EMP_TIME}
+        , #{p.WEAK_CONTRACT_EMP_CNT}
+        , #{p.WEAK_CONTRACT_WEEK_TIME}
+        , #{p.WEAK_CONTRACT_MONTH_PAY}
+        , #{p.WEAK_CONTRACT_EMP_TIME}
+        , #{p.WEAK_TIME_EMP_CNT}
+        , #{p.WEAK_TIME_WEEK_TIME}
+        , #{p.WEAK_TIME_MONTH_PAY}
+        , #{p.WEAK_TIME_EMP_TIME}
+        , #{p.WEAK_SPE_EMP_CNT}
+        , #{p.WEAK_SPE_WEEK_TIME}
+        , #{p.WEAK_SPE_MONTH_PAY}
+        , #{p.WEAK_SPE_EMP_TIME}
+        , #{p.WEAK_AVG_YEAR}
+        , #{p.WEAK_TYPE1_CNT}
+        , #{p.WEAK_TYPE2_CNT}
+        , #{p.WEAK_TYPE3_CNT}
+        , #{p.WEAK_TYPE4_CNT}
+        , #{p.WEAK_TYPE5_CNT}
+        , #{p.WEAK_TYPE6_CNT}
+        , #{p.WEAK_TYPE7_CNT}
+        , #{p.FIRST_REASON}
+        , #{p.SECOND_REASON}
+        , #{p.ETC_REASON}
+        , #{p.CORP_ASSET}
+        , #{p.CORP_CAPITAL}
+        , #{p.CORP_DEBT}
+        , #{p.CORP_SALES}
+        , #{p.CORP_SALES_PROFIT}
+        , #{p.CORP_LABOR_COST}
+        , #{p.CORP_TAX}
+        , #{p.CORP_OP_PROFIT}
+        , #{p.CORP_NET_INCOM}
+        , #{p.GOV_SUP_ASSET}
+        , #{p.GOV_SUP_COST}
+        , #{p.SPONSOR_DONATE}
+        , #{p.FUNDS_REVENUE}
+        , #{p.FUNDS_DONATE}
+        , #{p.FUNDS_SUPP}
+        , #{p.FUNDS_LOAN}
+        , #{p.FUNDS_ETC}
+        , #{u.userId}
+        , now()
+        )
+    </insert>
+
+    <update id="updateCorpInfo">
+        UPDATE CORP_INFO
+        SET
+        CORP_NM           = #{p.CORP_NM}
+        , OPEN_DT           = #{p.OPEN_DT, typeHandler=snp.spring.mybatis.DateHandler}
+        , SE_YN            = #{p.SE_YN}
+        , ORG_TYPE            = #{p.ORG_TYPE}
+        , BEFORE_TYPE           = #{p.BEFORE_TYPE}
+        , LEG_TYPE1            = #{p.LEG_TYPE1}
+        , LEG_TYPE2     = #{p.LEG_TYPE2}
+        , MAIN_TYPE        = #{p.MAIN_TYPE}
+        , SECTOR 		= #{p.SECTOR}
+        , HISTORY 		= #{p.HISTORY}
+        , REGION         = #{p.REGION}
+        , LIFE_CHG		= #{p.LIFE_CHG}
+        , LOCAL_SOL		= #{p.LOCAL_SOL}
+        , CITY_ENL		= #{p.CITY_ENL}
+        , WEAK_CHG		= #{p.WEAK_CHG}
+        , WEAK_ENL		= #{p.WEAK_ENL}
+        , PROD_NM1		= #{p.PROD_NM1}
+        , PROD_NM2		= #{p.PROD_NM2}
+        , PROD_NM3		= #{p.PROD_NM3}
+        , PROD_NM1_PCT		= #{p.PROD_NM1_PCT}
+        , PROD_NM2_PCT		= #{p.PROD_NM2_PCT}
+        , PROD_NM3_PCT		= #{p.PROD_NM3_PCT}
+        , PROD_ETC_PCT		= #{p.PROD_ETC_PCT}
+        , SERVICE_NM1		= #{p.SERVICE_NM1}
+        , SERVICE_NM2		= #{p.SERVICE_NM2}
+        , SERVICE_NM3		= #{p.SERVICE_NM3}
+        , SERVICE_NM1_PCT		= #{p.SERVICE_NM1_PCT}
+        , SERVICE_NM2_PCT		= #{p.SERVICE_NM2_PCT}
+        , SERVICE_NM3_PCT		= #{p.SERVICE_NM3_PCT}
+        , SERVICE_ETC_PCT		= #{p.SERVICE_ETC_PCT}
+        , IN_TOT1		= #{p.IN_TOT1}
+        , IN_SEE1		= #{p.IN_SEE1}
+        , IN_TOT2		= #{p.IN_TOT2}
+        , IN_SEE2		= #{p.IN_SEE2}
+        , IN_TOT3		= #{p.IN_TOT3}
+        , IN_SEE3		= #{p.IN_SEE3}
+        , OUT_TOT1 		= #{p.OUT_TOT1}
+        , OUT_SEE1		= #{p.OUT_SEE1}
+        , OUT_TOT2		= #{p.OUT_TOT2}
+        , OUT_SEE2		= #{p.OUT_SEE2}
+        , OUT_TOT3		= #{p.OUT_TOT3}
+        , OUT_SEE3		= #{p.OUT_SEE3}
+        , SAILS_PCT1		= #{p.SAILS_PCT1}
+        , SAILS_PCT2		= #{p.SAILS_PCT2}
+        , SAILS_PCT3		= #{p.SAILS_PCT3}
+        , SAILS_PCT4		= #{p.SAILS_PCT4}
+        , SAILS_PCT5		= #{p.SAILS_PCT5}
+        , TOT_PAR		= #{p.TOT_PAR}
+        , TOT_EMP		= #{p.TOT_EMP}
+        , MALE_CNT		= #{p.MALE_CNT}
+        , FMALE_CNT		= #{p.FMALE_CNT}
+        , REG_EMP_CNT		= #{p.REG_EMP_CNT}
+        , REG_WEEK_TIME		= #{p.REG_WEEK_TIME}
+        , REG_MONTH_PAY		= #{p.REG_MONTH_PAY}
+        , REG_EMP_TIME		= #{p.REG_EMP_TIME}
+        , COM_EMP_CNT		= #{p.COM_EMP_CNT}
+        , COM_WEEK_TIME		= #{p.COM_WEEK_TIME}
+        , COM_MONTH_PAY		= #{p.COM_MONTH_PAY}
+        , COM_EMP_TIME		= #{p.COM_EMP_TIME}
+        , CONTRACT_EMP_CNT		= #{p.CONTRACT_EMP_CNT}
+        , CONTRACT_WEEK_TIME		= #{p.CONTRACT_WEEK_TIME}
+        , CONTRACT_MONTH_PAY		= #{p.CONTRACT_MONTH_PAY}
+        , CONTRACT_EMP_TIME		= #{p.CONTRACT_EMP_TIME}
+        , TIME_EMP_CNT		= #{p.TIME_EMP_CNT}
+        , TIME_WEEK_TIME		= #{p.TIME_WEEK_TIME}
+        , TIME_MONTH_PAY		= #{p.TIME_MONTH_PAY}
+        , TIME_EMP_TIME		= #{p.TIME_EMP_TIME}
+        , SPE_EMP_CNT		= #{p.SPE_EMP_CNT}
+        , SPE_WEEK_TIME		= #{p.SPE_WEEK_TIME}
+        , SPE_MONTH_PAY		= #{p.SPE_MONTH_PAY}
+        , SPE_EMP_TIME		= #{p.SPE_EMP_TIME}
+        , VOL_EMP_CNT		= #{p.VOL_EMP_CNT}
+        , VOL_WEEK_TIME		= #{p.VOL_WEEK_TIME}
+        , AVG_YEAR		= #{p.AVG_YEAR}
+        , WEAK_TOT_EMP		= #{p.WEAK_TOT_EMP}
+        , WEAK_MALE_CNT		= #{p.WEAK_MALE_CNT}
+        , WEAK_FMALE_CNT		= #{p.WEAK_FMALE_CNT}
+        , WEAK_REG_EMP_CNT		= #{p.WEAK_REG_EMP_CNT}
+        , WEAK_REG_WEEK_TIME		= #{p.WEAK_REG_WEEK_TIME}
+        , WEAK_REG_MONTH_PAY		= #{p.WEAK_REG_MONTH_PAY}
+        , WEAK_REG_EMP_TIME		= #{p.WEAK_REG_EMP_TIME}
+        , WEAK_COM_EMP_CNT		= #{p.WEAK_COM_EMP_CNT}
+        , WEAK_COM_WEEK_TIME		= #{p.WEAK_COM_WEEK_TIME}
+        , WEAK_COM_MONTH_PAY		= #{p.WEAK_COM_MONTH_PAY}
+        , WEAK_COM_EMP_TIME		= #{p.WEAK_COM_EMP_TIME}
+        , WEAK_CONTRACT_EMP_CNT		= #{p.WEAK_CONTRACT_EMP_CNT}
+        , WEAK_CONTRACT_WEEK_TIME		= #{p.WEAK_CONTRACT_WEEK_TIME}
+        , WEAK_CONTRACT_MONTH_PAY		= #{p.WEAK_CONTRACT_MONTH_PAY}
+        , WEAK_CONTRACT_EMP_TIME		= #{p.WEAK_CONTRACT_EMP_TIME}
+        , WEAK_TIME_EMP_CNT		= #{p.WEAK_TIME_EMP_CNT}
+        , WEAK_TIME_WEEK_TIME		= #{p.WEAK_TIME_WEEK_TIME}
+        , WEAK_TIME_MONTH_PAY		= #{p.WEAK_TIME_MONTH_PAY}
+        , WEAK_TIME_EMP_TIME		= #{p.WEAK_TIME_EMP_TIME}
+        , WEAK_SPE_EMP_CNT		= #{p.WEAK_SPE_EMP_CNT}
+        , WEAK_SPE_WEEK_TIME		= #{p.WEAK_SPE_WEEK_TIME}
+        , WEAK_SPE_MONTH_PAY		= #{p.WEAK_SPE_MONTH_PAY}
+        , WEAK_SPE_EMP_TIME		= #{p.WEAK_SPE_EMP_TIME}
+        , WEAK_AVG_YEAR		= #{p.WEAK_AVG_YEAR}
+        , WEAK_TYPE1_CNT		= #{p.WEAK_TYPE1_CNT}
+        , WEAK_TYPE2_CNT		= #{p.WEAK_TYPE2_CNT}
+        , WEAK_TYPE3_CNT		= #{p.WEAK_TYPE3_CNT}
+        , WEAK_TYPE4_CNT		= #{p.WEAK_TYPE4_CNT}
+        , WEAK_TYPE5_CNT		= #{p.WEAK_TYPE5_CNT}
+        , WEAK_TYPE6_CNT		= #{p.WEAK_TYPE6_CNT}
+        , WEAK_TYPE7_CNT		= #{p.WEAK_TYPE7_CNT}
+        , FIRST_REASON		= #{p.FIRST_REASON}
+        , SECOND_REASON		= #{p.SECOND_REASON}
+        , ETC_REASON		= #{p.ETC_REASON}
+        , CORP_ASSET		= #{p.CORP_ASSET}
+        , CORP_CAPITAL		= #{p.CORP_CAPITAL}
+        , CORP_DEBT		= #{p.CORP_DEBT}
+        , CORP_SALES		= #{p.CORP_SALES}
+        , CORP_SALES_PROFIT 		= #{p.CORP_SALES_PROFIT}
+        , CORP_LABOR_COST		= #{p.CORP_LABOR_COST}
+        , CORP_TAX		= #{p.CORP_TAX}
+        , CORP_OP_PROFIT		= #{p.CORP_OP_PROFIT}
+        , CORP_NET_INCOM		= #{p.CORP_NET_INCOM}
+        , GOV_SUP_ASSET		= #{p.GOV_SUP_ASSET}
+        , GOV_SUP_COST		= #{p.GOV_SUP_COST}
+        , SPONSOR_DONATE		= #{p.SPONSOR_DONATE}
+        , FUNDS_REVENUE		= #{p.FUNDS_REVENUE}
+        , FUNDS_DONATE		= #{p.FUNDS_DONATE}
+        , FUNDS_SUPP		= #{p.FUNDS_SUPP}
+        , FUNDS_LOAN		= #{p.FUNDS_LOAN}
+        , FUNDS_ETC		= #{p.FUNDS_ETC}
+        , MOD_ID            = #{u.userId}
+        , MOD_DT            = now()
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+    </update>
+
+    <delete id="deleteCorpInfo">
+        DELETE FROM CORP_INFO
+        WHERE CORP_SEQ = #{p.CORP_SEQ} AND CORP_TYPE = #{p.CORP_TYPE}
+    </delete>
+
+
+
+
+
+
+
+
+
+
+
+
+
 	<!-- 사회적기업 목록 -->
 	<select id="findSocialList" resultType="hashmap">
 		SELECT

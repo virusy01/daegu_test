@@ -6,7 +6,7 @@
 <dom-module id="cooperation-info-list">
 <template>
 	<iron-ajax  auto id="getCorpList" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
-		       url="/api/hq/cooperationList"
+		       url="/api/hq/2/type"
 	 	       on-request="_startLoader"
 	  	       on-response="_stopLoader"
 		       last-response="{{_data}}">
@@ -31,10 +31,10 @@ Polymer({
 			type: Object,
 			value: function() {
 				return {
+                    CORP_TYPE: '기업유형',
                     CORP_NM: '기업명',
                     OPEN_DT: '설립연월',
-                    COOP_TYPE_NM: '조직형태',
-					COOP_CONFIG_NM: '조합원구성',
+                    ORG_TYPE_NM: '조직형태',
                     REGION_NM: '지역',
 				};
 			}

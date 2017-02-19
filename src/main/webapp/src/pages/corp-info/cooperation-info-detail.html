@@ -27,7 +27,7 @@
 
 
 		<iron-ajax id="getCooperationInfo" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
-				   url$="/api/hq/cooperationInfo/[[_corpSeq]]"
+				   url="/api/hq/corpInfo"
 				   on-request="_startLoader"
 				   on-response="_stopLoader"
 				   last-response="{{_data}}">
@@ -35,7 +35,7 @@
 		<form id="cooperationForm" is="iron-form"
 			  content-type="application/json"
 			  method="post"
-			  action="/api/hq/cooperationInfo"
+			  action="/api/hq/corpInfo"
 			  on-iron-form-presubmit="_parseDataBeforeSubmit"
 			  on-iron-form-response="_submitResponse"
 			  class="form-horizontal">
@@ -75,14 +75,14 @@
 				</div>
 				<label class="col-xs-2 control-label">법인형태</label>
 				<div class="col-xs-4">
-					<normal-select name="COOP_TYPE" items="{{_coopType}}" name-from="CD_NM" value-from="CD" value="{{_data.COOP_TYPE}}"></normal-select>
+					<normal-select name="ORG_TYPE" items="{{_coopType}}" name-from="CD_NM" value-from="CD" value="{{_data.ORG_TYPE}}"></normal-select>
 				</div>
 			</div>
 
 			<div class="form-group">
 				<label class="col-xs-2 control-label">조합원 구성</label>
 				<div class="col-xs-4">
-					<normal-select name="COOP_CONFIG" items="{{_coopConfig}}" name-from="CD_NM" value-from="CD" value="{{_data.COOP_CONFIG}}"></normal-select>
+					<normal-select name="BEFORE_TYPE" items="{{_coopConfig}}" name-from="CD_NM" value-from="CD" value="{{_data.BEFORE_TYPE}}"></normal-select>
 				</div>
 				<label class="col-xs-2 control-label">주요 활동 업종 분야</label>
 				<div class="col-xs-4">
@@ -119,7 +119,7 @@
 			<div class="form-group">
 				<label class="col-xs-2 control-label">설립 목적</label>
 				<div class="col-xs-10">
-					<normal-select name="ESTABLISH_PURPOSE" items="{{_establishPurpose}}" name-from="CD_NM" value-from="CD" value="{{_data.ESTABLISH_PURPOSE}}"></normal-select>
+					<normal-select name="MAIN_VALUE1" items="{{_establishPurpose}}" name-from="CD_NM" value-from="CD" value="{{_data.MAIN_VALUE1}}"></normal-select>
 				</div>
 			</div>
 
@@ -912,11 +912,11 @@
 			<div class="form-group">
 				<label class="col-xs-2 control-label">지역사회 기여 목적</label>
 				<div class="col-xs-4">
-					<normal-select name="LOCAL_PURPOSE" items="{{_localPurpose}}" name-from="CD_NM" value-from="CD" value="{{_data.LOCAL_PURPOSE}}"></normal-select>
+					<normal-select name="LIFE_CHG" items="{{_localPurpose}}" name-from="CD_NM" value-from="CD" value="{{_data.LIFE_CHG}}"></normal-select>
 				</div>
 				<label class="col-xs-2 control-label">해결하고자하는 지역문제</label>
 				<div class="col-xs-4">
-					<normal-select name="LOCAL_PROBLEM" items="{{_localProblem}}" name-from="CD_NM" value-from="CD" value="{{_data.LOCAL_PROBLEM}}"></normal-select>
+					<normal-select name="LOCAL_SOL" items="{{_localProblem}}" name-from="CD_NM" value-from="CD" value="{{_data.LOCAL_SOL}}"></normal-select>
 				</div>
 			</div>
 
@@ -936,6 +936,7 @@
 
             properties: {
 
+                corpType: Number,
                 readId: {
                     type: Number,
                     observer: '_callAPI'
@@ -995,9 +996,17 @@
             },
 
             _getCooperationInfo: function(value) {
-                this._corpSeq = value;
+
+                this.corpType = 2;
+                this.$.getCooperationInfo.params = {
+                    CORP_SEQ: value,
+                    CORP_TYPE: this.corpType,
+
+                };
+
                 this.$.getCooperationInfo.generateRequest();
             },
+
 
             _callAPI: function(value) {
                 if (value) {

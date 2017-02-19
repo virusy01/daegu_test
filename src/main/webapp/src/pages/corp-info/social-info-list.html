@@ -6,7 +6,7 @@
 <dom-module id="social-info-list">
 <template>
 	<iron-ajax  auto id="getCorpList" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
-		       url="/api/hq/socialList"
+		       url="/api/hq/1/type"
 	 	       on-request="_startLoader"
 	  	       on-response="_stopLoader"
 		       last-response="{{_data}}">
@@ -21,16 +21,19 @@ Polymer({
 	behaviors: [Lunch.LoaderBehavior],
 
 	properties: {
+
 		_data: {
 			type: Array,
 			value: function() {
 				return [];
 			}
 		},
+
 		_headerLabels: {
 			type: Object,
 			value: function() {
 				return {
+				    CORP_TYPE: '기업유형',
                     CORP_NM: '기업명',
                     OPEN_DT: '설립연월',
                     SE_YN_NM: '인증여부',

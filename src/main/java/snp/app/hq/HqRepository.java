@@ -10,6 +10,16 @@ import java.util.Map;
 @Repository
 public interface HqRepository
 {
+
+	List<Map<String, Object>> findCorpList(String corpType);
+
+	Map<String, Object> findCorpInfo(@Param("p") Map<String, Object> params, @Param("u") User user);
+	int insertCorpInfo(@Param("p") Map<String, Object> params, @Param("u") User user);
+	int updateCorpInfo(@Param("p") Map<String, Object> params, @Param("u") User user);
+	int deleteCorpInfo(@Param("p") Map<String, Object> params, @Param("u") User user);
+
+
+
 	// 사회적기업 기업 리스트
 	List<Map<String, Object>> findSocialList();
 
