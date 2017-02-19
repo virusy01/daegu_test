@@ -69,7 +69,7 @@ public class HqController
 	}
 
 	/**
-	 * 사회적기업정보 상세정보
+	 * 협동조합 상세정보
 	 * @return
 	 */
 	@RequestMapping(value="/cooperationInfo/{CORP_SEQ}")
@@ -98,5 +98,49 @@ public class HqController
 	{
 		return service.deleteCooperationInfo(corpSeq);
 	}
+
+
+	/**
+	 * 마을기업정보 기본정보 목록
+	 * @return
+	 */
+	@RequestMapping(value="/villageList")
+	public List<Map<String, Object>> findVillageList(){
+		return service.findVillageList();
+	}
+
+	/**
+	 * 마을기업정보 상세정보
+	 * @return
+	 */
+	@RequestMapping(value="/villageInfo/{CORP_SEQ}")
+	public Map<String, Object> findVillageInfo(@PathVariable("CORP_SEQ") Integer corpSeq){
+		return service.findVillageInfo(corpSeq);
+	}
+
+	/**
+	 * 마을기업 정보 저장
+	 * corp_info_save.php
+	 * @param params
+	 * @return
+	 */
+	@RequestMapping(value="/villageInfo", method= RequestMethod.POST)
+	public int saveVillageInfo(@RequestBody Map<String, Object> params)
+	{
+		return service.saveVillageInfo(params);
+	}
+
+	/**
+	 * 마을기업 정보 삭제
+	 * corp_info_del.php
+	 * @param corpSeq
+	 * @return
+	 */
+	@RequestMapping(value="/villageinfo/{CORP_SEQ}", method= RequestMethod.DELETE)
+	public int deleteVillageInfo(@PathVariable("CORP_SEQ") Integer corpSeq)
+	{
+		return service.deleteVillageInfo(corpSeq);
+	}
+
 
 }

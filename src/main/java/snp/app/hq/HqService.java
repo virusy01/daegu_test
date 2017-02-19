@@ -75,9 +75,35 @@ public class HqService
 	}
 
 	public int deleteCooperationInfo(int corpSeq) {
-		return repository.deleteSocialInfo(corpSeq, Security.user());
+		return repository.deleteVillageInfo(corpSeq, Security.user());
 	}
 
 
+	// 마을기업 리스트
+	public List<Map<String, Object>> findVillageList()
+	{
+		return repository.findVillageList();
+	}
+
+	// 마을기업 상세 정보
+	public Map<String, Object> findVillageInfo(int corpSeq) {
+		return repository.findVillageInfo(corpSeq, Security.user());
+	}
+
+	public int saveVillageInfo(Map<String, Object> params) {
+		int r;
+		Integer corpSeq = (Integer) params.get("CORP_SEQ");
+		if (corpSeq != null) {
+			//repository.deleteCorpInfo(corpSeq, Security.user());
+			r = repository.updateVillageInfo(params, Security.user());
+		} else {
+			r = repository.insertVillageInfo(params, Security.user());
+		}
+		return r;
+	}
+
+	public int deleteVillageInfo(int corpSeq) {
+		return repository.deleteVillageInfo(corpSeq, Security.user());
+	}
 
 }

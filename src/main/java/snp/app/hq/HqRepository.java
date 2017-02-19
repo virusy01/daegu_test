@@ -28,6 +28,14 @@ public interface HqRepository
 	int updateCooperationInfo(@Param("p") Map<String, Object> params, @Param("u") User user);
 	int deleteCooperationInfo(@Param("CORP_SEQ") int corpSeq, @Param("u") User user);
 
+	// 마을기업 기업 리스트
+	List<Map<String, Object>> findVillageList();
+
+	// 마을기업 상세정보
+	Map<String, Object> findVillageInfo(@Param("CORP_SEQ") int corpSeq, @Param("u") User user);
+	int insertVillageInfo(@Param("p") Map<String, Object> params, @Param("u") User user);
+	int updateVillageInfo(@Param("p") Map<String, Object> params, @Param("u") User user);
+	int deleteVillageInfo(@Param("CORP_SEQ") int corpSeq, @Param("u") User user);
 
 }
 	

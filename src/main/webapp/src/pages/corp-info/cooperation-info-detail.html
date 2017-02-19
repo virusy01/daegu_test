@@ -23,9 +23,6 @@
 		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/ESTABLISH_PURPOSE/code/" last-response="{{_establishPurpose}}"></iron-ajax>
 		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/LOCAL_PURPOSE/code/" last-response="{{_localPurpose}}"></iron-ajax>
 		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/LOCAL_PROBLEM/code/" last-response="{{_localProblem}}"></iron-ajax>
-
-
-		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/SEL_IMPORT/code/" last-response="{{_selImport}}"></iron-ajax>
 		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/HARD_REASON/code/" last-response="{{_hardReason}}"></iron-ajax>
 
 
@@ -987,12 +984,6 @@
                     }
                 },
 
-                _selImport: {
-                    type: Array,
-                    value: function() {
-                        return [];
-                    }
-                },
                 _hardReason: {
                     type: Array,
                     value: function() {
