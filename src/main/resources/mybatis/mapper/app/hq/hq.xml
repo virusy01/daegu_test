@@ -17,7 +17,7 @@
 		, MAIN_TYPE
 		, SECTOR
 		, REGION
-		FROM CORP_INFO_SE
+		FROM SOCIAL_INFO
 	</select>
 
 	<!-- 사회적기업 상세정보 -->
@@ -39,10 +39,20 @@
 		, CITY_ENL
 		, WEAK_CHG
 		, WEAK_ENL
-		, PROD_NM
-		, PROD_PCT
-		, SERVICE_NM
-		, SERVICE_PCT
+		, PROD_NM1		/*f22 주요제품명 1*/
+		, PROD_NM2		/*f23 주요제품명 1*/
+		, PROD_NM3		/*f24 주요제품명 1*/
+		, PROD_NM1_PCT	/*f25 주요제품명1 %*/
+		, PROD_NM2_PCT	/*f26 주요제품명2 %*/
+		, PROD_NM3_PCT	/*f27 주요제품명3 %*/
+		, PROD_ETC_PCT	/*f28 기타 생산제품 %*/
+		, SERVICE_NM1		/*f22 주요제품명 1*/
+		, SERVICE_NM2		/*f23 주요제품명 1*/
+		, SERVICE_NM3		/*f24 주요제품명 1*/
+		, SERVICE_NM1_PCT	/*f25 주요제품명1 %*/
+		, SERVICE_NM2_PCT	/*f26 주요제품명2 %*/
+		, SERVICE_NM3_PCT	/*f27 주요제품명3 %*/
+		, SERVICE_ETC_PCT	/*f28 기타 생산제품 %*/
 		, IN_TOT1
 		, IN_SEE1
 		, IN_TOT2
@@ -110,8 +120,6 @@
 		, WEAK_SPE_WEEK_TIME
 		, WEAK_SPE_MONTH_PAY
 		, WEAK_SPE_EMP_TIME
-		, WEAK_VOL_EMP_CNT
-		, WEAK_VOL_WEEK_TIME
 		, WEAK_AVG_YEAR
 		, WEAK_TYPE1_CNT
 		, WEAK_TYPE2_CNT
@@ -140,12 +148,12 @@
 		, FUNDS_SUPP
 		, FUNDS_LOAN
 		, FUNDS_ETC
-		FROM CORP_INFO_SE
+		FROM SOCIAL_INFO
 		WHERE CORP_SEQ = #{CORP_SEQ}
 	</select>
 
 	<insert id="insertSocialInfo">
-		INSERT INTO CORP_INFO_SE
+		INSERT INTO SOCIAL_INFO
 		(
 		 CORP_NM
 		, OPEN_DT
@@ -163,10 +171,20 @@
 		, CITY_ENL
 		, WEAK_CHG
 		, WEAK_ENL
-		, PROD_NM
-		, PROD_PCT
-		, SERVICE_NM
-		, SERVICE_PCT
+		, PROD_NM1		/*f22 주요제품명 1*/
+		, PROD_NM2		/*f23 주요제품명 1*/
+		, PROD_NM3		/*f24 주요제품명 1*/
+		, PROD_NM1_PCT	/*f25 주요제품명1 %*/
+		, PROD_NM2_PCT	/*f26 주요제품명2 %*/
+		, PROD_NM3_PCT	/*f27 주요제품명3 %*/
+		, PROD_ETC_PCT	/*f28 기타 생산제품 %*/
+		, SERVICE_NM1		/*f22 주요제품명 1*/
+		, SERVICE_NM2		/*f23 주요제품명 1*/
+		, SERVICE_NM3		/*f24 주요제품명 1*/
+		, SERVICE_NM1_PCT	/*f25 주요제품명1 %*/
+		, SERVICE_NM2_PCT	/*f26 주요제품명2 %*/
+		, SERVICE_NM3_PCT	/*f27 주요제품명3 %*/
+		, SERVICE_ETC_PCT	/*f28 기타 생산제품 %*/
 		, IN_TOT1
 		, IN_SEE1
 		, IN_TOT2
@@ -234,8 +252,6 @@
 		, WEAK_SPE_WEEK_TIME
 		, WEAK_SPE_MONTH_PAY
 		, WEAK_SPE_EMP_TIME
-		, WEAK_VOL_EMP_CNT
-		, WEAK_VOL_WEEK_TIME
 		, WEAK_AVG_YEAR
 		, WEAK_TYPE1_CNT
 		, WEAK_TYPE2_CNT
@@ -286,10 +302,20 @@
 		, #{p.CITY_ENL}
 		, #{p.WEAK_CHG}
 		, #{p.WEAK_ENL}
-		, #{p.PROD_NM}
-		, #{p.PROD_PCT}
-		, #{p.SERVICE_NM}
-		, #{p.SERVICE_PCT}
+		, #{p.PROD_NM1}
+		, #{p.PROD_NM2}
+		, #{p.PROD_NM3}
+		, #{p.PROD_NM1_PCT}
+		, #{p.PROD_NM2_PCT}
+		, #{p.PROD_NM3_PCT}
+		, #{p.PROD_ETC_PCT}
+		, #{p.SERVICE_NM1}
+		, #{p.SERVICE_NM2}
+		, #{p.SERVICE_NM3}
+		, #{p.SERVICE_NM1_PCT}
+		, #{p.SERVICE_NM2_PCT}
+		, #{p.SERVICE_NM3_PCT}
+		, #{p.SERVICE_ETC_PCT}
 		, #{p.IN_TOT1}
 		, #{p.IN_SEE1}
 		, #{p.IN_TOT2}
@@ -357,8 +383,6 @@
 		, #{p.WEAK_SPE_WEEK_TIME}
 		, #{p.WEAK_SPE_MONTH_PAY}
 		, #{p.WEAK_SPE_EMP_TIME}
-		, #{p.WEAK_VOL_EMP_CNT}
-		, #{p.WEAK_VOL_WEEK_TIME}
 		, #{p.WEAK_AVG_YEAR}
 		, #{p.WEAK_TYPE1_CNT}
 		, #{p.WEAK_TYPE2_CNT}
@@ -393,7 +417,7 @@
 	</insert>
 
 	<update id="updateSocialInfo">
-		UPDATE CORP_INFO_SE
+		UPDATE SOCIAL_INFO
 		SET
 	    CORP_NM           = #{p.CORP_NM}
 	    , OPEN_DT           = #{p.OPEN_DT, typeHandler=snp.spring.mybatis.DateHandler}
@@ -411,10 +435,22 @@
 		, CITY_ENL		= #{p.CITY_ENL}
 		, WEAK_CHG		= #{p.WEAK_CHG}
 		, WEAK_ENL		= #{p.WEAK_ENL}
-		, PROD_NM		= #{p.PROD_NM}
-		, PROD_PCT		= #{p.PROD_PCT}
-		, SERVICE_NM		= #{p.SERVICE_NM}
-		, SERVICE_PCT		= #{p.SERVICE_PCT}
+
+		, PROD_NM1		= #{p.PROD_NM1}
+		, PROD_NM2		= #{p.PROD_NM2}
+		, PROD_NM3		= #{p.PROD_NM3}
+		, PROD_NM1_PCT		= #{p.PROD_NM1_PCT}
+		, PROD_NM2_PCT		= #{p.PROD_NM2_PCT}
+		, PROD_NM3_PCT		= #{p.PROD_NM3_PCT}
+		, PROD_ETC_PCT		= #{p.PROD_ETC_PCT}
+		, SERVICE_NM1		= #{p.SERVICE_NM1}
+		, SERVICE_NM2		= #{p.SERVICE_NM2}
+		, SERVICE_NM3		= #{p.SERVICE_NM3}
+		, SERVICE_NM1_PCT		= #{p.SERVICE_NM1_PCT}
+		, SERVICE_NM2_PCT		= #{p.SERVICE_NM2_PCT}
+		, SERVICE_NM3_PCT		= #{p.SERVICE_NM3_PCT}
+		, SERVICE_ETC_PCT		= #{p.SERVICE_ETC_PCT}
+
 		, IN_TOT1		= #{p.IN_TOT1}
 		, IN_SEE1		= #{p.IN_SEE1}
 		, IN_TOT2		= #{p.IN_TOT2}
@@ -482,8 +518,6 @@
 		, WEAK_SPE_WEEK_TIME		= #{p.WEAK_SPE_WEEK_TIME}
 		, WEAK_SPE_MONTH_PAY		= #{p.WEAK_SPE_MONTH_PAY}
 		, WEAK_SPE_EMP_TIME		= #{p.WEAK_SPE_EMP_TIME}
-		, WEAK_VOL_EMP_CNT		= #{p.WEAK_VOL_EMP_CNT}
-		, WEAK_VOL_WEEK_TIME		= #{p.WEAK_VOL_WEEK_TIME}
 		, WEAK_AVG_YEAR		= #{p.WEAK_AVG_YEAR}
 		, WEAK_TYPE1_CNT		= #{p.WEAK_TYPE1_CNT}
 		, WEAK_TYPE2_CNT		= #{p.WEAK_TYPE2_CNT}
@@ -518,7 +552,7 @@
 	</update>
 
 	<delete id="deleteSocialInfo">
-		DELETE FROM CORP_INFO_SE
+		DELETE FROM SOCIAL_INFO
 		WHERE CORP_SEQ = #{CORP_SEQ}
 	</delete>
 

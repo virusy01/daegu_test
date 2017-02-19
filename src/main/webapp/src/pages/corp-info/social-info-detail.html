@@ -13,6 +13,19 @@
 <dom-module id="social-info-detail">
 
 	<template>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/ORG_TYPE/code/" last-response="{{_orgType}}"></iron-ajax>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/BEFORE_TYPE/code/" last-response="{{_beforeType}}"></iron-ajax>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/LEG_TYPE1/code/" last-response="{{_legType1}}"></iron-ajax>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/LEG_TYPE2/code/" last-response="{{_legType2}}"></iron-ajax>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/MAIN_TYPE/code/" last-response="{{_mainType}}"></iron-ajax>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/SECTOR/code/" last-response="{{_sector}}"></iron-ajax>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/HISTORY/code/" last-response="{{_history}}"></iron-ajax>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/REGION/code/" last-response="{{_region}}"></iron-ajax>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/SEL_IMPORT/code/" last-response="{{_selImport}}"></iron-ajax>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/HARD_REASON/code/" last-response="{{_hardReason}}"></iron-ajax>
+
+
+
 		<iron-ajax id="getSocialInfo" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
 				   url$="/api/hq/socialInfo/[[_corpSeq]]"
 				   on-request="_startLoader"
@@ -66,29 +79,29 @@
 			<div class="form-group">
 				<label class="col-xs-2 control-label">조직형태</label>
 				<div class="col-xs-4">
-					<normal-select name="ORG_TYPE" items="{{_orgTYPE}}" name-from="CD_NM" value-from="CD" value="{{_data.ORG_TYPE}}"></normal-select>
+					<normal-select name="ORG_TYPE" items="{{_orgType}}" name-from="CD_NM" value-from="CD" value="{{_data.ORG_TYPE}}"></normal-select>
 				</div>
 				<label class="col-xs-2 control-label">사회적기업 이전 조직형태</label>
 				<div class="col-xs-4">
-					<normal-select name="BEFORE_TYPE" items="{{_beforeTYPE}}" name-from="CD_NM" value-from="CD" value="{{_data.BEFORE_TYPE}}"></normal-select>
+					<normal-select name="BEFORE_TYPE" items="{{_beforeType}}" name-from="CD_NM" value-from="CD" value="{{_data.BEFORE_TYPE}}"> </normal-select>
 				</div>
 			</div>
 
 			<div class="form-group">
 				<label class="col-xs-2 control-label">법적 유형1</label>
 				<div class="col-xs-4">
-					<normal-select name="LEG_TYPE1" items="{{_legTYPE1}}" name-from="CD_NM" value-from="CD" value="{{_data.LEG_TYPE1}}"></normal-select>
+					<normal-select name="LEG_TYPE1" items="{{_legType1}}" name-from="CD_NM" value-from="CD" value="{{_data.LEG_TYPE1}}"> </normal-select>
 				</div>
 				<label class="col-xs-2 control-label">법적 유형2</label>
 				<div class="col-xs-4">
-					<normal-select name="LEG_TYPE2" items="{{_legTYPE2}}" name-from="CD_NM" value-from="CD" value="{{_data.LEG_TYPE2}}"></normal-select>
+					<normal-select name="LEG_TYPE2" items="{{_legType2}}" name-from="CD_NM" value-from="CD" value="{{_data.LEG_TYPE2}}"></normal-select>
 				</div>
 			</div>
 
 			<div class="form-group">
 				<label class="col-xs-2 control-label">주요 활동 업종 분야</label>
 				<div class="col-xs-4">
-					<normal-select name="MAIN_TYPE" items="{{_mainTYPE}}" name-from="CD_NM" value-from="CD" value="{{_data.MAIN_TYPE}}"></normal-select>
+					<normal-select name="MAIN_TYPE" items="{{_mainType}}" name-from="CD_NM" value-from="CD" value="{{_data.MAIN_TYPE}}"></normal-select>
 				</div>
 				<label class="col-xs-2 control-label">업종(전국사업체조사 대분류)</label>
 				<div class="col-xs-4">
@@ -118,29 +131,29 @@
 			<div class="form-group">
 				<label class="col-xs-2 control-label">취약계층 일자리 및 삶의 태도 변화</label>
 				<div class="col-xs-4">
-					<normal-select name="LIFE_CHG" items="{{_selIMPORT}}" name-from="CD_NM" value-from="CD" value="{{_data.LIFE_CHG}}"></normal-select>
+					<normal-select name="LIFE_CHG" items="{{_selImport}}" name-from="CD_NM" value-from="CD" value="{{_data.LIFE_CHG}}"></normal-select>
 				</div>
 				<label class="col-xs-2 control-label">지역사회 문제해결</label>
 				<div class="col-xs-4">
-					<normal-select name="LOCAL_SOL" items="{{_selIMPORT}}" name-from="CD_NM" value-from="CD" value="{{_data.LOCAL_SOL}}"></normal-select>
+					<normal-select name="LOCAL_SOL" items="{{_selImport}}" name-from="CD_NM" value-from="CD" value="{{_data.LOCAL_SOL}}"></normal-select>
 				</div>
 			</div>
 
 			<div class="form-group">
 				<label class="col-xs-2 control-label">도시 주민공동체 형성 및 확대</label>
 				<div class="col-xs-4">
-					<normal-select name="CITY_ENL" items="{{_selIMPORT}}" name-from="CD_NM" value-from="CD" value="{{_data.CITY_ENL}}"></normal-select>
+					<normal-select name="CITY_ENL" items="{{_selImport}}" name-from="CD_NM" value-from="CD" value="{{_data.CITY_ENL}}"></normal-select>
 				</div>
 				<label class="col-xs-2 control-label">소수·배제계층에 대한 사회인식 전환</label>
 				<div class="col-xs-4">
-					<normal-select name="WEAK_CHG" items="{{_selIMPORT}}" name-from="CD_NM" value-from="CD" value="{{_data.WEAK_CHG}}"></normal-select>
+					<normal-select name="WEAK_CHG" items="{{_selImport}}" name-from="CD_NM" value-from="CD" value="{{_data.WEAK_CHG}}"></normal-select>
 				</div>
 			</div>
 
 			<div class="form-group">
 				<label class="col-xs-2 control-label">취약계층 고용기회 확대</label>
 				<div class="col-xs-4">
-					<normal-select name="WEAK_ENL" items="{{_selIMPORT}}" name-from="CD_NM" value-from="CD" value="{{_data.WEAK_ENL}}"></normal-select>
+					<normal-select name="WEAK_ENL" items="{{_selImport}}" name-from="CD_NM" value-from="CD" value="{{_data.WEAK_ENL}}"></normal-select>
 				</div>
 			</div>
 
@@ -152,24 +165,88 @@
 			</div>
 
 			<div class="form-group">
-				<label class="col-xs-2 control-label">주요 생산 제품(명칭)</label>
+				<label class="col-xs-2 control-label">주요 생산 제품(명칭) : 1. </label>
 				<div class="col-xs-4">
-					<normal-input name="PROD_NM" value="{{_data.PROD_NM}}"></normal-input>
+					<normal-input name="PROD_NM1" value="{{_data.PROD_NM1}}"></normal-input>
 				</div>
-				<label class="col-xs-2 control-label">주요 생산 제품(비율%)</label>
+				<label class="col-xs-2 control-label">주요 생산 제품(비율%) : 1. </label>
 				<div class="col-xs-4">
-					<number-input name="PROD_PCT" value="{{_data.PROD_PCT}}"></number-input>
+					<number-input name="PROD_NM1_PCT" value="{{_data.PROD_NM1_PCT}}"></number-input>
 				</div>
 			</div>
 
 			<div class="form-group">
-				<label class="col-xs-2 control-label">주요 서비스(명칭)</label>
+				<label class="col-xs-2 control-label">2. </label>
 				<div class="col-xs-4">
-					<normal-input name="SERVICE_NM"  value="{{_data.SERVICE_NM}}"></normal-input>
+					<normal-input name="PROD_NM2" value="{{_data.PROD_NM2}}"></normal-input>
 				</div>
-				<label class="col-xs-2 control-label">주요 서비스(비율%)</label>
+				<label class="col-xs-2 control-label">2. </label>
 				<div class="col-xs-4">
-					<number-input name="SERVICE_PCT" value="{{_data.SERVICE_PCT}}"></number-input>
+					<number-input name="PROD_NM2_PCT" value="{{_data.PROD_NM2_PCT}}"></number-input>
+				</div>
+			</div>
+
+			<div class="form-group" >
+				<label class="col-xs-2 control-label">3. </label>
+				<div class="col-xs-4">
+					<normal-input name="PROD_NM3" value="{{_data.PROD_NM3}}"></normal-input>
+				</div>
+				<label class="col-xs-2 control-label">3. </label>
+				<div class="col-xs-4">
+					<number-input name="PROD_NM3_PCT" value="{{_data.PROD_NM3_PCT}}"></number-input>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label"></label>
+				<div class="col-xs-4">
+				</div>
+				<label class="col-xs-2 control-label ">기타(비율%)</label>
+				<div class="col-xs-4 text-right">
+					<number-input name="PROD_ETC_PCT" value="{{_data.PROD_ETC_PCT}}"></number-input>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">주요 서비스(명칭) : 1. </label>
+				<div class="col-xs-4">
+					<normal-input name="SERVICE_NM1" value="{{_data.SERVICE_NM1}}"></normal-input>
+				</div>
+				<label class="col-xs-2 control-label">주요 서비스(비율%) : 1. </label>
+				<div class="col-xs-4">
+					<number-input name="SERVICE_NM1_PCT" value="{{_data.SERVICE_NM1_PCT}}"></number-input>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">2. </label>
+				<div class="col-xs-4">
+					<normal-input name="SERVICE_NM2" value="{{_data.SERVICE_NM2}}"> </normal-input>
+				</div>
+				<label class="col-xs-2 control-label">2. </label>
+				<div class="col-xs-4">
+					<number-input name="SERVICE_NM2_PCT" value="{{_data.SERVICE_NM2_PCT}}"></number-input>
+				</div>
+			</div>
+
+			<div class="form-group" >
+				<label class="col-xs-2 control-label">3. </label>
+				<div class="col-xs-4">
+					<normal-input name="SERVICE_NM3" value="{{_data.SERVICE_NM3}}"></normal-input>
+				</div>
+				<label class="col-xs-2 control-label">3. </label>
+				<div class="col-xs-4">
+					<number-input name="SERVICE_NM3_PCT" value="{{_data.SERVICE_NM3_PCT}}"></number-input>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label"></label>
+				<div class="col-xs-4">
+				</div>
+				<label class="col-xs-2 control-label ">기타(비율%)</label>
+				<div class="col-xs-4 text-right">
+					<number-input name="SERVICE_ETC_PCT" value="{{_data.SERVICE_ETC_PCT}}"></number-input>
 				</div>
 			</div>
 
@@ -675,23 +752,6 @@
 
 			<div class="row">
 				<div class="col-xs-10 col-xs-offset-2">
-					<h5>자원봉사자</h5>
-				</div>
-			</div>
-
-			<div class="form-group">
-				<label class="col-xs-2 control-label">근로자수(명)</label>
-				<div class="col-xs-4">
-					<number-input name="WEAK_VOL_EMP_CNT" value="{{_data.WEAK_VOL_EMP_CNT}}"></number-input>
-				</div>
-				<label class="col-xs-2 control-label">주당 평균 근로시간(시간)</label>
-				<div class="col-xs-4">
-					<number-input name="WEAK_VOL_WEEK_TIME" value="{{_data.WEAK_VOL_WEEK_TIME}}"></number-input>
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="col-xs-10 col-xs-offset-2">
 					<h5>평균 연령</h5>
 				</div>
 			</div>
@@ -758,11 +818,11 @@
 			<div class="form-group">
 				<label class="col-xs-2 control-label">첫번째 이유</label>
 				<div class="col-xs-4">
-					<normal-select name="FIRST_REASON" items="{{_hardREASON}}" name-from="CD_NM" value-from="CD" value="{{_data.FIRST_REASON}}"></normal-select>
+					<normal-select name="FIRST_REASON" items="{{_hardReason}}" name-from="CD_NM" value-from="CD" value="{{_data.FIRST_REASON}}"></normal-select>
 				</div>
 				<label class="col-xs-2 control-label">두번째 이유</label>
 				<div class="col-xs-4">
-					<normal-select name="SECOND_REASON" items="{{_hardREASON}}" name-from="CD_NM" value-from="CD" value="{{_data.SECOND_REASON}}"></normal-select>
+					<normal-select name="SECOND_REASON" items="{{_hardReason}}" name-from="CD_NM" value-from="CD" value="{{_data.SECOND_REASON}}"></normal-select>
 				</div>
 			</div>
 			<div class="form-group">
@@ -907,108 +967,65 @@
                             {CD_NM:'예비',CD:'예비'},{CD_NM:'인증',CD:'인증'}];
                     }
                 },
-                _orgTYPE: {
+                _orgType: {
                     type: Array,
                     value: function() {
-                        return [{CD_NM:'',CD:''},
-                            {CD_NM:'주식회사',CD:'주식회사'},{CD_NM:'사단법인',CD:'사단법인'},
-                            {CD_NM:'협동조합',CD:'협동조합'},{CD_NM:'영농조합법인',CD:'영농조합법인'},
-                            {CD_NM:'사회복지법인',CD:'사회복지법인'},{CD_NM:'사업단',CD:'사업단'},
-                            {CD_NM:'전문예술단체',CD:'전문예술단체'},{CD_NM:'기타',CD:'기타'}];
+                        return [];
                     }
                 },
-                _beforeTYPE: {
+                _beforeType: {
 					type: Array,
 						value: function() {
-                            return [{CD_NM:'',CD:''},
-						    {CD_NM:'자활기업',CD:'자활기업'},{CD_NM:'장애인 직업재활시설',CD:'장애인 직업재활시설'},
-							{CD_NM:'영리회사',CD:'영리회사'},{CD_NM:'비영리조직 사업단',CD:'비영리조직 사업단'},
-							{CD_NM:'협동조합',CD:'협동조합'},{CD_NM:'기타',CD:'기타'}];
+                            return [];
             		}
         		},
-                _legTYPE1: {
+                _legType1: {
                     type: Array,
                     value: function() {
-                        return [{CD_NM:'',CD:''},
-                            {CD_NM:'일자리제공형  ',CD:'일자리제공형  '},{CD_NM:'사회서비스제공형',CD:'사회서비스제공형'},
-                            {CD_NM:'역사회공헌형',CD:'역사회공헌형'},{CD_NM:'혼합형',CD:'혼합형'},
-                            {CD_NM:'기타형',CD:'기타형'}];
+                        return [];
                     }
                 },
-                _legTYPE2: {
+                _legType2: {
                     type: Array,
                     value: function() {
-                        return [{CD_NM:'',CD:''},
-                            {CD_NM:'노동통합형',CD:'노동통합형'},{CD_NM:'문제해결(사회수요)형',CD:'문제해결(사회수요)형'},
-                            {CD_NM:'지역사회/사회혁신형',CD:'지역사회/사회혁신형'},{CD_NM:'고용창출형',CD:'고용창출형'}];
+                        return [];
                     }
                 },
-                _mainTYPE: {
+                _mainType: {
                     type: Array,
                     value: function() {
-                        return [{CD_NM:'',CD:''},
-                            {CD_NM:'농업/임업',CD:'농업/임업'},{CD_NM:'농식품 제조/유통',CD:'농식품 제조/유통'},
-                            {CD_NM:'일반 제조/유통',CD:'일반 제조/유통'},{CD_NM:'문화/예술',CD:'문화/예술'},
-                            {CD_NM:'교육/상담/컨설팅',CD:'교육/상담/컨설팅'},{CD_NM:'보건/자활',CD:'보건/자활'},
-                            {CD_NM:'가사/간병/돌봄',CD:'가사/간병/돌봄'},{CD_NM:'청소/경비/용역',CD:'청소/경비/용역'},
-                            {CD_NM:'환경/재생/에너지',CD:'환경/재생/에너지'},{CD_NM:'주거/건축',CD:'주거/건축'},
-                            {CD_NM:'인쇄/출판/디자인',CD:'인쇄/출판/디자인'},{CD_NM:'운송/배달',CD:'운송/배달'},
-                            {CD_NM:'음식점/카페',CD:'음식점/카페'},{CD_NM:'기타',CD:'기타'}];
+                        return [];
                     }
                 },
                 _sector: {
                     type: Array,
                     value: function() {
-                        return [{CD_NM:'',CD:''},
-                            {CD_NM:'농업, 임업 및 어업',CD:'농업, 임업 및 어업'},{CD_NM:'제조업',CD:'제조업'},
-                            {CD_NM:'도매 및 소매업',CD:'도매 및 소매업'},{CD_NM:'운수업',CD:'운수업'},
-                            {CD_NM:'숙박 및 음식점업',CD:'숙박 및 음식점업'},{CD_NM:'사업시설관리 및 사업지원서비스업',CD:'사업시설관리 및 사업지원서비스업'},
-                            {CD_NM:'교육 서비스업',CD:'교육 서비스업'},{CD_NM:'보건업 및 사회복지서비스업',CD:'보건업 및 사회복지서비스업'},
-                            {CD_NM:'예술, 스포츠 및 여가관련 서비스업',CD:'예술, 스포츠 및 여가관련 서비스업'},{CD_NM:'협회 및 단체, 수리 및 기타 개인 서비스업',CD:'협회 및 단체, 수리 및 기타 개인 서비스업'},
-                            {CD_NM:'인쇄/출판/디자인',CD:'인쇄/출판/디자인'},{CD_NM:'운송/배달',CD:'운송/배달'},
-                            {CD_NM:'기타',CD:'기타'}];
+                        return [];
                     }
                 },
                 _history: {
                     type: Array,
                     value: function() {
-                        return [{CD_NM:'',CD:''},
-                            {CD_NM:'사회복지 관련 종사자',CD:'사회복지 관련 종사자'},{CD_NM:'자활근로자',CD:'자활근로자'},
-                            {CD_NM:'민간 기업가',CD:'민간 기업가'},{CD_NM:'장기 실업자',CD:'장기 실업자'},
-                            {CD_NM:'시민사회 활동가',CD:'시민사회 활동가'},{CD_NM:'예술가',CD:'예술가'},
-                            {CD_NM:'자원봉사자',CD:'자원봉사자'},{CD_NM:'소셜벤처 창업가',CD:'소셜벤처 창업가'},
-                            {CD_NM:'기타',CD:'기타'}];
+                        return [];
                     }
                 },
                 _region: {
                     type: Array,
                     value: function() {
-                        return [{CD_NM:'',CD:''},
-                            {CD_NM:'중구',CD:'중구'},{CD_NM:'동구',CD:'동구'},
-                            {CD_NM:'서구',CD:'서구'},{CD_NM:'남구',CD:'남구'},
-                            {CD_NM:'북구',CD:'북구'},{CD_NM:'수성구',CD:'수성구'},
-                            {CD_NM:'달서구',CD:'달서구'},{CD_NM:'달성군',CD:'달성군'}];
+                        return [];
                     }
                 },
 
-                _selIMPORT: {
+                _selImport: {
                     type: Array,
                     value: function() {
-                        return [{CD_NM:'',CD:''},
-                            {CD_NM:'1.매우낮음',CD:'1.매우낮음'},{CD_NM:'2.낮음',CD:'2.낮음'},
-                            {CD_NM:'3.약간낮음',CD:'3.약간낮음'},{CD_NM:'4.보통',CD:'4.보통'},
-                            {CD_NM:'5.약간높음',CD:'5.약간높음'},{CD_NM:'6.높음',CD:'6.높음'},
-                            {CD_NM:'7.매우높음',CD:'7.매우높음'}];
+                        return [];
                     }
                 },
-                _hardREASON: {
+                _hardReason: {
                     type: Array,
                     value: function() {
-                        return [{CD_NM:'',CD:''},
-                            {CD_NM:'우수인재 선발',CD:'우수인재 선발'},{CD_NM:'높은 이직률',CD:'높은 이직률'},
-                            {CD_NM:'낮은 임금수준',CD:'낮은 임금수준'},{CD_NM:'근로자의 실무능력 부족',CD:'근로자의 실무능력 부족'},
-                            {CD_NM:'적절한 교육/훈련 시스템 부재',CD:'적절한 교육/훈련 시스템 부재'},{CD_NM:'열악한 근로환경',CD:'열악한 근로환경'},
-                            {CD_NM:'불투명한 비전',CD:'불투명한 비전'},{CD_NM:'근로자의 도덕적 해이',CD:'근로자의 도덕적 해이'}];
+                        return [];
                     }
                 },
 
