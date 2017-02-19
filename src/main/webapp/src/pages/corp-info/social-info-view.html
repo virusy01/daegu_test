@@ -18,9 +18,6 @@
 		<div class="horizontal-margin-20"></div>
 
 		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h3 class="panel-title">나비프로젝트 </h3>
-			</div>
 			<div class="panel-body">
 				<social-info-detail admin-mode="true" read-id="{{id}}"></social-info-detail>
 			</div>
@@ -33,11 +30,7 @@
 
             properties: {
                 id: Number,
-                tab: {
-                    type: String,
-                    value: 'income',
-                    observer: "_selectTab"
-                },
+
                 _yearList: {
                     type: Array,
                     value: function() {
@@ -62,9 +55,6 @@
                         return moment().year();
                     }
                 },
-            },
-            _getData: function(e) {
-                this.$.reportTabs.selectedItem.requestData();
             },
 
             _toList: function(e) {

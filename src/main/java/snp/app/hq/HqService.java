@@ -54,12 +54,12 @@ public class HqService
 	// 협동조합 리스트
 	public List<Map<String, Object>> findCooperationList()
 	{
-		return repository.findSocialList();
+		return repository.findCooperationList();
 	}
 
-	// 사회적기업 상세 정보
+	// 협동조합 상세 정보
 	public Map<String, Object> findCooperationInfo(int corpSeq) {
-		return repository.findSocialInfo(corpSeq, Security.user());
+		return repository.findCooperationInfo(corpSeq, Security.user());
 	}
 
 	public int saveCooperationInfo(Map<String, Object> params) {
@@ -67,9 +67,9 @@ public class HqService
 		Integer corpSeq = (Integer) params.get("CORP_SEQ");
 		if (corpSeq != null) {
 			//repository.deleteCorpInfo(corpSeq, Security.user());
-			r = repository.updateSocialInfo(params, Security.user());
+			r = repository.updateCooperationInfo(params, Security.user());
 		} else {
-			r = repository.insertSocialInfo(params, Security.user());
+			r = repository.insertCooperationInfo(params, Security.user());
 		}
 		return r;
 	}

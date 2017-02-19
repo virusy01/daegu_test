@@ -13,6 +13,7 @@
 <dom-module id="social-info-detail">
 
 	<template>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/SE_YN/code/" last-response="{{_seYn}}"></iron-ajax>
 		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/ORG_TYPE/code/" last-response="{{_orgType}}"></iron-ajax>
 		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/BEFORE_TYPE/code/" last-response="{{_beforeType}}"></iron-ajax>
 		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/LEG_TYPE1/code/" last-response="{{_legType1}}"></iron-ajax>
@@ -42,7 +43,10 @@
 
 
 			<div class="row">
-				<div class="col-xs-12 text-right">
+				<div class="col-xs-4">
+					<h3> {{_data.CORP_NM}}<small> _ 상세정보</small></h3>
+				</div>
+				<div class="col-xs-8 text-right">
 					<button type="button" on-tap="_submitForm" class="btn btn-sm btn-success">수정</button>
 				</div>
 			</div>
@@ -52,7 +56,7 @@
 
 			<div class="form-group sub-header">
 				<div class="col-xs-10 col-xs-offset-2">
-					<h4>기업 일반 정보</h4>
+					<h4>일반 정보</h4>
 					<hr/>
 				</div>
 			</div>
@@ -72,7 +76,7 @@
 				</div>
 				<label class="col-xs-2 control-label">인증여부</label>
 				<div class="col-xs-4">
-					<normal-select name="SE_YN" items="{{_seYN}}" name-from="CD_NM" value-from="CD" value="{{_data.SE_YN}}"></normal-select>
+					<normal-select name="SE_YN" items="{{_seYn}}" name-from="CD_NM" value-from="CD" value="{{_data.SE_YN}}"></normal-select>
 				</div>
 			</div>
 
@@ -960,11 +964,10 @@
                     },
                     observer: '_getSocialInfo'
                 },
-                _seYN: {
+                _seYn: {
                     type: Array,
                     value: function() {
-                        return [{CD_NM:'',CD:''},
-                            {CD_NM:'예비',CD:'예비'},{CD_NM:'인증',CD:'인증'}];
+                        return [];
                     }
                 },
                 _orgType: {

@@ -20,15 +20,13 @@ public interface HqRepository
 	int deleteSocialInfo(@Param("CORP_SEQ") int corpSeq, @Param("u") User user);
 
 	// 협동조합 리스트
-	//List<Map<String, Object>> findCooperationList();
+	List<Map<String, Object>> findCooperationList();
 
 	// 협동조합 상세정보
-	//Map<String, Object> findCooperationInfo(@Param("CORP_SEQ") int corpSeq, @Param("u") User user);
-	//int insertCooperationInfo(@Param("p") Map<String, Object> params, @Param("u") User user);
-	//int updateCooperationInfo(@Param("p") Map<String, Object> params, @Param("u") User user);
-	//int deleteCooperationInfo(@Param("CORP_SEQ") int corpSeq, @Param("u") User user);
-
-
+	Map<String, Object> findCooperationInfo(@Param("CORP_SEQ") int corpSeq, @Param("u") User user);
+	int insertCooperationInfo(@Param("p") Map<String, Object> params, @Param("u") User user);
+	int updateCooperationInfo(@Param("p") Map<String, Object> params, @Param("u") User user);
+	int deleteCooperationInfo(@Param("CORP_SEQ") int corpSeq, @Param("u") User user);
 
 
 }
