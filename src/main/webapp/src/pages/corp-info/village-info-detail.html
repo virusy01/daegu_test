@@ -1,0 +1,1078 @@
+<link rel="import" href="/bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="/bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="/bower_components/iron-form/iron-form.html">
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/bower_components/iron-input/iron-input.html">
+<link rel="import" href="/src/components/common/normal-input.html" />
+<link rel="import" href="/src/components/common/number-input.html" />
+<link rel="import" href="/src/components/common/normal-select.html" />
+<link rel="import" href="/src/components/common/date-input.html" />
+<link rel="import" href="/src/components/behaviors/behavior-loader.html">
+
+
+<dom-module id="village-info-detail">
+
+	<template>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/VILL_TYPE/code/" last-response="{{_villType}}"></iron-ajax>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/BEFORE_TYPE/code/" last-response="{{_beforeType}}"></iron-ajax>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/MAIN_TYPE/code/" last-response="{{_mainType}}"></iron-ajax>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/SECTOR/code/" last-response="{{_sector}}"></iron-ajax>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/HISTORY/code/" last-response="{{_history}}"></iron-ajax>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/REGION/code/" last-response="{{_region}}"></iron-ajax>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/MAIN_VALUE/code/" last-response="{{_mainValue}}"></iron-ajax>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/SEL_IMPORT/code/" last-response="{{_selImport}}"></iron-ajax>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/HARD_REASON/code/" last-response="{{_hardReason}}"></iron-ajax>
+
+		<iron-ajax id="getVillageInfo" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
+				   url="/api/hq/corpInfo"
+				   on-request="_startLoader"
+				   on-response="_stopLoader"
+				   last-response="{{_data}}">
+		</iron-ajax>
+		<form id="villageForm" is="iron-form"
+			  content-type="application/json"
+			  method="post"
+			  action="/api/hq/corpInfo"
+			  on-iron-form-presubmit="_parseDataBeforeSubmit"
+			  on-iron-form-response="_submitResponse"
+			  class="form-horizontal">
+
+
+			<div class="row">
+				<div class="col-xs-4">
+					<h3> {{_data.CORP_NM}}<small> _ 상세정보</small></h3>
+				</div>
+				<div class="col-xs-8 text-right">
+					<button type="button" on-tap="_submitForm" class="btn btn-sm btn-success">수정</button>
+				</div>
+			</div>
+
+
+			<div id="alert" class="alert alert-dismissible hide" role="alert"></div>
+
+			<div class="form-group sub-header">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h4>일반 정보</h4>
+					<hr/>
+				</div>
+			</div>
+
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">회사명</label>
+				<div class="col-xs-10">
+					<normal-input name="CORP_NM" value="{{_data.CORP_NM}}" placeholder="회사명" readonly></normal-input>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">설립년도</label>
+				<div class="col-xs-4">
+					<date-input name="OPEN_DT" bind-value="{{_data.OPEN_DT}}" required></date-input>
+				</div>
+				<label class="col-xs-2 control-label">조직형태</label>
+				<div class="col-xs-4">
+					<normal-select name="ORG_TYPE" items="{{_villType}}" name-from="CD_NM" value-from="CD" value="{{_data.ORG_TYPE}}"></normal-select>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">마을기업 이전 조직형태</label>
+				<div class="col-xs-4">
+					<normal-select name="BEFORE_TYPE" items="{{_beforeType}}" name-from="CD_NM" value-from="CD" value="{{_data.BEFORE_TYPE}}"> </normal-select>
+				</div>
+				<label class="col-xs-2 control-label">주요 활동 업종 분야</label>
+				<div class="col-xs-4">
+					<normal-select name="MAIN_TYPE" items="{{_mainType}}" name-from="CD_NM" value-from="CD" value="{{_data.MAIN_TYPE}}"></normal-select>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">업종(전국사업체조사 대분류)</label>
+				<div class="col-xs-4">
+					<normal-select name="SECTOR" items="{{_sector}}" name-from="CD_NM" value-from="CD" value="{{_data.SECTOR}}"></normal-select>
+				</div>
+				<label class="col-xs-2 control-label">사회적기업 대표자 핵심 과거 경력</label>
+				<div class="col-xs-4">
+					<normal-select name="HISTORY" items="{{_history}}" name-from="CD_NM" value-from="CD" value="{{_data.HISTORY}}"></normal-select>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">회사 소재지</label>
+				<div class="col-xs-4">
+					<normal-select name="REGION" items="{{_region}}" name-from="CD_NM" value-from="CD" value="{{_data.REGION}}"></normal-select>
+				</div>
+			</div>
+
+
+			<div class="form-group sub-header">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h4>핵심 사회적 가치의 중요도(설립 목적)</h4>
+					<hr/>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">기업의 핵심 사회적 가치 1순위</label>
+				<div class="col-xs-4">
+					<normal-select name="MAIN_VALUE1" items="{{_mainValue}}" name-from="CD_NM" value-from="CD" value="{{_data.MAIN_VALUE1}}"></normal-select>
+				</div>
+				<label class="col-xs-2 control-label">기업의 핵심 사회적 가치 2순위</label>
+				<div class="col-xs-4">
+					<normal-select name="MAIN_VALUE2" items="{{_mainValue}}" name-from="CD_NM" value-from="CD" value="{{_data.MAIN_VALUE2}}"></normal-select>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">지역주민의 안정적 일자리 유지와 고용기회 확대</label>
+				<div class="col-xs-4">
+					<normal-select name="LIFE_CHG" items="{{_selImport}}" name-from="CD_NM" value-from="CD" value="{{_data.LIFE_CHG}}"></normal-select>
+				</div>
+				<label class="col-xs-2 control-label">특정한 지역사회 문제해결</label>
+				<div class="col-xs-4">
+					<normal-select name="LOCAL_SOL" items="{{_selImport}}" name-from="CD_NM" value-from="CD" value="{{_data.LOCAL_SOL}}"></normal-select>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">도시 주민공동체 형성 및 확대</label>
+				<div class="col-xs-4">
+					<normal-select name="CITY_ENL" items="{{_selImport}}" name-from="CD_NM" value-from="CD" value="{{_data.CITY_ENL}}"></normal-select>
+				</div>
+				<label class="col-xs-2 control-label">지역사회 자원 활용</label>
+				<div class="col-xs-4">
+					<normal-select name="WEAK_CHG" items="{{_selImport}}" name-from="CD_NM" value-from="CD" value="{{_data.WEAK_CHG}}"></normal-select>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">지역사회 기여(공헌)</label>
+				<div class="col-xs-4">
+					<normal-select name="WEAK_ENL" items="{{_selImport}}" name-from="CD_NM" value-from="CD" value="{{_data.WEAK_ENL}}"></normal-select>
+				</div>
+			</div>
+
+			<div class="form-group sub-header">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h4>주요 제품 및 서비스 비중</h4>
+					<hr/>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">주요 생산 제품(명칭) : 1. </label>
+				<div class="col-xs-4">
+					<normal-input name="PROD_NM1" value="{{_data.PROD_NM1}}"></normal-input>
+				</div>
+				<label class="col-xs-2 control-label">주요 생산 제품(비율%) : 1. </label>
+				<div class="col-xs-4">
+					<number-input name="PROD_NM1_PCT" value="{{_data.PROD_NM1_PCT}}"></number-input>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">2. </label>
+				<div class="col-xs-4">
+					<normal-input name="PROD_NM2" value="{{_data.PROD_NM2}}"></normal-input>
+				</div>
+				<label class="col-xs-2 control-label">2. </label>
+				<div class="col-xs-4">
+					<number-input name="PROD_NM2_PCT" value="{{_data.PROD_NM2_PCT}}"></number-input>
+				</div>
+			</div>
+
+			<div class="form-group" >
+				<label class="col-xs-2 control-label">3. </label>
+				<div class="col-xs-4">
+					<normal-input name="PROD_NM3" value="{{_data.PROD_NM3}}"></normal-input>
+				</div>
+				<label class="col-xs-2 control-label">3. </label>
+				<div class="col-xs-4">
+					<number-input name="PROD_NM3_PCT" value="{{_data.PROD_NM3_PCT}}"></number-input>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label"></label>
+				<div class="col-xs-4">
+				</div>
+				<label class="col-xs-2 control-label ">기타(비율%)</label>
+				<div class="col-xs-4 text-right">
+					<number-input name="PROD_ETC_PCT" value="{{_data.PROD_ETC_PCT}}"></number-input>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">주요 서비스(명칭) : 1. </label>
+				<div class="col-xs-4">
+					<normal-input name="SERVICE_NM1" value="{{_data.SERVICE_NM1}}"></normal-input>
+				</div>
+				<label class="col-xs-2 control-label">주요 서비스(비율%) : 1. </label>
+				<div class="col-xs-4">
+					<number-input name="SERVICE_NM1_PCT" value="{{_data.SERVICE_NM1_PCT}}"></number-input>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">2. </label>
+				<div class="col-xs-4">
+					<normal-input name="SERVICE_NM2" value="{{_data.SERVICE_NM2}}"> </normal-input>
+				</div>
+				<label class="col-xs-2 control-label">2. </label>
+				<div class="col-xs-4">
+					<number-input name="SERVICE_NM2_PCT" value="{{_data.SERVICE_NM2_PCT}}"></number-input>
+				</div>
+			</div>
+
+			<div class="form-group" >
+				<label class="col-xs-2 control-label">3. </label>
+				<div class="col-xs-4">
+					<normal-input name="SERVICE_NM3" value="{{_data.SERVICE_NM3}}"></normal-input>
+				</div>
+				<label class="col-xs-2 control-label">3. </label>
+				<div class="col-xs-4">
+					<number-input name="SERVICE_NM3_PCT" value="{{_data.SERVICE_NM3_PCT}}"></number-input>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label"></label>
+				<div class="col-xs-4">
+				</div>
+				<label class="col-xs-2 control-label ">기타(비율%)</label>
+				<div class="col-xs-4 text-right">
+					<number-input name="SERVICE_ETC_PCT" value="{{_data.SERVICE_ETC_PCT}}"></number-input>
+				</div>
+			</div>
+
+			<div class="form-group sub-header">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h4>구매/판매 지역 비중</h4>
+					<hr/>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h5>원재료(제품) 구입처 지역 - 총 구매액 기준</h5>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-4 control-label">대구 지역</label>
+				<label class="col-xs-2 control-label">전체(%)</label>
+				<div class="col-xs-2">
+					<number-input name="IN_TOT1" value="{{_data.IN_TOT1}}" ></number-input>
+				</div>
+				<label class="col-xs-2 control-label">사회적경제기업(%)</label>
+				<div class="col-xs-2">
+					<number-input name="IN_SEE1" value="{{_data.IN_SEE1}}" ></number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-4 control-label">경북 지역</label>
+				<label class="col-xs-2 control-label">전체(%)</label>
+				<div class="col-xs-2">
+					<number-input name="IN_TOT2" value="{{_data.IN_TOT2}}" ></number-input>
+				</div>
+				<label class="col-xs-2 control-label">사회적경제기업(%)</label>
+				<div class="col-xs-2">
+					<number-input name="IN_SEE2" value="{{_data.IN_SEE2}}" ></number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-4 control-label">기타 지역</label>
+				<label class="col-xs-2 control-label">전체(%)</label>
+				<div class="col-xs-2">
+					<number-input name="IN_TOT3" value="{{_data.IN_TOT3}}" ></number-input>
+				</div>
+				<label class="col-xs-2 control-label">사회적경제기업(%)</label>
+				<div class="col-xs-2">
+					<number-input name="IN_SEE3" value="{{_data.IN_SEE3}}" ></number-input>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h5>상품 판매처 지역 - 총 매출액 기준</h5>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-4 control-label">대구 지역</label>
+				<label class="col-xs-2 control-label">전체(%)</label>
+				<div class="col-xs-2">
+					<number-input name="OUT_TOT1" value="{{_data.OUT_TOT1}}" ></number-input>
+				</div>
+				<label class="col-xs-2 control-label">사회적경제기업(%)</label>
+				<div class="col-xs-2">
+					<number-input name="OUT_SEE1" value="{{_data.OUT_SEE1}}" ></number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-4 control-label">경북 지역</label>
+				<label class="col-xs-2 control-label">전체(%)</label>
+				<div class="col-xs-2">
+					<number-input name="OUT_TOT2" value="{{_data.OUT_TOT2}}" ></number-input>
+				</div>
+				<label class="col-xs-2 control-label">사회적경제기업(%)</label>
+				<div class="col-xs-2">
+					<number-input name="OUT_SEE2" value="{{_data.OUT_SEE2}}" ></number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-4 control-label">기타 지역</label>
+				<label class="col-xs-2 control-label">전체(%)</label>
+				<div class="col-xs-2">
+					<number-input name="OUT_TOT3" value="{{_data.OUT_TOT3}}" ></number-input>
+				</div>
+				<label class="col-xs-2 control-label">사회적경제기업(%)</label>
+				<div class="col-xs-2">
+					<number-input name="OUT_SEE3" value="{{_data.OUT_SEE3}}" ></number-input>
+				</div>
+			</div>
+
+			<div class="form-group sub-header">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h4>고객 비중</h4>
+					<hr/>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-4 control-label">고객별 매출액 비중(합계 100%)</label>
+				<label class="col-xs-2 control-label">민간기업(%)</label>
+				<div class="col-xs-2">
+					<number-input name="SAILS_PCT1" value="{{_data.SAILS_PCT1}}" ></number-input>
+				</div>
+				<label class="col-xs-2 control-label">민간소비자(%)</label>
+				<div class="col-xs-2">
+					<number-input name="SAILS_PCT2" value="{{_data.SAILS_PCT2}}" ></number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-4 control-label"></label>
+				<label class="col-xs-2 control-label">공공기관(%)</label>
+				<div class="col-xs-2">
+					<number-input name="SAILS_PCT3" value="{{_data.SAILS_PCT3}}" ></number-input>
+				</div>
+				<label class="col-xs-2 control-label">취약계층 대상자(%)</label>
+				<div class="col-xs-2">
+					<number-input name="SAILS_PCT4" value="{{_data.SAILS_PCT4}}" ></number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-4 control-label"></label>
+				<label class="col-xs-2 control-label">기타(%)</label>
+				<div class="col-xs-2">
+					<number-input name="SAILS_PCT5" value="{{_data.SAILS_PCT5}}" ></number-input>
+				</div>
+			</div>
+
+
+			<div class="form-group sub-header">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h4>고용 현황</h4>
+					<hr/>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">전체 참여자 수(명)</label>
+				<div class="col-xs-4">
+					<number-input name="TOT_PAR" value="{{_data.TOT_PAR}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">전체 근로자 수(명)</label>
+				<div class="col-xs-4">
+					<number-input name="TOT_EMP" value="{{_data.TOT_EMP}}"></number-input>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h5>성 별</h5>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">남자(명)</label>
+				<div class="col-xs-4">
+					<number-input name="MALE_CNT" value="{{_data.MALE_CNT}}" ></number-input>
+				</div>
+				<label class="col-xs-2 control-label">여자(명)</label>
+				<div class="col-xs-4">
+					<number-input name="FMALE_CNT" value="{{_data.FMALE_CNT}}"></number-input>
+				</div>
+			</div>
+
+
+			<div class="row">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h5>정규직</h5>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">근로자수(명)</label>
+				<div class="col-xs-4">
+					<number-input name="REG_EMP_CNT" value="{{_data.REG_EMP_CNT}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">주당 평균 근로시간(시간)</label>
+				<div class="col-xs-4">
+					<number-input name="REG_WEEK_TIME" value="{{_data.REG_WEEK_TIME}}"></number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">월 평균임금(만원)</label>
+				<div class="col-xs-4">
+					<number-input name="REG_MONTH_PAY" value="{{_data.REG_MONTH_PAY}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">평균 근속기간(년/개월)</label>
+				<div class="col-xs-4">
+					<number-input name="REG_EMP_TIME" value="{{_data.REG_EMP_TIME}}"></number-input>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h5>상용직</h5>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">근로자수(명)</label>
+				<div class="col-xs-4">
+					<number-input name="COM_EMP_CNT" value="{{_data.COM_EMP_CNT}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">주당 평균 근로시간(시간)</label>
+				<div class="col-xs-4">
+					<number-input name="COM_WEEK_TIME" value="{{_data.COM_WEEK_TIME}}"></number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">월 평균임금(만원)</label>
+				<div class="col-xs-4">
+					<number-input name="COM_MONTH_PAY" value="{{_data.COM_MONTH_PAY}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">평균 근속기간(년/개월)</label>
+				<div class="col-xs-4">
+					<number-input name="COM_EMP_TIME" value="{{_data.COM_EMP_TIME}}"></number-input>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h5>계약직(임시직)</h5>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">근로자수(명)</label>
+				<div class="col-xs-4">
+					<number-input name="CONTRACT_EMP_CNT" value="{{_data.CONTRACT_EMP_CNT}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">주당 평균 근로시간(시간)</label>
+				<div class="col-xs-4">
+					<number-input name="CONTRACT_WEEK_TIME" value="{{_data.CONTRACT_WEEK_TIME}}"></number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">월 평균임금(만원)</label>
+				<div class="col-xs-4">
+					<number-input name="CONTRACT_MONTH_PAY" value="{{_data.CONTRACT_MONTH_PAY}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">평균 근속기간(년/개월)</label>
+				<div class="col-xs-4">
+					<number-input name="CONTRACT_EMP_TIME" value="{{_data.CONTRACT_EMP_TIME}}"></number-input>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h5>시간제(파트타임)</h5>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">근로자수(명)</label>
+				<div class="col-xs-4">
+					<number-input name="TIME_EMP_CNT" value="{{_data.TIME_EMP_CNT}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">주당 평균 근로시간(시간)</label>
+				<div class="col-xs-4">
+					<number-input name="TIME_WEEK_TIME" value="{{_data.TIME_WEEK_TIME}}"></number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">시간당(원)</label>
+				<div class="col-xs-4">
+					<number-input name="TIME_MONTH_PAY" value="{{_data.TIME_MONTH_PAY}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">평균 근속기간(년/개월)</label>
+				<div class="col-xs-4">
+					<number-input name="TIME_EMP_TIME" value="{{_data.TIME_EMP_TIME}}"></number-input>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h5>특수고용직</h5>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">근로자수(명)</label>
+				<div class="col-xs-4">
+					<number-input name="SPE_EMP_CNT" value="{{_data.SPE_EMP_CNT}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">주당 평균 근로시간(시간)</label>
+				<div class="col-xs-4">
+					<number-input name="SPE_WEEK_TIME" value="{{_data.SPE_WEEK_TIME}}"></number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">회당(원)</label>
+				<div class="col-xs-4">
+					<number-input name="SPE_MONTH_PAY" value="{{_data.SPE_MONTH_PAY}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">평균 근속기간(년/개월)</label>
+				<div class="col-xs-4">
+					<number-input name="SPE_EMP_TIME" value="{{_data.SPE_EMP_TIME}}"></number-input>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h5>자원봉사자</h5>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">근로자수(명)</label>
+				<div class="col-xs-4">
+					<number-input name="VOL_EMP_CNT" value="{{_data.VOL_EMP_CNT}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">주당 평균 근로시간(시간)</label>
+				<div class="col-xs-4">
+					<number-input name="VOL_WEEK_TIME" value="{{_data.VOL_WEEK_TIME}}"></number-input>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h5>평균 연령</h5>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">평균 연령</label>
+				<div class="col-xs-10">
+					<paper-radio-group selected="{{_data.AVG_YEAR}}" attr-for-selected="value">
+						<paper-radio-button name="AVG_YEAR" value="30대 미만" >30대 미만</paper-radio-button>
+						<paper-radio-button name="AVG_YEAR" value="30대" >30대</paper-radio-button>
+						<paper-radio-button name="AVG_YEAR" value="40대" >40대</paper-radio-button>
+						<paper-radio-button name="AVG_YEAR" value="50대" >50대</paper-radio-button>
+						<paper-radio-button name="AVG_YEAR" value="60대 이상" >60대 이상</paper-radio-button>
+					</paper-radio-group>
+				</div>
+			</div>
+
+
+
+			<div class="form-group sub-header">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h4>취약계층/장애인/고령자 고용현황</h4>
+					<hr/>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">취약계층/장애인/고령자 근로자 수(명)</label>
+				<div class="col-xs-10">
+					<number-input name="WEAK_TOT_EMP" value="{{_data.WEAK_TOT_EMP}}"></number-input>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h5>성 별</h5>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">남자(명)</label>
+				<div class="col-xs-4">
+					<number-input name="WEAK_MALE_CNT" value="{{_data.WEAK_MALE_CNT}}" ></number-input>
+				</div>
+				<label class="col-xs-2 control-label">여자(명)</label>
+				<div class="col-xs-4">
+					<number-input name="WEAK_FMALE_CNT" value="{{_data.WEAK_FMALE_CNT}}"></number-input>
+				</div>
+			</div>
+
+
+			<div class="row">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h5>정규직</h5>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">근로자수(명)</label>
+				<div class="col-xs-4">
+					<number-input name="WEAK_REG_EMP_CNT" value="{{_data.WEAK_REG_EMP_CNT}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">주당 평균 근로시간(시간)</label>
+				<div class="col-xs-4">
+					<number-input name="WEAK_REG_WEEK_TIME" value="{{_data.WEAK_REG_WEEK_TIME}}"></number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">월 평균임금(만원)</label>
+				<div class="col-xs-4">
+					<number-input name="WEAK_REG_MONTH_PAY" value="{{_data.WEAK_REG_MONTH_PAY}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">평균 근속기간(년/개월)</label>
+				<div class="col-xs-4">
+					<number-input name="WEAK_REG_EMP_TIME" value="{{_data.WEAK_REG_EMP_TIME}}"></number-input>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h5>상용직</h5>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">근로자수(명)</label>
+				<div class="col-xs-4">
+					<number-input name="WEAK_COM_EMP_CNT" value="{{_data.WEAK_COM_EMP_CNT}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">주당 평균 근로시간(시간)</label>
+				<div class="col-xs-4">
+					<number-input name="WEAK_COM_WEEK_TIME" value="{{_data.WEAK_COM_WEEK_TIME}}"></number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">월 평균임금(만원)</label>
+				<div class="col-xs-4">
+					<number-input name="WEAK_COM_MONTH_PAY" value="{{_data.WEAK_COM_MONTH_PAY}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">평균 근속기간(년/개월)</label>
+				<div class="col-xs-4">
+					<number-input name="WEAK_COM_EMP_TIME" value="{{_data.WEAK_COM_EMP_TIME}}"></number-input>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h5>계약직(임시직)</h5>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">근로자수(명)</label>
+				<div class="col-xs-4">
+					<number-input name="WEAK_CONTRACT_EMP_CNT" value="{{_data.WEAK_CONTRACT_EMP_CNT}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">주당 평균 근로시간(시간)</label>
+				<div class="col-xs-4">
+					<number-input name="WEAK_CONTRACT_WEEK_TIME" value="{{_data.WEAK_CONTRACT_WEEK_TIME}}"></number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">월 평균임금(만원)</label>
+				<div class="col-xs-4">
+					<number-input name="WEAK_CONTRACT_MONTH_PAY" value="{{_data.WEAK_CONTRACT_MONTH_PAY}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">평균 근속기간(년/개월)</label>
+				<div class="col-xs-4">
+					<number-input name="WEAK_CONTRACT_EMP_TIME" value="{{_data.WEAK_CONTRACT_EMP_TIME}}"></number-input>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h5>시간제(파트타임)</h5>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">근로자수(명)</label>
+				<div class="col-xs-4">
+					<number-input name="WEAK_TIME_EMP_CNT" value="{{_data.WEAK_TIME_EMP_CNT}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">주당 평균 근로시간(시간)</label>
+				<div class="col-xs-4">
+					<number-input name="WEAK_TIME_WEEK_TIME" value="{{_data.WEAK_TIME_WEEK_TIME}}"></number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">시간당(원)</label>
+				<div class="col-xs-4">
+					<number-input name="WEAK_TIME_MONTH_PAY" value="{{_data.WEAK_TIME_MONTH_PAY}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">평균 근속기간(년/개월)</label>
+				<div class="col-xs-4">
+					<number-input name="WEAK_TIME_EMP_TIME" value="{{_data.WEAK_TIME_EMP_TIME}}"></number-input>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h5>특수고용직</h5>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">근로자수(명)</label>
+				<div class="col-xs-4">
+					<number-input name="WEAK_SPE_EMP_CNT" value="{{_data.WEAK_SPE_EMP_CNT}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">주당 평균 근로시간(시간)</label>
+				<div class="col-xs-4">
+					<number-input name="WEAK_SPE_WEEK_TIME" value="{{_data.WEAK_SPE_WEEK_TIME}}"></number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">회당(원)</label>
+				<div class="col-xs-4">
+					<number-input name="WEAK_SPE_MONTH_PAY" value="{{_data.WEAK_SPE_MONTH_PAY}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">평균 근속기간(년/개월)</label>
+				<div class="col-xs-4">
+					<number-input name="WEAK_SPE_EMP_TIME" value="{{_data.WEAK_SPE_EMP_TIME}}"></number-input>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h5>평균 연령</h5>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">평균 연령</label>
+				<div class="col-xs-10">
+					<paper-radio-group selected="{{_data.WEAK_AVG_YEAR}}" attr-for-selected="value">
+						<paper-radio-button name="WEAK_AVG_YEAR" value="30대 미만" >30대 미만</paper-radio-button>
+						<paper-radio-button name="WEAK_AVG_YEAR" value="30대" >30대</paper-radio-button>
+						<paper-radio-button name="WEAK_AVG_YEAR" value="40대" >40대</paper-radio-button>
+						<paper-radio-button name="WEAK_AVG_YEAR" value="50대" >50대</paper-radio-button>
+						<paper-radio-button name="WEAK_AVG_YEAR" value="60대 이상" >60대 이상</paper-radio-button>
+					</paper-radio-group>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h5>취약계층 유형별 고용인원 수</h5>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">고령자(명)</label>
+				<div class="col-xs-2">
+					<number-input name="WEAK_TYPE1_CNT" value="{{_data.WEAK_TYPE1_CNT}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">장애인(명)</label>
+				<div class="col-xs-2">
+					<number-input name="WEAK_TYPE2_CNT" value="{{_data.WEAK_TYPE2_CNT}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">저소득(명)</label>
+				<div class="col-xs-2">
+					<number-input name="WEAK_TYPE3_CNT" value="{{_data.WEAK_TYPE3_CNT}}"></number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">경력단절여성(명)</label>
+				<div class="col-xs-2">
+					<number-input name="WEAK_TYPE4_CNT" value="{{_data.WEAK_TYPE4_CNT}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">장기실업(명)</label>
+				<div class="col-xs-2">
+					<number-input name="WEAK_TYPE5_CNT" value="{{_data.WEAK_TYPE5_CNT}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">결혼이민(명)</label>
+				<div class="col-xs-2">
+					<number-input name="WEAK_TYPE6_CNT" value="{{_data.WEAK_TYPE6_CNT}}"></number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">기타(명)</label>
+				<div class="col-xs-2">
+					<number-input name="WEAK_TYPE7_CNT" value="{{_data.WEAK_TYPE7_CNT}}"></number-input>
+				</div>
+			</div>
+
+			<div class="form-group sub-header">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h4>인력관리 애로사항</h4>
+					<hr/>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">첫번째 이유</label>
+				<div class="col-xs-4">
+					<normal-select name="FIRST_REASON" items="{{_hardReason}}" name-from="CD_NM" value-from="CD" value="{{_data.FIRST_REASON}}"></normal-select>
+				</div>
+				<label class="col-xs-2 control-label">두번째 이유</label>
+				<div class="col-xs-4">
+					<normal-select name="SECOND_REASON" items="{{_hardReason}}" name-from="CD_NM" value-from="CD" value="{{_data.SECOND_REASON}}"></normal-select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">기타</label>
+				<div class="col-xs-10">
+					<normal-input name="ETC_REASON" value="{{_data.ETC_REASON}}"></normal-input>
+				</div>
+			</div>
+
+			<div class="form-group sub-header">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h4>재무 현황(최근 재무재표 기준)</h4>
+					<hr/>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">자산(원)</label>
+				<div class="col-xs-2">
+					<number-input name="CORP_ASSET" value="{{_data.CORP_ASSET}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">자본(원)</label>
+				<div class="col-xs-2">
+					<number-input name="CORP_CAPITAL" value="{{_data.CORP_CAPITAL}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">부채(원)</label>
+				<div class="col-xs-2">
+					<number-input name="CORP_DEBT" value="{{_data.CORP_DEBT}}"></number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">매출액(원)</label>
+				<div class="col-xs-2">
+					<number-input name="CORP_SALES" value="{{_data.CORP_SALES}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">매출 총이익(원)</label>
+				<div class="col-xs-2">
+					<number-input name="CORP_SALES_PROFIT" value="{{_data.CORP_SALES_PROFIT}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">노무비(원)</label>
+				<div class="col-xs-2">
+					<number-input name="CORP_LABOR_COST" value="{{_data.CORP_LABOR_COST}}"></number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">법인세(원)</label>
+				<div class="col-xs-2">
+					<number-input name="CORP_TAX" value="{{_data.CORP_TAX}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">영업이익(원)</label>
+				<div class="col-xs-2">
+					<number-input name="CORP_OP_PROFIT" value="{{_data.CORP_OP_PROFIT}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">당기순이익(원)</label>
+				<div class="col-xs-2">
+					<number-input name="CORP_NET_INCOM" value="{{_data.CORP_NET_INCOM}}"></number-input>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h5>영업외 수익</h5>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">정부지원금 - 건물 등 자산취득 관련 지원금</label>
+				<div class="col-xs-2">
+					<number-input name="GOV_SUP_ASSET" value="{{_data.GOV_SUP_ASSET}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">정부지원금 - 인건비 등 비용관련 지원금</label>
+				<div class="col-xs-2">
+					<number-input name="GOV_SUP_COST" value="{{_data.GOV_SUP_COST}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label"> 각종 후원금 및 기부금</label>
+				<div class="col-xs-2">
+					<number-input name="SPONSOR_DONATE" value="{{_data.SPONSOR_DONATE}}"></number-input>
+				</div>
+			</div>
+
+			<div class="form-group sub-header">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h4>자금 조달 비중</h4>
+					<hr/>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-2 control-label">수익활동(%)</label>
+				<div class="col-xs-2">
+					<number-input name="FUNDS_REVENUE" value="{{_data.FUNDS_REVENUE}}" ></number-input>
+				</div>
+				<label class="col-xs-2 control-label">기부금(%)</label>
+				<div class="col-xs-2">
+					<number-input name="FUNDS_DONATE" value="{{_data.FUNDS_DONATE}}" ></number-input>
+				</div>
+				<label class="col-xs-2 control-label">정부지원금(%)</label>
+				<div class="col-xs-2">
+					<number-input name="FUNDS_SUPP" value="{{_data.FUNDS_SUPP}}" ></number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">대출(차입)(%)</label>
+				<div class="col-xs-2">
+					<number-input name="FUNDS_LOAN" value="{{_data.FUNDS_LOAN}}" ></number-input>
+				</div>
+				<label class="col-xs-2 control-label">기타(%)</label>
+				<div class="col-xs-2">
+					<number-input name="FUNDS_ETC" value="{{_data.FUNDS_ETC}}" ></number-input>
+				</div>
+			</div>
+
+			<input is="iron-input" type="number" name="CORP_SEQ" bind-value="[[_corpSeq]]" hidden></input>
+
+		</form>
+	</template>
+
+	<script>
+        Polymer({
+
+            is: 'village-info-detail',
+
+            behaviors: [Lunch.LoaderBehavior],
+
+
+            properties: {
+
+                corpType: Number,
+                readId: {
+                    type: Number,
+                    observer: '_callAPI'
+                },
+                _corpSeq: {
+                    type: Number,
+                    value: function() {
+                        return sessionStorage.corpSeq;
+                    },
+                    observer: '_getVillageInfo'
+                },
+                _seYn: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _orgType: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _beforeType: {
+					type: Array,
+						value: function() {
+                            return [];
+            		}
+        		},
+                _legType1: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _legType2: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _mainType: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _sector: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _history: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _region: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+
+                _selImport: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _hardReason: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+
+
+            },
+
+            _getVillageInfo: function(value) {
+
+                this.corpType = 3;
+                this.$.getVillageInfo.params = {
+                    CORP_SEQ: value,
+                    CORP_TYPE: this.corpType,
+
+                };
+
+                this.$.getVillageInfo.generateRequest();
+            },
+
+            _callAPI: function(value) {
+                if (value) {
+                    this.readId = value;
+                    this._corpSeq = value;
+                }
+            },
+
+            _submitForm: function(e) {
+                if (this.$.villageForm.validate()) {
+                    this.$.villageForm.submit();
+                }
+            },
+
+            _submitResponse: function(e) {
+                if (e.detail.response == 1) {
+                    this.$.alert.innerHTML = '수정되었습니다';
+                    this.$.alert.classList.remove('hide');
+                    this.$.alert.classList.add('alert-success');
+                }else {
+                    this.$.alert.innerHTML = '오류가 발생하였습니다';
+                    this.$.alert.classList.remove('hide');
+                    this.$.alert.classList.add('alert-danger');
+                }
+
+                this.async(function() {
+                    this.$.alert.classList.add('hide');
+                }, 2000);
+            },
+
+            _parseDataBeforeSubmit: function(e) {
+                this.$.villageForm.request.body['CORP_SEQ'] = this._corpSeq;
+            },
+        });
+	</script>
+
+</dom-module>

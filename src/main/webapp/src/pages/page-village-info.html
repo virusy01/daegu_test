@@ -1,0 +1,53 @@
+<link rel="import" href="/bower_components/app-route/app-route.html">
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+
+<dom-module id="page-village-info">
+<template>
+	<app-route route="{{route}}"
+		   pattern="/app/village-info/:mode/:id"
+		   data="{{routeData}}"
+		   active>
+	</app-route>
+
+	<div class="page-header">
+		<h2>마을기업 현황조회 <small>VillageEnterprise Information</small></h2>
+	</div>
+
+	<iron-pages id="village-info" selected="[[mode]]" attr-for-selected="name">
+		<village-info-list name="list"></village-info-list>
+		<village-info-view name="view" id="{{id}}"></village-info-view>
+	</iron-pages>
+
+</template>
+<script>
+Polymer({
+	is: 'page-village-info',
+
+	properties: {
+		mode: {
+			type: String,
+			value: 'list',
+			observer: '_importHTML'
+		},
+		id: Number,
+	},
+
+	observers: [
+		'_determineMode(routeData.mode)',
+        '_idChanged(routeData.id)',
+	],
+
+	_determineMode: function(value) {
+		this.mode = value || 'list'; 
+	},
+
+    _idChanged: function(value) {
+        this.id = parseInt(value);
+    },
+
+    _importHTML: function(newValue) {
+		this.importHref(this.resolveUrl('corp-info/village-info-' + newValue + '.html'), null, null, true);
+	},
+});
+</script>
+</dom-module>

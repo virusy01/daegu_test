@@ -1,0 +1,65 @@
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="/bower_components/iron-location/iron-location.html">
+
+<link rel="import" href="/src/pages/corp-info/village-info-detail.html">
+
+<link rel="import" href="/src/components/common/normal-select.html">
+
+<dom-module id="village-info-view">
+	<template>
+		<iron-location id="location"></iron-location>
+
+		<div class="row">
+			<div class="col-xs-12 text-right">
+				<button type="button" on-tap="_toList" class="btn btn-sm btn-default">목록으로</button>
+			</div>
+		</div>
+
+		<div class="horizontal-margin-20"></div>
+
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<village-info-detail admin-mode="true" read-id="{{id}}"></village-info-detail>
+			</div>
+		</div>
+
+	</template>
+	<script>
+        Polymer({
+            is: 'village-info-view',
+
+            properties: {
+                id: Number,
+
+                _yearList: {
+                    type: Array,
+                    value: function() {
+                        var list = [];
+
+                        for (var i = 2011; i <= 2030; i++) {
+                            list.push({cdNm:i, cd:i});
+                        }
+
+                        return list;
+                    }
+                },
+                _year: {
+                    type: Number,
+                    value: function() {
+                        return moment().year();
+                    }
+                },
+                _yearForYearly: {
+                    type: Number,
+                    value: function() {
+                        return moment().year();
+                    }
+                },
+            },
+
+            _toList: function(e) {
+                this.$.location.path = '/app/village-info/list/';
+            },
+        });
+	</script>
+</dom-module>

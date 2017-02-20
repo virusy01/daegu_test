@@ -1,0 +1,51 @@
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/src/components/common/normal-table.html">
+
+<link rel="import" href="/src/components/behaviors/behavior-loader.html">
+
+<dom-module id="village-info-list">
+<template>
+	<iron-ajax  auto id="getCorpList" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
+		       url="/api/hq/3/type"
+	 	       on-request="_startLoader"
+	  	       on-response="_stopLoader"
+		       last-response="{{_data}}">
+	</iron-ajax>
+
+	<normal-table data="{{_data}}" header-labels="{{_headerLabels}}" link-url="{{_linkURL}}"></normal-table>
+</template>
+<script>
+Polymer({
+	is: 'village-info-list',
+
+	behaviors: [Lunch.LoaderBehavior],
+
+	properties: {
+		_data: {
+			type: Array,
+			value: function() {
+				return [];
+			}
+		},
+		_headerLabels: {
+			type: Object,
+			value: function() {
+				return {
+                    CORP_TYPE: '기업유형',
+                    CORP_NM: '기업명',
+                    OPEN_DT: '설립연월',
+                    ORG_TYPE_NM: '조직형태',
+                    REGION_NM: '지역',
+				};
+			}
+		},
+		_linkURL: {
+			type: String,
+			value: '/app/village-info/view/'
+		},
+
+	},
+
+});
+</script>
+</dom-module>
