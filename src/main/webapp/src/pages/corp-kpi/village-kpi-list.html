@@ -6,7 +6,7 @@
 <dom-module id="village-kpi-list">
 <template>
 	<iron-ajax auto id="getCorpList" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
-		       url="/api/hq/3/type"
+		       url="/api/hq/2/type"
 	 	       on-request="_startLoader"
 	  	       on-response="_stopLoader"
 		       last-response="{{_data}}">
