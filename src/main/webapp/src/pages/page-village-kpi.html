@@ -1,0 +1,51 @@
+<link rel="import" href="/bower_components/app-route/app-route.html">
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="/src/pages/corp-kpi/village-kpi-detail.html">
+
+<dom-module id="page-village-kpi">
+<template>
+	<app-route route="{{route}}"
+		   pattern="/app/village-kpi/:mode/:id"
+		   data="{{routeData}}"
+		   active>
+	</app-route>
+
+	<div class="page-header">
+		<h2>마을기업 성과지표 조회 <small>VillageEnterprise KPI</small></h2>
+	</div>
+
+	<iron-pages id="center-status" selected="[[mode]]" attr-for-selected="name">
+		<village-kpi-list name="list"></village-kpi-list>
+		<village-kpi-detail name="view" id="{{routeData.id}}" admin-mode="true"></village-kpi-detail>
+	</iron-pages>
+
+</template>
+<script>
+Polymer({
+	is: 'page-village-kpi',
+
+	properties: {
+		mode: {
+			type: String,
+			value: 'list',
+			observer: '_importHTML'
+		},
+		id: Number,
+	},
+
+	observers: [
+		'_determineMode(routeData.mode)',
+	],
+
+	_determineMode: function(value) {
+		this.mode = value || 'list'; 
+	},
+
+	_importHTML: function(newValue) {
+		if (newValue != 'view')
+			this.importHref(this.resolveUrl('corp-kpi/village-kpi-' + newValue + '.html'), null, null, true);
+	},
+});
+</script>
+</dom-module>
+

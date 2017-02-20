@@ -2,13 +2,13 @@
 <link rel="import" href="/bower_components/iron-location/iron-location.html">
 <link rel="import" href="/src/components/behaviors/behavior-loader.html">
 
-<dom-module id="social-kpi-detail">
+<dom-module id="village-kpi-detail">
 <template>
 	<iron-location id="location"></iron-location>
 
 	<iron-ajax id="getData" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
 			 on-request="_startLoader"
-			   url="/api/corp/socialkpi"
+			   url="/api/corp/villagekpi"
 		      on-response="_drawChart">
 	</iron-ajax>
 
@@ -49,7 +49,7 @@
 </template>
 <script>
 Polymer({
-	is: 'social-kpi-detail',
+	is: 'village-kpi-detail',
 
 	behaviors: [Lunch.LoaderBehavior],
 
@@ -148,47 +148,30 @@ Polymer({
 			td.setAttribute('class', 'pointer');
 			Polymer.dom(tr).appendChild(td);
 
-			if ( row.IS_GRADE == 'Y') {
-
-                switch (row.RESULT) {
-                    case '1':
-                    case '2':
-                        var legend = document.createElement('div');
-                        legend.setAttribute('class', this._grade['B']);
-                        Polymer.dom(td).appendChild(legend);
-                        break;
-                    case '3':
-                    case '4':
-                    case '5':
-                        var legend = document.createElement('div');
-                        legend.setAttribute('class', this._grade['W']);
-                        Polymer.dom(td).appendChild(legend);
-                        break;
-                    case '6':
-                    case '7':
-                        var legend = document.createElement('div');
-                        legend.setAttribute('class', this._grade['G']);
-                        Polymer.dom(td).appendChild(legend);
-                        break;
-                    default:
-                        td.innerHTML = 'N/A';
-                        break;
-                }
+            switch (row.RESULT) {
+                case '1':
+                case '2':
+                    var legend = document.createElement('div');
+                    legend.setAttribute('class', this._grade['B']);
+                    Polymer.dom(td).appendChild(legend);
+                    break;
+                case '3':
+                case '4':
+                case '5':
+                    var legend = document.createElement('div');
+                    legend.setAttribute('class', this._grade['W']);
+                    Polymer.dom(td).appendChild(legend);
+                    break;
+                case '6':
+                case '7':
+                    var legend = document.createElement('div');
+                    legend.setAttribute('class', this._grade['G']);
+                    Polymer.dom(td).appendChild(legend);
+                    break;
+                default:
+                    td.innerHTML = 'N/A';
+                    break;
             }
-			else {
-
-			    	if ( row.RESULT > 50 ){
-                        var legend = document.createElement('div');
-                        legend.setAttribute('class', this._grade['G']);
-                        Polymer.dom(td).appendChild(legend);
-					}
-					else {
-                        var legend = document.createElement('div');
-                        legend.setAttribute('class', this._grade['B']);
-                        Polymer.dom(td).appendChild(legend);
-                    }
-
-				}
 
 
 			Polymer.dom(table).appendChild(tr);
@@ -214,7 +197,7 @@ Polymer({
 
 
 	_toList: function(e) {
-		this.$.location.path = '/app/social-kpi/list/';
+		this.$.location.path = '/app/village-kpi/list/';
 	},	
 });
 </script>

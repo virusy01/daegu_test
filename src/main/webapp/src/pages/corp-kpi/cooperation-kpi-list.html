@@ -3,10 +3,10 @@
 
 <link rel="import" href="/src/components/behaviors/behavior-loader.html">
 
-<dom-module id="social-kpi-list">
+<dom-module id="cooperation-kpi-list">
 <template>
 	<iron-ajax auto id="getCorpList" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
-		       url="/api/hq/1/type"
+		       url="/api/hq/2/type"
 	 	       on-request="_startLoader"
 	  	       on-response="_stopLoader"
 		       last-response="{{_data}}">
@@ -16,7 +16,7 @@
 </template>
 <script>
 Polymer({
-	is: 'social-kpi-list',
+	is: 'cooperation-kpi-list',
 
 	behaviors: [Lunch.LoaderBehavior],
 
@@ -42,7 +42,7 @@ Polymer({
 		},
 		_linkURL: {
 			type: String,
-			value: '/app/social-kpi/view/'
+			value: '/app/cooperation-kpi/view/'
 		},
 
 	},
