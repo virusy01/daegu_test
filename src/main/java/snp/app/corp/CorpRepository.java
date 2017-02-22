@@ -35,6 +35,9 @@ public interface CorpRepository
 	List<Map<String, Object>>chartGrade3(@Param("u") User user);
 	List<Map<String, Object>>chartGrade4(@Param("u") User user);
 
+	List<Map<String, Object>>chartKpiAll(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartKpiEach(@Param("p") Map<String, Object> params,@Param("u") User user);
+
 	// 성과지표 등급별 분석 데모용
 	List<Map<String, Object>>chartDemo2(@Param("p") Map<String, Object> params,@Param("u") User user);
 

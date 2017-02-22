@@ -133,9 +133,25 @@ public class CorpService {
 		return result;
 	}
 	// 성과지표 항목별 분석 데모용
-	public List<Map<String, Object>>chartDemo2(Map<String, Object> params,String corpKind) {
-		return repository.chartDemo2(params,Security.user());
+	public List<Map<String, Object>>chartKpi(Map<String, Object> params,String corpKind) {
+		List<Map<String, Object>> result;
+		switch (corpKind) {
+			case "0":
+				result = repository.chartKpiAll(params, Security.user()); //전체
+				break;
+			case "1":
+				result = repository.chartKpiEach(params, Security.user()); //사회적기업
+				break;
+			case "2":
+				result = repository.chartKpiEach(params, Security.user()); //협동조합
+				break;
+			default:
+				result = repository.chartKpiEach(params, Security.user()); //마을기업
+				break;
+		}
+		return result;
 	}
+
 
 	// 성과지표 지역별 분석 데모용
 	public List<Map<String, Object>>chartDemo3(Map<String, Object> params,String corpKind) {

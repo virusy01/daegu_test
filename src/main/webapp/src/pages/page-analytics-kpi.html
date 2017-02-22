@@ -6,7 +6,7 @@
 	<template>
 		<iron-ajax id="getData" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
 				   on-request="_startLoader"
-				   url="/api/corp/analytics/chartDemo2"
+				   url="/api/corp/analytics/kpi"
 				   on-response="_drawChart">
 		</iron-ajax>
 		<div class="page-header">
@@ -19,11 +19,6 @@
 			<normal-select id="year" on-change="_fetchData" value="{{_corpType}}" items="{{_corpTypeList}}"></normal-select>
 		</div>
 
-		<div class="row">
-			<div class="col-xs-2">
-				<button on-tap="_fetchData" class="btn btn-sm btn-success">조회</button>
-			</div>
-		</div>
 		<div class="horizontal-margin-20"></div>
 
 		<div class="row">
@@ -52,8 +47,9 @@
                         return [
                             {cdNm: '전체', cd: 0},
                             {cdNm: '사회적기업', cd: 1},
-                            {cdNm: '협동조합', cd: 2},
-                            {cdNm: '마을기업', cd: 3},
+                            {cdNm: '마을기업', cd: 2},
+                            {cdNm: '협동조합', cd: 3},
+
                         ];
                     }
                 },
@@ -77,7 +73,14 @@
 
             },
             _drawChart: function(e) {
+
                 this._data = e.currentTarget.lastResponse;
+
+                for (var i = 0; i < 4; i++) {
+					if (this._data[i].RESULT == null)
+						this._data[i].RESULT = 0;
+           		 }
+
 
                 var data = {
                     labels: ['사회적/경제적 성과', '기업 건전성', '사회 가치창출 역량', '비즈니스 역량'],

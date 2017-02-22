@@ -56,16 +56,16 @@ public class CorpController
 
 
 
-	// 성과지표 등급별 분석 데모용
+	// 성과지표 등급별 분석
 	@RequestMapping(value="/analytics/grade", method= RequestMethod.GET)
 	public List<Map<String, Object>>chartDemo1(@RequestParam(name = "CORP_KIND") String corpKind){
 		return service.chartGrade(corpKind);
 	}
 
-	// 성과지표 항목별 분석 데모용
-	@RequestMapping(value="/analytics/chartDemo2", method= RequestMethod.GET)
-	public List<Map<String, Object>>chartDemo2(@RequestParam(name = "CORP_KIND") String corpKind){
-		return service.chartDemo2(RequestParams.map(),corpKind);
+	// 성과지표 KPI 항목별 분석
+	@RequestMapping(value="/analytics/kpi", method= RequestMethod.GET)
+	public List<Map<String, Object>>chartKpi(@RequestParam(name = "CORP_KIND") String corpKind){
+		return service.chartKpi(RequestParams.map(), corpKind);
 	}
 
 	// 성과지표 지역별 분석 데모용
