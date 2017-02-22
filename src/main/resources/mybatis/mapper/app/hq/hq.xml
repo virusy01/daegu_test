@@ -8,8 +8,8 @@
     <select id="findCorpList" resultType="hashmap">
         SELECT
          CASE CORP_TYPE WHEN '1' THEN '사회적기업'
-                        WHEN '2' THEN '협동조합'
-                        ELSE '마을기업' END AS CORP_TYPE
+                        WHEN '2' THEN '마을기업'
+                        ELSE '협동조합' END AS CORP_TYPE
         ,CORP_SEQ
         , CORP_NM
         , DATE_FORMAT(OPEN_DT, '%Y') AS OPEN_DT

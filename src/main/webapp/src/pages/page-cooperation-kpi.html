@@ -1,51 +1,55 @@
 <link rel="import" href="/bower_components/app-route/app-route.html">
 <link rel="import" href="/bower_components/iron-pages/iron-pages.html">
-<link rel="import" href="/src/pages/corp-kpi/cooperation-kpi-detail.html">
+<link rel="import" href="/src/pages/corp-kpi/cooperation-kpi-view.html">
 
 <dom-module id="page-cooperation-kpi">
-<template>
-	<app-route route="{{route}}"
-		   pattern="/app/cooperation-kpi/:mode/:id"
-		   data="{{routeData}}"
-		   active>
-	</app-route>
+	<template>
+		<app-route route="{{route}}"
+				   pattern="/app/cooperation-kpi/:mode/:id"
+				   data="{{routeData}}"
+				   active>
+		</app-route>
 
-	<div class="page-header">
-		<h2>협동조합 성과지표 조회 <small>CooperationEnterprise KPI</small></h2>
-	</div>
+		<div class="page-header">
+			<h2>협동조합 성과지표 조회 <small>CooperationEnterprise KPI</small></h2>
+		</div>
 
-	<iron-pages id="center-status" selected="[[mode]]" attr-for-selected="name">
-		<cooperation-kpi-list name="list"></cooperation-kpi-list>
-		<cooperation-kpi-detail name="view" id="{{routeData.id}}" admin-mode="true"></cooperation-kpi-detail>
-	</iron-pages>
+		<iron-pages id="center-status" selected="[[mode]]" attr-for-selected="name">
+			<cooperation-kpi-list name="list"></cooperation-kpi-list>
+			<cooperation-kpi-view name="view" id="{{id}}" admin-mode="true"></cooperation-kpi-view>
+		</iron-pages>
 
-</template>
-<script>
-Polymer({
-	is: 'page-cooperation-kpi',
+	</template>
+	<script>
+        Polymer({
+            is: 'page-cooperation-kpi',
 
-	properties: {
-		mode: {
-			type: String,
-			value: 'list',
-			observer: '_importHTML'
-		},
-		id: Number,
-	},
+            properties: {
+                mode: {
+                    type: String,
+                    value: 'list',
+                    observer: '_importHTML'
+                },
+                id: Number,
+            },
 
-	observers: [
-		'_determineMode(routeData.mode)',
-	],
+            observers: [
+                '_determineMode(routeData.mode)',
+                '_idChanged(routeData.id)',
+            ],
 
-	_determineMode: function(value) {
-		this.mode = value || 'list'; 
-	},
+            _determineMode: function(value) {
+                this.mode = value || 'list';
+            },
+            _idChanged: function(value) {
+                this.id = parseInt(value);
+            },
 
-	_importHTML: function(newValue) {
-		if (newValue != 'view')
-			this.importHref(this.resolveUrl('corp-kpi/cooperation-kpi-' + newValue + '.html'), null, null, true);
-	},
-});
-</script>
+            _importHTML: function(newValue) {
+                if (newValue != 'view')
+                    this.importHref(this.resolveUrl('corp-kpi/cooperation-kpi-' + newValue + '.html'), null, null, true);
+            },
+        });
+	</script>
 </dom-module>
 
