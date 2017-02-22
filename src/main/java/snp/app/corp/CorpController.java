@@ -73,4 +73,13 @@ public class CorpController
 	public List<Map<String, Object>>chartRegion(@RequestParam(name = "CORP_KIND") String corpKind){
 		return service.chartRegion(RequestParams.map(),corpKind);
 	}
+
+
+    // 성과지표 유형별 분석- 각각 세개의 서비스로 되 있던걸 각각 하나로 통합
+    @RequestMapping(value="/analytics/all", method= RequestMethod.GET)
+    public Map<String, Object> chartAll(){
+        return service.chartAll();
+    }
+
+
 }

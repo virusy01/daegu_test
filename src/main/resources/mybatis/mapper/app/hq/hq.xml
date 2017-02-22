@@ -2197,5 +2197,57 @@
     </delete>
 
 
+    <!-- 연간실적 사회혁신 노력 -->
+    <select id="findCenterMgm" resultType="hashmap">
+        SELECT
+          USER_ID
+        , USER_NAME
+        , CORP_SEQ
+        , EMAIL
+        , PHONE_NO1
+        , PHONE_NO2
+        , PASSWORD
+        , ADMIN_YN
+        , USE_YN
+         FROM USERS
+    </select>
+
+    <insert id="insertCenterMgm">
+        INSERT INTO USERS
+        (
+        USER_ID
+        , USER_NAME
+        , CORP_SEQ
+        , EMAIL
+        , PHONE_NO1
+        , PHONE_NO2
+        , PASSWORD
+        , ADMIN_YN
+        , USE_YN
+        , REG_ID
+        , REG_DT
+
+        )
+        VALUES
+        (
+        #{p.USER_ID}
+        , #{p.USER_NAME}
+        , #{p.CORP_SEQ}
+        , #{p.EMAIL}
+        , #{p.PHONE_NO1}
+        , #{p.PHONE_NO2}
+        , #{p.PASSWORD}
+        , #{p.ADMIN_YN}
+        , #{p.USE_YN}
+        ,#{u.userId}
+        , now()
+        )
+    </insert>
+
+    <delete id="deleteCenterMgm">
+        DELETE FROM USERS
+
+    </delete>
+
 
 </mapper>

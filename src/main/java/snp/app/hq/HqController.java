@@ -167,4 +167,14 @@ public class HqController
 	}
 
 
+	// 센터 관리
+	@RequestMapping(value="/centerMgm", method= RequestMethod.GET)
+	public List<Map<String, Object>> findCenterMgm(){
+		return service.findCenterMgm();
+	}
+	@RequestMapping(value="/centerMgm", method= RequestMethod.POST)
+	public int saveCenterMgm(@RequestBody List<Map<String, Object>> centerMgm){
+		return service.saveCenterMgm(centerMgm);
+	}
+
 }

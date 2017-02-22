@@ -43,5 +43,14 @@ public interface CorpRepository
 	List<Map<String, Object>>chartRegionAll(@Param("p") Map<String, Object> params,@Param("u") User user);
 	List<Map<String, Object>>chartRegionEach(@Param("p") Map<String, Object> params,@Param("u") User user);
 
+	// 성과지표 유형별 분석
+	List<Map<String, Object>> chartAllSocial(@Param("u") User user);
+	List<Map<String, Object>> chartAllVillage(@Param("u") User user);
+	List<Map<String, Object>> chartAllCooperation(@Param("u") User user);
+	List<Map<String, Object>> chartAllTotal(@Param("u") User user);
+
+
+
+
 }
 	

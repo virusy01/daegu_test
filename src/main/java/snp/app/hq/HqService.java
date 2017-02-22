@@ -131,4 +131,26 @@ public class HqService
 		return repository.deleteVillageInfo(corpSeq, Security.user());
 	}
 
+
+	// 센터 관리
+	public List<Map<String, Object>> findCenterMgm() {
+		return repository.findCenterMgm(Security.user());
+	}
+
+	public int saveCenterMgm(List<Map<String, Object>> centerMgm) {
+		centerMgm.forEach(param -> {
+			repository.deleteCenterMgm(param, Security.user());
+		});
+
+		centerMgm.forEach(param -> {
+			repository.insertCenterMgm(param, Security.user());
+		});
+		return 1;
+	}
+
+
+
+
+
+
 }

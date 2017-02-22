@@ -47,5 +47,11 @@ public interface HqRepository
 	int updateVillageInfo(@Param("p") Map<String, Object> params, @Param("u") User user);
 	int deleteVillageInfo(@Param("CORP_SEQ") int corpSeq, @Param("u") User user);
 
+
+	// 센터 관리
+	List<Map<String, Object>> findCenterMgm(@Param("u") User user);
+	int insertCenterMgm(@Param("p") Map<String, Object> params, @Param("u") User user);
+	int deleteCenterMgm(@Param("p") Map<String, Object> params, @Param("u") User user);
+
 }
 	

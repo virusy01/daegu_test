@@ -161,4 +161,33 @@ public class CorpService {
 		return result;
 	}
 
+	// 성과지표 유형별
+	public Map<String, Object> chartAll() {
+		Map<String, Object> nestedData = new HashMap<>();
+
+		nestedData.put("socialData", chartAllSocial());
+		nestedData.put("villageData", chartAllVillage());
+		nestedData.put("cooperationData", chartAllCooperation());
+		nestedData.put("totalData", chartAllTotal());
+
+		return nestedData;
+	}
+
+	// 성과지표 유형별 상세 - 사회적 기업
+	public List<Map<String, Object>> chartAllSocial() {
+		return repository.chartAllSocial(Security.user());
+	}
+	// 성과지표 유형별 상세 - 마을기업
+	public List<Map<String, Object>> chartAllVillage() {
+		return repository.chartAllVillage(Security.user());
+	}
+	// 성과지표 유형별 상세 - 협동조합
+	public List<Map<String, Object>> chartAllCooperation() {
+		return repository.chartAllCooperation(Security.user());
+	}
+	// 성과지표 유형별 상세 - 합계
+	public List<Map<String, Object>> chartAllTotal() {
+		return repository.chartAllTotal(Security.user());
+	}
+
 }
