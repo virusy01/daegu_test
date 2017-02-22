@@ -163,7 +163,8 @@
     <insert id="insertCorpInfo">
         INSERT INTO CORP_INFO
         (
-        CORP_NM		/*기업명*/
+        CORP_SEQ        /* 기업코드 */
+        , CORP_NM		/*기업명*/
         , OPEN_DT		/*f1 설립년도*/
         , SE_YN			/*f2 인증여부*/
         , ORG_TYPE		/*f3 조직형태*/

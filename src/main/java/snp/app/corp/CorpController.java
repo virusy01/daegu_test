@@ -38,7 +38,11 @@ public class CorpController
 		return service.findVillageKpi(RequestParams.map());
 	}
 
-
+	// KPI 저장
+    @RequestMapping(value="/savekpi", method= RequestMethod.POST)
+    public int saveKpi(@RequestBody List<Map<String, Object>> social){
+        return service.saveKpi(social);
+    }
 
 
 

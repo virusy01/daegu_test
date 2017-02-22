@@ -1,0 +1,65 @@
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="/bower_components/iron-location/iron-location.html">
+
+<link rel="import" href="/src/pages/corp-kpi/social-kpi-detail.html">
+
+<link rel="import" href="/src/components/common/normal-select.html">
+
+<dom-module id="social-kpi-view">
+	<template>
+		<iron-location id="location"></iron-location>
+
+		<div class="row">
+			<div class="col-xs-12 text-right">
+				<button type="button" on-tap="_toList" class="btn btn-sm btn-default">목록으로</button>
+			</div>
+		</div>
+
+		<div class="horizontal-margin-20"></div>
+
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<social-kpi-detail admin-mode="true" read-id="{{id}}"></social-kpi-detail>
+			</div>
+		</div>
+
+	</template>
+	<script>
+        Polymer({
+            is: 'social-kpi-view',
+
+            properties: {
+                id: Number,
+
+                _yearList: {
+                    type: Array,
+                    value: function() {
+                        var list = [];
+
+                        for (var i = 2013; i <= 2030; i++) {
+                            list.push({cdNm:i, cd:i});
+                        }
+
+                        return list;
+                    }
+                },
+                _year: {
+                    type: Number,
+                    value: function() {
+                        return moment().year();
+                    }
+                },
+                _yearForYearly: {
+                    type: Number,
+                    value: function() {
+                        return moment().year();
+                    }
+                },
+            },
+
+            _toList: function(e) {
+                this.$.location.path = '/app/social-kpi/list/';
+            },
+        });
+	</script>
+</dom-module>

@@ -1,6 +1,10 @@
 <link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="/bower_components/iron-location/iron-location.html">
 <link rel="import" href="/src/components/behaviors/behavior-loader.html">
+<link rel="import" href="/src/components/common/number-input.html">
+<link rel="import" href="/bower_components/iron-form/iron-form.html">
+<link rel="import" href="/src/components/behaviors/behavior-grid.html">
+
 
 <dom-module id="social-kpi-detail">
 <template>
@@ -12,11 +16,22 @@
 		      on-response="_drawChart">
 	</iron-ajax>
 
+	<form id="gridForm" is="iron-form"
+		  content-type="application/json"
+		  method="post"
+		  action="/api/corp/savekpi"
+		  on-iron-form-presubmit="_parseDataBeforeSubmit"
+		  on-iron-form-response="_submitResponse"
+		  class="form-horizontal">
+
 	<div class="row">
 		<div class="col-xs-12 text-right">
-			<button type="button" on-tap="_toList" class="btn btn-sm btn-default">목록으로</button>
+			<button type="button" on-tap="_submitForm" class="btn btn-sm btn-primary">저   장</button>
 		</div>
 	</div>
+
+	<div id="alert1" class="alert alert-dismissible hide" role="alert"></div>
+
 	<div class="horizontal-margin-20"></div>
 	<div class="row">
 		<div class="col-xs-12 text-right">
@@ -44,29 +59,45 @@
 		<tbody>
 		</tbody>
 	</table>
+	<div id="alert2" class="alert alert-dismissible hide" role="alert"></div>
 
+		<div class="horizontal-margin-20"></div>
+	<div class="row">
+		<div class="col-xs-12 text-right">
+			<button type="button" on-tap="_submitForm" class="btn btn-sm btn-primary">저   장</button>
+		</div>
+	</div>
+	</form>
 
 </template>
 <script>
 Polymer({
 	is: 'social-kpi-detail',
 
-	behaviors: [Lunch.LoaderBehavior],
+	behaviors: [ Lunch.GridBehavior, Lunch.LoaderBehavior],
 
 	properties: {
 		adminMode: {
 			type: Boolean,
 			value: false
 		},
-		id: {
+        _formData: {
+            type: Array,
+            value: function() {
+                return [];
+            }
+        },
+
+		readid: {
 			type: Number,
 			observer: '_callAPI'
 		},
 		_corpSeq: {
 			type: Number,
 			value: function() {
-				return parseInt(sessionStorage.corpSeq);
-			}
+				return -1;
+			},
+            observer: '_getSocialKpi'
 		},
 		_data: {
 			type: Array,
@@ -83,14 +114,26 @@ Polymer({
 		},
 	},
 
-	_callAPI: function() {
-		this.$.getData.params = {
-			YEAR: 2016,
-			CORP_SEQ: this.id ? this.id : this._corpSeq
-		};
-		
-		this.$.getData.generateRequest();
+	_callAPI: function(value) {
+        if (value) {
+            //this.readId = value;
+            this._corpSeq = value;
+
+        }
 	},
+
+    _getSocialKpi: function(value) {
+
+        this.corpType = 1;
+
+         this.$.getData.params = {
+            YEAR: 2016,
+            CORP_SEQ: value
+        };
+
+    if(value > 0)
+		this.$.getData.generateRequest();
+    },
 
 	_drawChart: function(e) {
 		this._data = e.currentTarget.lastResponse;
@@ -102,11 +145,17 @@ Polymer({
 		var prevRowNum, prev2ndDepth;
 		var row;
 
+
+
+
 		Polymer.dom(table).innerHTML = '';
 
 		for (var key in this._data) {
+
+
 			row = this._data[key];
-			tr = document.createElement('tr');
+
+           	tr = document.createElement('tr');
 
 			if (prevRowNum != row.L1_KPI_CD)
 				startOfRow = true;
@@ -138,11 +187,16 @@ Polymer({
 			Polymer.dom(tr).appendChild(td);
 
             td = document.createElement('td');
-            if(row.RESULT)
-		    	td.innerHTML = row.RESULT;
-            else
-                td.innerHTML = '0';
             Polymer.dom(tr).appendChild(td);
+
+            input = document.createElement('number-input');
+            input.setAttribute('transparent', true);
+            input.setAttribute('value', accounting.formatNumber(row.RESULT));
+            input.setAttribute('id', 'TABLE' + '_' + key + i);
+            input.setAttribute('name', 'TABLE' + '_' + key);
+            Polymer.dom(td).appendChild(input);
+
+
 
 			td = document.createElement('td');
 			td.setAttribute('class', 'pointer');
@@ -195,6 +249,13 @@ Polymer({
 
 			prevRowNum = row.L1_KPI_CD;
 			prev2ndDepth = row.L2_KPI_CD;
+
+            this._formData[key] = {};
+			this._formData[key].CORP_SEQ = row.CORP_SEQ;
+            this._formData[key].YEAR = row.YEAR;
+            this._formData[key].KPI_CD = row.L3_KPI_CD;
+
+
 		}
 
 		this._stopLoader();
@@ -212,6 +273,64 @@ Polymer({
 		return count;
 	},
 
+    _submitForm: function(e) {
+
+            this.$.gridForm.submit();
+
+    },
+
+    _submitResponse: function(e) {
+        if (e.detail.response == 1) {
+            this.$.alert1.innerHTML = '수정되었습니다';
+            this.$.alert1.classList.remove('hide');
+            this.$.alert1.classList.add('alert-success');
+            this.$.alert2.innerHTML = '수정되었습니다';
+            this.$.alert2.classList.remove('hide');
+            this.$.alert2.classList.add('alert-success');
+        }else {
+            this.$.alert1.innerHTML = '오류가 발생하였습니다';
+            this.$.alert1.classList.remove('hide');
+            this.$.alert1.classList.add('alert-danger');
+            this.$.alert2.innerHTML = '오류가 발생하였습니다';
+            this.$.alert2.classList.remove('hide');
+            this.$.alert2.classList.add('alert-danger');
+        }
+
+        this.async(function() {
+            this.$.alert1.classList.add('hide');
+            this.$.alert2.classList.add('hide');
+        }, 2000);
+    },
+
+    _parseDataBeforeSubmit: function(e) {
+
+        var data = this.$.gridForm.serialize();
+        var parsedData = [];
+        var inc = 0;
+
+		for (var key in data) {
+			var keySplit = key.split('_');
+			var category = keySplit[0];
+			var insertKey = keySplit.splice(1, keySplit.length).join('_');
+			var insertValue = Array.isArray(data[key]) ? data[key][inc] : data[key];
+
+			if (!parsedData[inc])
+				parsedData[inc] = {};
+
+
+			parsedData[inc].CORP_SEQ = this._formData[inc].CORP_SEQ;
+			parsedData[inc].YEAR = this._formData[inc].YEAR;
+			parsedData[inc].KPI_CD = this._formData[inc].KPI_CD;
+			parsedData[inc].CORP_TYPE = 1;
+			parsedData[inc].RESULT = insertValue;
+			inc++;
+
+	   }
+
+
+        this.$.gridForm.request.body = parsedData;
+
+    },
 
 	_toList: function(e) {
 		this.$.location.path = '/app/social-kpi/list/';

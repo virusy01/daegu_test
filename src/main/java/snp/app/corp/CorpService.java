@@ -92,6 +92,25 @@ public class CorpService {
 	}
 
 
+	public int saveKpi(List<Map<String, Object>> social) {
+
+		if (social.size() < 1) {
+			return -1;
+		}
+		repository.deleteKpi(social.get(0), Security.user());
+
+		social.forEach(param -> {
+			repository.insertKpi(param, Security.user());
+		});
+		return 1;
+	}
+
+
+
+
+
+
+
 
 	// 성과지표 등급별 분석 데모용
 	public List<Map<String, Object>>chartDemo1(String corpKind) {

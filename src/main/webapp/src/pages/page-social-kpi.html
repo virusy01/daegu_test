@@ -1,6 +1,6 @@
 <link rel="import" href="/bower_components/app-route/app-route.html">
 <link rel="import" href="/bower_components/iron-pages/iron-pages.html">
-<link rel="import" href="/src/pages/corp-kpi/social-kpi-detail.html">
+<link rel="import" href="/src/pages/corp-kpi/social-kpi-view.html">
 
 <dom-module id="page-social-kpi">
 <template>
@@ -16,7 +16,7 @@
 
 	<iron-pages id="center-status" selected="[[mode]]" attr-for-selected="name">
 		<social-kpi-list name="list"></social-kpi-list>
-		<social-kpi-detail name="view" id="{{routeData.id}}" admin-mode="true"></social-kpi-detail>
+		<social-kpi-view name="view" id="{{id}}" admin-mode="true"></social-kpi-view>
 	</iron-pages>
 
 </template>
@@ -34,12 +34,16 @@ Polymer({
 	},
 
 	observers: [
-		'_determineMode(routeData.mode)',
+        '_determineMode(routeData.mode)',
+        '_idChanged(routeData.id)',
 	],
 
 	_determineMode: function(value) {
 		this.mode = value || 'list'; 
 	},
+    _idChanged: function(value) {
+        this.id = parseInt(value);
+    },
 
 	_importHTML: function(newValue) {
 		if (newValue != 'view')

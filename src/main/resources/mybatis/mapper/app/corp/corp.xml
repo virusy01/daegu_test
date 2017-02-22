@@ -14,6 +14,8 @@
 		, L3.KPI_CD AS L3_KPI_CD
 		, L3.KPI_NM AS L3_KPI_NM
 		, L3.IS_GRADE AS IS_GRADE
+		, #{p.CORP_SEQ} AS CORP_SEQ
+		, #{p.YEAR} AS YEAR
 		, null        AS STATUS
 		FROM
 		(
@@ -32,15 +34,45 @@
 	</select>
 
 
+
+	<insert id="insertKpi">
+		INSERT INTO KPI_RESULT
+		(
+		CORP_SEQ
+		, CORP_TYPE
+		, YEAR
+		, KPI_CD
+		, RESULT
+		, REG_ID
+		, REG_DT
+		)
+		VALUES
+		(
+		#{p.CORP_SEQ}
+		, #{p.CORP_TYPE}
+		, #{p.YEAR}
+		, #{p.KPI_CD}
+		, #{p.RESULT}
+		, #{u.userId}
+		, now()
+		)
+	</insert>
+
+	<delete id="deleteKpi">
+		DELETE FROM  KPI_RESULT
+		WHERE CORP_SEQ = #{p.CORP_SEQ} AND CORP_TYPE = #{p.CORP_TYPE} AND YEAR = #{p.YEAR}
+	</delete>
+
+
+
+
 	<select id="findKpi_detail" resultType="hashmap">
 		<![CDATA[
 		SELECT
-		CORP_NM,
 		IFNULL(RESULT, 0) AS RESULT
 		FROM KPI_RESULT
 		WHERE CORP_SEQ = #{p.CORP_SEQ}
 		  AND YEAR = #{p.YEAR} AND KPI_CD = #{LEVEL3CODE}
-		GROUP BY YEAR
 		]]>
 	</select>
 
@@ -54,6 +86,8 @@
 		, L3.KPI_CD AS L3_KPI_CD
 		, L3.KPI_NM AS L3_KPI_NM
 		, L3.IS_GRADE AS IS_GRADE
+		, #{p.CORP_SEQ} AS CORP_SEQ
+		, #{p.YEAR} AS YEAR
 		, null        AS STATUS
 		FROM
 		(
@@ -82,6 +116,8 @@
 		, L3.KPI_CD AS L3_KPI_CD
 		, L3.KPI_NM AS L3_KPI_NM
 		, L3.IS_GRADE AS IS_GRADE
+		, #{p.CORP_SEQ} AS CORP_SEQ
+		, #{p.YEAR} AS YEAR
 		, null        AS STATUS
 		FROM
 		(

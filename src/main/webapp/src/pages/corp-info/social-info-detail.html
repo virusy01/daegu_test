@@ -961,7 +961,7 @@
                 _corpSeq: {
                     type: Number,
                     value: function() {
-                        return sessionStorage.corpSeq;
+                        return -1;
                     },
                     observer: '_getSocialInfo'
                 },
@@ -1034,9 +1034,11 @@
 
             _callAPI: function(value) {
                 if (value) {
-                    this.readId = value;
+                    //this.readId = value;
                     this._corpSeq = value;
+
                 }
+
             },
 
             _submitForm: function(e) {

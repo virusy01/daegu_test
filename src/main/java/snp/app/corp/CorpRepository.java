@@ -24,6 +24,8 @@ public interface CorpRepository
 	Map<String, Object> findKpi_detail( @Param("LEVEL3CODE") String level3Code, @Param("p") Map<String, Object> params, @Param("u") User user);
 
 
+	int deleteKpi(@Param("p") Map<String, Object> params, @Param("u") User user);
+	int insertKpi(@Param("p") Map<String, Object> params, @Param("u") User user);
 
 
 
