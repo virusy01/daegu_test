@@ -139,23 +139,26 @@ public class CorpService {
 			case "0":
 				result = repository.chartKpiAll(params, Security.user()); //전체
 				break;
-			case "1":
-				result = repository.chartKpiEach(params, Security.user()); //사회적기업
-				break;
-			case "2":
-				result = repository.chartKpiEach(params, Security.user()); //협동조합
-				break;
 			default:
-				result = repository.chartKpiEach(params, Security.user()); //마을기업
+				result = repository.chartKpiEach(params, Security.user()); //사회적기업,마을기업, 협동조합
 				break;
 		}
 		return result;
 	}
 
 
-	// 성과지표 지역별 분석 데모용
-	public List<Map<String, Object>>chartDemo3(Map<String, Object> params,String corpKind) {
-		return repository.chartDemo3(params,Security.user());
+	// 성과지표 지역별 분석
+	public List<Map<String, Object>>chartRegion(Map<String, Object> params,String corpKind) {
+		List<Map<String, Object>> result;
+		switch (corpKind) {
+			case "0":
+				result = repository.chartRegionAll(params, Security.user()); //전체
+				break;
+			default:
+				result = repository.chartRegionEach(params, Security.user()); //사회적기업,마을기업, 협동조합
+				break;
+		}
+		return result;
 	}
 
 }

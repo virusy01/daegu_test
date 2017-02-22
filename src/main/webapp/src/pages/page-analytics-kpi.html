@@ -76,12 +76,6 @@
 
                 this._data = e.currentTarget.lastResponse;
 
-                for (var i = 0; i < 4; i++) {
-					if (this._data[i].RESULT == null)
-						this._data[i].RESULT = 0;
-           		 }
-
-
                 var data = {
                     labels: ['사회적/경제적 성과', '기업 건전성', '사회 가치창출 역량', '비즈니스 역량'],
                     datasets: [

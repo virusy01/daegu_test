@@ -29,19 +29,19 @@ public interface CorpRepository
 
 
 
-	// 성과지표 등급별 분석 데모용
+	// 성과지표 등급별 분석
 	List<Map<String, Object>>chartGrade1(@Param("u") User user);
 	List<Map<String, Object>>chartGrade2(@Param("u") User user);
 	List<Map<String, Object>>chartGrade3(@Param("u") User user);
 	List<Map<String, Object>>chartGrade4(@Param("u") User user);
 
+	// 성과지표 항목별 분석
 	List<Map<String, Object>>chartKpiAll(@Param("p") Map<String, Object> params,@Param("u") User user);
 	List<Map<String, Object>>chartKpiEach(@Param("p") Map<String, Object> params,@Param("u") User user);
 
-	// 성과지표 등급별 분석 데모용
-	List<Map<String, Object>>chartDemo2(@Param("p") Map<String, Object> params,@Param("u") User user);
+	// 성과지표 지역별 분석
+	List<Map<String, Object>>chartRegionAll(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionEach(@Param("p") Map<String, Object> params,@Param("u") User user);
 
-	// 성과지표 등급별 분석 데모용
-	List<Map<String, Object>>chartDemo3(@Param("p") Map<String, Object> params,@Param("u") User user);
 }
 	

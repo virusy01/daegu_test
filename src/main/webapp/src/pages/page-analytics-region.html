@@ -6,11 +6,11 @@
 	<template>
 		<iron-ajax id="getData" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
 				   on-request="_startLoader"
-				   url="/api/corp/analytics/chartDemo3"
+				   url="/api/corp/analytics/region"
 				   on-response="_drawChart">
 		</iron-ajax>
 		<div class="page-header">
-			<h2>성과지표 지역별 분석 <small>KPI Region Analytics</small></h2>
+			<h2>성과지표 지역별 분석 <small>By Region Analytics</small></h2>
 		</div>
 
 		<div class="horizontal-margin-20"></div>
@@ -19,16 +19,11 @@
 			<normal-select id="year" on-change="_fetchData" value="{{_corpType}}" items="{{_corpTypeList}}"></normal-select>
 		</div>
 
-		<div class="row">
-			<div class="col-xs-2">
-				<button on-tap="_fetchData"  class="btn btn-sm btn-success">조회</button>
-			</div>
-		</div>
 		<div class="horizontal-margin-20"></div>
 
 		<div class="row">
 			<div class="col-xs-12">
-				<canvas id="barChart"  width="500" height="450"></canvas>
+				<canvas id="barChart"  width="600" height="550"></canvas>
 			</div>
 		</div>
 	</template>
@@ -52,8 +47,8 @@
                         return [
                             {cdNm: '전체', cd: 0},
                             {cdNm: '사회적기업', cd: 1},
-                            {cdNm: '협동조합', cd: 2},
-                            {cdNm: '마을기업', cd: 3},
+                            {cdNm: '마을기업', cd: 2},
+                            {cdNm: '협동조합', cd: 3},
                         ];
                     }
                 },
@@ -61,6 +56,12 @@
                     type: Number,
                     value: function() {
                         return 0;
+                    }
+                },
+                _labels: {
+                    type: Object,
+                    value: function() {
+                        return {'01':'중구', '02':'동구', '03':'서구', '04':'남구', '05':'북구', '06':'수성구', '07':'달서구', '08':'달성군'};
                     }
                 },
                 _myBarChart: Object,
@@ -79,9 +80,18 @@
             },
             _drawChart: function(e) {
                 this._data = e.currentTarget.lastResponse;
+                var labels = [];
+                var data = [];
+
+
+                for (var key in this._data) {
+                    console.log('REGION : ' + this._labels[05]);
+                    labels.push(this._labels[this._data[key].REGION]);
+                    data.push(this._data[key].RESULT);
+                }
 
                 var data = {
-                    labels: ['중구','동구','서구','남구','북구', '수성구', '달서구', '달성군'],
+                    labels: labels,
                     datasets: [
                         {
                             type: 'bar',
@@ -107,8 +117,7 @@
                                 'rgba(160, 162, 235, 1)'
                             ],
                             borderWidth: 1,
-                            data: [this._data[0].RESULT, this._data[1].RESULT, this._data[2].RESULT,this._data[3].RESULT,
-                            	   this._data[4].RESULT, this._data[5].RESULT, this._data[6].RESULT,this._data[7].RESULT],
+                            data: data,
                             spanGaps: false
                         },
                     ]

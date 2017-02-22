@@ -69,8 +69,8 @@ public class CorpController
 	}
 
 	// 성과지표 지역별 분석 데모용
-	@RequestMapping(value="/analytics/chartDemo3", method= RequestMethod.GET)
-	public List<Map<String, Object>>chartDemo3(@RequestParam(name = "CORP_KIND") String corpKind){
-		return service.chartDemo3(RequestParams.map(),corpKind);
+	@RequestMapping(value="/analytics/region", method= RequestMethod.GET)
+	public List<Map<String, Object>>chartRegion(@RequestParam(name = "CORP_KIND") String corpKind){
+		return service.chartRegion(RequestParams.map(),corpKind);
 	}
 }
