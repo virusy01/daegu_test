@@ -6,7 +6,7 @@
 	<template>
 		<iron-ajax id="getData" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
 				   on-request="_startLoader"
-				   url="/api/corp/analytics/chartDemo1"
+				   url="/api/corp/analytics/grade"
 				   on-response="_drawChart">
 		</iron-ajax>
 		<div class="page-header">
@@ -52,8 +52,8 @@
                         return [
                             {cdNm: '전체', cd: 0},
                             {cdNm: '사회적기업', cd: 1},
-                            {cdNm: '협동조합', cd: 2},
-                            {cdNm: '마을기업', cd: 3}
+                            {cdNm: '마을기업', cd: 2},
+                            {cdNm: '협동조합', cd: 3},
                         ];
                     }
                 },

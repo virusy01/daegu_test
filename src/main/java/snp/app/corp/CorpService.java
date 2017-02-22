@@ -113,20 +113,20 @@ public class CorpService {
 
 
 	// 성과지표 등급별 분석 데모용
-	public List<Map<String, Object>>chartDemo1(String corpKind) {
+	public List<Map<String, Object>>chartGrade(String corpKind) {
 		List<Map<String, Object>> result;
 		switch (corpKind) {
 			case "0":
-				result = repository.chartDemo10(Security.user()); //전체
+				result = repository.chartGrade1(Security.user()); //전체
 				break;
 			case "1":
-				result = repository.chartDemo11(Security.user()); //사회적기업
+				result = repository.chartGrade2(Security.user()); //사회적기업
 				break;
 			case "2":
-				result = repository.chartDemo12(Security.user()); //협동조합
+				result = repository.chartGrade3(Security.user()); //협동조합
 				break;
 			default:
-				result = repository.chartDemo13(Security.user()); //마을기업
+				result = repository.chartGrade4(Security.user()); //마을기업
 				break;
 		}
 

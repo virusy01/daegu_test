@@ -144,33 +144,104 @@
 
 
 
-	<!-- 성과지표 등급별 분석 데모용-->
-	<select id="chartDemo10" resultType="hashmap">
-		SELECT COL2 as STATUS, COL3 as COUNT
-		FROM DEMO_TBL
-		WHERE SEQ = 1 and COL1= '0'
+	<!-- 성과지표 등급별 분석 - 전체기업-->
+	<select id="chartGrade1" resultType="hashmap">
+		SELECT 'B' AS STATUS, count(*) AS COUNT
+		FROM kpi_result
+		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+			 AND RESULT in ('1', '2')
+		UNION ALL
+		SELECT 'W' AS STATUS, count(*) AS COUNT
+		FROM kpi_result
+		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+			 AND RESULT in ('3', '4', '5')
+		UNION ALL
+		SELECT 'G' AS STATUS, count(*) AS COUNT
+		FROM kpi_result
+		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+			 AND RESULT in ('6', '7')
 	</select>
 
-	<!-- 성과지표 항목별 분석 데모용 -->
-	<select id="chartDemo11" resultType="hashmap">
-		SELECT COL2 as STATUS, COL3 as COUNT
-		FROM DEMO_TBL
-		WHERE SEQ = 1 and COL1= '1'
+	<!-- 성과지표 등급별 분석 - 사회적기업 -->
+	<select id="chartGrade2" resultType="hashmap">
+		SELECT 'B' AS STATUS, count(*) AS COUNT
+		FROM kpi_result
+		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+			AND CORP_TYPE = 1 AND RESULT in ('1', '2')
+		UNION ALL
+		SELECT 'W' AS STATUS, count(*) AS COUNT
+		FROM kpi_result
+		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+			AND CORP_TYPE = 1 AND RESULT in ('3', '4', '5')
+		UNION ALL
+		SELECT 'G' AS STATUS, count(*) AS COUNT
+		FROM kpi_result
+		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+			AND CORP_TYPE = 1 AND RESULT in ('6', '7')
 	</select>
 
-	<!-- pie chart DEMO2 -->
-	<select id="chartDemo12" resultType="hashmap">
-		SELECT COL2 as STATUS, COL3 as COUNT
-		FROM DEMO_TBL
-		WHERE SEQ = 1 and COL1= '2'
+	<!-- 성과지표 등급별 분석 - 마을기업 -->
+	<select id="chartGrade3" resultType="hashmap">
+		SELECT 'B' AS STATUS, count(*) AS COUNT
+		FROM kpi_result
+		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+			AND CORP_TYPE = 2 AND RESULT in ('1', '2')
+		UNION ALL
+		SELECT 'W' AS STATUS, count(*) AS COUNT
+		FROM kpi_result
+		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+			AND CORP_TYPE = 2 AND RESULT in ('3', '4', '5')
+		UNION ALL
+		SELECT 'G' AS STATUS, count(*) AS COUNT
+		FROM kpi_result
+		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+			AND CORP_TYPE = 2 AND RESULT in ('6', '7')
 	</select>
 
-	<!-- pie chart DEMO3-->
-	<select id="chartDemo13" resultType="hashmap">
-		SELECT COL2 as STATUS, COL3 as COUNT
-		FROM DEMO_TBL
-		WHERE SEQ = 1 and COL1= '3'
+	<!-- 성과지표 등급별 분석 - 협동조합-->
+	<select id="chartGrade4" resultType="hashmap">
+		SELECT 'B' AS STATUS, count(*) AS COUNT
+		FROM kpi_result
+		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+			AND CORP_TYPE = 3 AND RESULT in ('1', '2')
+		UNION ALL
+		SELECT 'W' AS STATUS, count(*) AS COUNT
+		FROM kpi_result
+		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+			AND CORP_TYPE = 3 AND RESULT in ('3', '4', '5')
+		UNION ALL
+		SELECT 'G' AS STATUS, count(*) AS COUNT
+		FROM kpi_result
+		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+			AND CORP_TYPE = 3 AND RESULT in ('6', '7')
 	</select>
+
+
+
 
 	<!-- 성과지표 항목별 분석 데모용-->
 	<select id="chartDemo2" resultType="hashmap">

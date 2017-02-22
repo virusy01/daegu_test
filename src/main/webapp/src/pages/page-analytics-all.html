@@ -4,6 +4,12 @@
 
 <dom-module id="page-analytics-all">
 	<template>
+		<iron-ajax id="getData" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
+				   on-request="_startLoader"
+				   url="/api/hq/analytics/all"
+				   on-response="_drawChart">
+		</iron-ajax>
+
 		<div class="page-header">
 			<h2>기업 유형별 성과지표 분석 <small>Corporation Type Analytics</small></h2>
 		</div>

@@ -57,9 +57,9 @@ public class CorpController
 
 
 	// 성과지표 등급별 분석 데모용
-	@RequestMapping(value="/analytics/chartDemo1", method= RequestMethod.GET)
+	@RequestMapping(value="/analytics/grade", method= RequestMethod.GET)
 	public List<Map<String, Object>>chartDemo1(@RequestParam(name = "CORP_KIND") String corpKind){
-		return service.chartDemo1(corpKind);
+		return service.chartGrade(corpKind);
 	}
 
 	// 성과지표 항목별 분석 데모용
