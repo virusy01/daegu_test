@@ -1,0 +1,291 @@
+<link rel="import" href="/bower_components/iron-form/iron-form.html">
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/bower_components/paper-checkbox/paper-checkbox.html">
+
+<link rel="import" href="/src/components/common/number-input.html">
+<link rel="import" href="/src/components/common/normal-input.html">
+<link rel="import" href="/src/components/common/normal-select.html">
+<link rel="import" href="/src/components/common/date-input.html">
+<link rel="import" href="/src/components/behaviors/behavior-grid.html">
+<link rel="import" href="/src/components/behaviors/behavior-loader.html">
+
+<dom-module id="page-center-mgm">
+    <style>
+        :host {
+            --paper-checkbox-vertical-align: bottom;
+            --paper-checkbox-size: 16px;
+            --paper-checkbox-unchecked-color: #ccc;
+            --paper-checkbox-checked-color: #FD7400;
+        }
+    </style>
+    <template>
+        <iron-ajax auto id="getData" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
+                   on-request="_startLoader"
+                   url="/api/hq/centerMgm"
+                   on-response="_assignData">
+        </iron-ajax>
+        <div class="horizontal-margin-20"></div>
+
+        <form id="gridForm" is="iron-form"
+              content-type="application/json"
+              method="post"
+              action="/api/hq/centerMgm"
+              on-iron-form-presubmit="_parseDataBeforeSubmit"
+              on-iron-form-response="_submitResponse"
+              class="form-horizontal">
+            <div class="page-header">
+                <h2>센터 관리<small> Center Management</small></h2>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12  text-right">
+                    <button type="button" on-tap="_submitForm" class="btn btn-sm btn-primary">저장</button>
+                    <button type="button" on-tap="_addRow" class="btn btn-sm btn-primary">행추가</button>
+                </div>
+            </div>
+
+            <div class="horizontal-margin-20"></div>
+
+            <div id="alert" class="alert alert-dismissible hide" role="alert"></div>
+
+            <div class="horizontal-margin-20"></div>
+
+            <table id="centerManagement" class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>사용자ID</th>
+                    <th>센터명</th>
+                    <th>센터번호</th>
+                    <th>이메일</th>
+                    <th>전화번호 1</th>
+                    <th>전화번호 2</th>
+                    <th>비밀번호</th>
+                    <th>관리자여부</th>
+                    <th>사용여부</th>
+                    <th>-</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+                <tfoot>
+                </tfoot>
+            </table>
+
+        </form>
+    </template>
+    <script>
+        Polymer({
+            is: 'page-center-mgm',
+
+            behaviors: [Lunch.GridBehavior, Lunch.LoaderBehavior],
+
+            properties: {
+
+                _data: {
+                    type: Array,
+                    value: function () {
+                        return [];
+                    }
+                },
+                _totalCount: {
+                    type: Number,
+                    value: 0
+                },
+                _absoluteRowNum: {
+                    type: Number,
+                    value: 0
+                },
+                _guideTop: {
+                    type: Array,
+                    value: function () {
+                        return [
+                            'USER_ID',
+                            'USER_NAME',
+                            'CORP_SEQ',
+                            'EMAIL',
+                            'PHONE_NO1',
+                            'PHONE_NO2',
+                            'PASSWORD',
+                            'ADMIN_YN',
+                            'USE_YN',
+                            'LASTINPUT'
+                        ];
+                    }
+                },
+            },
+
+            _assignData: function(e) {
+                this._data = e.target.lastResponse;
+
+                if (this._data) {
+                    this._assignDataToTable('tableA', this.$.centerManagement, this._data, this._guideTop);
+                    this._stopLoader();
+                }
+            },
+
+            _clearData: function() {
+                Polymer.dom(this.$.centerManagement.querySelector('tbody')).innerHTML = '';
+                Polymer.dom(this.$.centerManagement.querySelector('tfoot')).innerHTML = '';
+            },
+
+            _assignDataToTable: function(prefix, table, data, guide) {
+                var body = table.querySelector('tbody');
+                var tr, th, td, value;
+                var input;
+                var total = {};
+
+                Polymer.dom(body).innerHTML = '';
+
+                this._absoluteRowNum = this._data.length;
+
+                for (var i = 0; i < this._data.length; i++) {
+
+                    tr = document.createElement('tr');
+                    tr.setAttribute('id', 'row_' + prefix + '_' + i);
+
+                    Polymer.dom(body).appendChild(tr);
+
+
+                    for (var attribute in guide) {
+                        td = document.createElement('td');
+                        Polymer.dom(tr).appendChild(td);
+
+                        value = data[i][guide[attribute]];
+
+                        switch (guide[attribute]) {
+                            case 'CORP_SEQ':
+                                input = document.createElement('normal-input');
+                                input.setAttribute('transparent', true);
+                                input.setAttribute('value', value ? value : '');
+                                input.setAttribute('id', prefix + '_' + guide[attribute] + i);
+                                input.setAttribute('name', prefix + '_' + guide[attribute]);
+                                input.setAttribute('readonly', 'readonly');
+                                break;
+                            default:
+                                input = document.createElement('normal-input');
+                                input.setAttribute('transparent', true);
+                                input.setAttribute('value', value ? value : '');
+                                input.setAttribute('id', prefix + '_' + guide[attribute] + i);
+                                input.setAttribute('name', prefix + '_' + guide[attribute]);
+                                break;
+                        }
+
+                        Polymer.dom(td).appendChild(input);
+
+                    }
+                    Polymer.dom(td).appendChild(input);
+
+                    this._appendColumnDeleteFunction(tr, prefix, i);
+
+                }
+                this._recalculateTotal();
+
+            },
+
+            _appendColumnDeleteFunction(tr, prefix, num) {
+                var td = document.createElement('td');
+                td.setAttribute('style', 'width:40px;');
+                Polymer.dom(tr).appendChild(td);
+
+                var button = document.createElement('button');
+                button.setAttribute('type', 'button');
+                button.setAttribute('id', 'del_' + prefix + '_' + num);
+                button.setAttribute('class', 'btn btn-xs btn-danger');
+                button.innerHTML = '<i class="fa fa-times" aria-hidden="true"></i>';
+                this.listen(button, 'tap', '_deleteRow');
+
+                Polymer.dom(td).appendChild(button);
+            },
+
+            _addRow: function(e) {
+                var table = this.$.centerManagement;
+                var body = table.querySelector('tbody');
+                var tr, th, td, value;
+                var input;
+                var total = {};
+                var prefix = "tableA";
+                var guide = this._guideTop;
+                var i = this._totalCount;
+
+
+                tr = document.createElement('tr');
+                tr.setAttribute('id', 'row_' + prefix + '_' + i);
+                Polymer.dom(body).appendChild(tr);
+
+                for (var attribute in guide) {
+                    td = document.createElement('td');
+                    Polymer.dom(tr).appendChild(td);
+
+                    value = 0;
+
+                    input = document.createElement('normal-input');
+                    input.setAttribute('transparent', true);
+                    input.setAttribute('value', value ? value : '');
+
+                    input.setAttribute('id', prefix + '_' + guide[attribute] + i);
+                    input.setAttribute('name', prefix + '_' + guide[attribute]);
+
+                    Polymer.dom(td).appendChild(input);
+                }
+
+                Polymer.dom(td).appendChild(input);
+
+                this._appendColumnDeleteFunction(tr, prefix, i);
+
+                this._absoluteRowNum++;
+
+                this._recalculateTotal();
+
+
+            },
+
+            _deleteRow: function(e) {
+                var name = e.currentTarget.id.split('_');
+                var prefix = name[1];
+                var row = name[2];
+
+                Polymer.dom(this.$.centerManagement.querySelector('tbody')).removeChild(this.$$('#row_' + prefix + '_' + row));
+
+                this._recalculateTotal();
+
+            },
+            _recalculateTotal: function(e) {
+                var total = 0, sum;
+                this._totalCount = this.$.centerManagement.querySelector('tbody').children.length;
+            },
+
+            _parseDataBeforeSubmit: function(e) {
+                var data = this.$.gridForm.serialize();
+                var parsedData = [];
+                var inc = 0;
+
+
+                for (var i = 0; i <= this._absoluteRowNum; i++) {
+
+                    if (this.$$('#tableA_USER_ID' + i)) {
+                        for (var key in data) {
+                            var keySplit = key.split('_');
+                            var category = keySplit[0];
+                            var insertKey = keySplit.splice(1, keySplit.length).join('_');
+                            var insertValue = Array.isArray(data[key]) ? data[key][inc] : data[key];
+
+
+                            if (!parsedData[inc])
+                                parsedData[inc] = {};
+
+
+                            parsedData[inc][insertKey] = insertValue;
+                        }
+                        inc++;
+
+                    }
+
+                }
+
+                this.$.gridForm.request.body = parsedData;
+
+            },
+
+        });
+    </script>
+</dom-module>
