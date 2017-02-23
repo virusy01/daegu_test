@@ -161,6 +161,20 @@ public class CorpService {
 		return result;
 	}
 
+	// 성과지표 업종별 분석
+	public List<Map<String, Object>>chartSector(Map<String, Object> params,String corpKind) {
+		List<Map<String, Object>> result;
+		switch (corpKind) {
+			case "0":
+				result = repository.chartSectorAll(params, Security.user()); //전체
+				break;
+			default:
+				result = repository.chartSectorEach(params, Security.user()); //사회적기업,마을기업, 협동조합
+				break;
+		}
+		return result;
+	}
+
 	// 성과지표 유형별
 	public Map<String, Object> chartAll() {
 		Map<String, Object> nestedData = new HashMap<>();

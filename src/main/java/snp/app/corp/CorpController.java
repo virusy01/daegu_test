@@ -68,12 +68,17 @@ public class CorpController
 		return service.chartKpi(RequestParams.map(), corpKind);
 	}
 
-	// 성과지표 지역별 분석 데모용
+	// 성과지표 지역별 분석
 	@RequestMapping(value="/analytics/region", method= RequestMethod.GET)
 	public List<Map<String, Object>>chartRegion(@RequestParam(name = "CORP_KIND") String corpKind){
 		return service.chartRegion(RequestParams.map(),corpKind);
 	}
 
+	// 성과지표 업종별 분석
+	@RequestMapping(value="/analytics/sector", method= RequestMethod.GET)
+	public List<Map<String, Object>>chartSector(@RequestParam(name = "CORP_KIND") String corpKind){
+		return service.chartSector(RequestParams.map(),corpKind);
+	}
 
     // 성과지표 유형별 분석- 각각 세개의 서비스로 되 있던걸 각각 하나로 통합
     @RequestMapping(value="/analytics/all", method= RequestMethod.GET)

@@ -2,15 +2,15 @@
 <link rel="import" href="/src/components/common/normal-select.html">
 <link rel="import" href="/src/components/behaviors/behavior-loader.html">
 
-<dom-module id="page-analytics-region">
+<dom-module id="page-analytics-sector">
 	<template>
 		<iron-ajax id="getData" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
 				   on-request="_startLoader"
-				   url="/api/corp/analytics/region"
+				   url="/api/corp/analytics/sector"
 				   on-response="_drawChart">
 		</iron-ajax>
 		<div class="page-header">
-			<h2>성과지표 지역별 분석 <small>By Region Analytics</small></h2>
+			<h2>성과지표 업종별 분석 <small>By Sector Analytics</small></h2>
 		</div>
 
 		<div class="horizontal-margin-20"></div>
@@ -29,7 +29,7 @@
 	</template>
 	<script>
         Polymer({
-            is: 'page-analytics-region',
+            is: 'page-analytics-sector',
 
             behaviors: [Lunch.LoaderBehavior],
 
@@ -61,7 +61,9 @@
                 _labels: {
                     type: Object,
                     value: function() {
-                        return {'01':'중구', '02':'동구', '03':'서구', '04':'남구', '05':'북구', '06':'수성구', '07':'달서구', '08':'달성군'};
+                        return {'01':'농업, 임업 및 어업', '02':'제조업', '03':'도매 및 소매업', '04':'운수업', '05':'숙박 및 음식점업', '06':'사업시설관리 및 사업지원서비스업',
+								'07':'교육 서비스업', '08':'보건업 및 사회복지서비스업','09':'예술/스포츠/여가관련 서비스업', '10':'협회/단체/수리/기타 개인서비스업',
+								'11':'인쇄/출판/디자인', '12':' 운송/배달',	'13':'기타' };
                     }
                 },
                 _myBarChart: Object,
@@ -85,7 +87,7 @@
 
 
                 for (var key in this._data) {
-                    labels.push(this._labels[this._data[key].REGION]);
+                    labels.push(this._labels[this._data[key].SECTOR]);
                     data.push(this._data[key].RESULT);
                 }
 
@@ -94,7 +96,7 @@
                     datasets: [
                         {
                             type: 'bar',
-                            label: '성과지표 지역별 분석',
+                            label: '성과지표 업종별 분석',
                             backgroundColor: [
                                 'rgba(255, 99, 132, 0.9)',
                                 'rgba(54, 162, 235, 0.9)',
