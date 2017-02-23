@@ -24,6 +24,8 @@
 		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/REGION/code/" last-response="{{_region}}"></iron-ajax>
 		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/SEL_IMPORT/code/" last-response="{{_selImport}}"></iron-ajax>
 		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/HARD_REASON/code/" last-response="{{_hardReason}}"></iron-ajax>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/NETWORK_YN/code/" last-response="{{_networkYn}}"></iron-ajax>
+		<iron-ajax auto headers='{"X-Requested-With": "XMLHttpRequest"}' method="get" url="/api/common/NETWORK_COUNT/code/" last-response="{{_networkCount}}"></iron-ajax>
 
 
 
@@ -774,7 +776,7 @@
 
 			<div class="row">
 				<div class="col-xs-10 col-xs-offset-2">
-					<h5>취약계층 유형별 고용인원 수</h5>
+					<h5>취약계층 유형별 및 청년 고용인원 수</h5>
 				</div>
 			</div>
 			<div class="form-group">
@@ -806,6 +808,10 @@
 				</div>
 			</div>
 			<div class="form-group">
+				<label class="col-xs-2 control-label">청년층 근로자(명)</label>
+				<div class="col-xs-2">
+					<number-input name="YOUTH_COUNT" value="{{_data.YOUTH_COUNT}}"></number-input>
+				</div>
 				<label class="col-xs-2 control-label">기타(명)</label>
 				<div class="col-xs-2">
 					<number-input name="WEAK_TYPE7_CNT" value="{{_data.WEAK_TYPE7_CNT}}"></number-input>
@@ -885,6 +891,12 @@
 					<number-input name="CORP_NET_INCOM" value="{{_data.CORP_NET_INCOM}}"></number-input>
 				</div>
 			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">노동생산성(1인당 매출액=매출액/근로자수)</label>
+				<div class="col-xs-2">
+					<number-input name="SALES_EMP_RATE" value="{{_data.SALES_EMP_RATE}}"></number-input>
+				</div>
+			</div>
 
 			<div class="row">
 				<div class="col-xs-10 col-xs-offset-2">
@@ -937,6 +949,142 @@
 					<number-input name="FUNDS_ETC" value="{{_data.FUNDS_ETC}}" ></number-input>
 				</div>
 			</div>
+
+
+			<div class="form-group sub-header">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h4>민주적 의사결정	구조</h4>
+					<hr/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">총회 개최 횟수</label>
+				<div class="col-xs-4">
+					<number-input name="DEMO_DECISION_1" value="{{_data.DEMO_DECISION_1}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">이사회 개최 횟수</label>
+				<div class="col-xs-4">
+					<number-input name="DEMO_DECISION_2" value="{{_data.DEMO_DECISION_2}}"> </number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">운영위원회 개최 횟수</label>
+				<div class="col-xs-4">
+					<number-input name="DEMO_DECISION_3" value="{{_data.DEMO_DECISION_3}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">기타 개최 횟수</label>
+				<div class="col-xs-4">
+					<number-input name="DEMO_DECISION_4" value="{{_data.DEMO_DECISION_4}}"> </number-input>
+				</div>
+			</div>
+
+			<div class="form-group sub-header">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h4>사회적목적 재투자 금액</h4>
+					<hr/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">일자리창출 금액</label>
+				<div class="col-xs-4">
+					<number-input name="SOCIAL_REINVEST_1" value="{{_data.SOCIAL_REINVEST_1}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">사회서비스제공 금액</label>
+				<div class="col-xs-4">
+					<number-input name="SOCIAL_REINVEST_2" value="{{_data.SOCIAL_REINVEST_2}}"> </number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">구성원성과급 금액</label>
+				<div class="col-xs-4">
+					<number-input name="SOCIAL_REINVEST_3" value="{{_data.SOCIAL_REINVEST_3}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">지역사회 재투자 금액</label>
+				<div class="col-xs-4">
+					<number-input name="SOCIAL_REINVEST_4" value="{{_data.SOCIAL_REINVEST_4}}"> </number-input>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">기타 금액</label>
+				<div class="col-xs-4">
+					<number-input name="SOCIAL_REINVEST_5" value="{{_data.SOCIAL_REINVEST_5}}"></number-input>
+				</div>
+			</div>
+
+			<div class="form-group sub-header">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h4>사회서비스 제공 인원</h4>
+					<hr/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">취약계층</label>
+				<div class="col-xs-4">
+					<number-input name="SOCIAL_SERVICE_WEAK" value="{{_data.SOCIAL_SERVICE_WEAK}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">일반</label>
+				<div class="col-xs-4">
+					<number-input name="SOCIAL_SERVICE_GENERAL" value="{{_data.SOCIAL_SERVICE_GENERAL}}"> </number-input>
+				</div>
+			</div>
+
+			<div class="form-group sub-header">
+				<div class="col-xs-10 col-xs-offset-2">
+					<h4>네트워크 연결 종류와 강도</h4>
+					<hr/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">사회적경제조직(사회적기업,마을기업,협동조합)</label>
+				<div class="col-xs-4">
+					<normal-select name="NETWORK_TARGET_YN" items="{{_networkYn}}" name-from="CD_NM" value-from="CD" value="{{_data.NETWORK_TARGET_YN}}"></normal-select>
+				</div>
+				<label class="col-xs-2 control-label">분기당 연결 횟수</label>
+				<div class="col-xs-4">
+					<normal-select name="NETWORK_TARGET_COUNT" items="{{_networkCount}}" name-from="CD_NM" value-from="CD" value="{{_data.NETWORK_TARGET_COUNT}}"> </normal-select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">기초자치단체 단위</label>
+				<div class="col-xs-4">
+					<normal-select name="NETWORK_BUNIT_YN" items="{{_networkYn}}" name-from="CD_NM" value-from="CD" value="{{_data.NETWORK_BUNIT_YN}}"></normal-select>
+				</div>
+				<label class="col-xs-2 control-label">분기당 연결 횟수</label>
+				<div class="col-xs-4">
+					<normal-select name="NETWORK_BUNIT_COUNT" items="{{_networkCount}}" name-from="CD_NM" value-from="CD" value="{{_data.NETWORK_BUNIT_COUNT}}"> </normal-select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">광역시 단위</label>
+				<div class="col-xs-4">
+					<normal-select name="NETWORK_BUNIT_YN" items="{{_networkYn}}" name-from="CD_NM" value-from="CD" value="{{_data.NETWORK_BUNIT_YN}}"></normal-select>
+				</div>
+				<label class="col-xs-2 control-label">분기당 연결 횟수</label>
+				<div class="col-xs-4">
+					<normal-select name="NETWORK_GUNIT_YN" items="{{_networkCount}}" name-from="CD_NM" value-from="CD" value="{{_data.NETWORK_GUNIT_COUNT}}"> </normal-select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">제공하는 제품/서비스별</label>
+				<div class="col-xs-4">
+					<normal-select name="NETWORK_TYPE_YN" items="{{_networkYn}}" name-from="CD_NM" value-from="CD" value="{{_data.NETWORK_TYPE_YN}}"></normal-select>
+				</div>
+				<label class="col-xs-2 control-label">분기당 연결 횟수</label>
+				<div class="col-xs-4">
+					<normal-select name="NETWORK_TYPE_COUNT" items="{{_networkCount}}" name-from="CD_NM" value-from="CD" value="{{_data.NETWORK_TYPE_COUNT}}"> </normal-select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-2 control-label">유사한 사회적 문제별</label>
+				<div class="col-xs-4">
+					<normal-select name="NETWORK_ISSUE_YN" items="{{_networkYn}}" name-from="CD_NM" value-from="CD" value="{{_data.NETWORK_ISSUE_YN}}"></normal-select>
+				</div>
+				<label class="col-xs-2 control-label">분기당 연결 횟수</label>
+				<div class="col-xs-4">
+					<normal-select name="NETWORK_ISSUE_COUNT" items="{{_networkCount}}" name-from="CD_NM" value-from="CD" value="{{_data.NETWORK_ISSUE_COUNT}}"> </normal-select>
+				</div>
+			</div>
+
 			<div id="alert2" class="alert alert-dismissible hide" role="alert"></div>
 
 			<div class="horizontal-margin-20"></div>
@@ -1024,7 +1172,18 @@
                         return [];
                     }
                 },
-
+                _networkYn: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _networkCount: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
 
             },
 

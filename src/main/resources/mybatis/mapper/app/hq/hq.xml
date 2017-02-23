@@ -155,6 +155,29 @@
         , FUNDS_SUPP		/*h17 정부지원금 */
         , FUNDS_LOAN		/*h18 대출(차입) */
         , FUNDS_ETC			/*h19 기타 */
+        , NETWORK_TARGET_YN   /* 네트워크대상 유무*/
+        , NETWORK_TARGET_COUNT /* 네트워크대상 횟수*/
+        , NETWORK_BUNIT_YN      /* 네트워크 기초단체 유무*/
+        , NETWORK_BUNIT_COUNT  /* 네트워크 기초단체 횟수*/
+        , NETWORK_GUNIT_YN    /* 네트워크 광역단체 유무*/
+        , NETWORK_GUNIT_COUNT  /* 네트워크 광역단체 횟수*/
+        , NETWORK_TYPE_YN     /* 네트워크 업종 유무*/
+        , NETWORK_TYPE_COUNT  /* 네트워크 업종 횟수*/
+        , NETWORK_ISSUE_YN   /*네트워크 이슈 유무 */
+        , NETWORK_ISSUE_COUNT /*네트워크 이슈 카운트 */
+        , YOUTH_COUNT         /*청년층 근로자 수 */
+        , SALES_EMP_RATE      /*노동생산성(1인당 매출액=매출액/근로자수)*/
+        , DEMO_DECISION_1		/*민주적의사결정 구조 - 총회 개최 횟수*/
+        , DEMO_DECISION_2		/*민주적의사결정 구조 - 이사회 개최 횟수*/
+        , DEMO_DECISION_3		/*민주적의사결정 구조 - 운영위원회 개최 횟수*/
+        , DEMO_DECISION_4		/*민주적의사결정 구조 - 기타 개최 횟수*/
+        , SOCIAL_REINVEST_1	/*사회적목적 재투자 금액 - 일자리창출 금액*/
+        , SOCIAL_REINVEST_2	/*사회적목적 재투자 금액 - 사회서비스제공 금액*/
+        , SOCIAL_REINVEST_3	/*사회적목적 재투자 금액 - 구성원성과급 금액*/
+        , SOCIAL_REINVEST_4	/*사회적목적 재투자 금액 - 지역사회 재투자 금액*/
+        , SOCIAL_REINVEST_5	/*사회적목적 재투자 금액 - 기타 금액*/
+        , SOCIAL_SERVICE_WEAK	/*사회서비스 제공 인원 -취약계층*/
+        , SOCIAL_SERVICE_GENERAL	/*사회서비스 제공 인원 - 일반*/
         FROM CORP_INFO
         WHERE CORP_SEQ = #{p.CORP_SEQ} AND CORP_TYPE = #{p.CORP_TYPE}
     </select>
@@ -289,6 +312,29 @@
         , FUNDS_SUPP		/*h17 정부지원금 */
         , FUNDS_LOAN		/*h18 대출(차입) */
         , FUNDS_ETC			/*h19 기타 */
+        , NETWORK_TARGET_YN   /* 네트워크대상 유무*/
+        , NETWORK_TARGET_COUNT /* 네트워크대상 횟수*/
+        , NETWORK_BUNIT_YN      /* 네트워크 기초단체 유무*/
+        , NETWORK_BUNIT_COUNT  /* 네트워크 기초단체 횟수*/
+        , NETWORK_GUNIT_YN    /* 네트워크 광역단체 유무*/
+        , NETWORK_GUNIT_COUNT  /* 네트워크 광역단체 횟수*/
+        , NETWORK_TYPE_YN     /* 네트워크 업종 유무*/
+        , NETWORK_TYPE_COUNT  /* 네트워크 업종 횟수*/
+        , NETWORK_ISSUE_YN   /*네트워크 이슈 유무 */
+        , NETWORK_ISSUE_COUNT /*네트워크 이슈 카운트 */
+        , YOUTH_COUNT         /*청년층 근로자 수 */
+        , SALES_EMP_RATE      /*노동생산성(1인당 매출액=매출액/근로자수)*/
+        , DEMO_DECISION_1		/*민주적의사결정 구조 - 총회 개최 횟수*/
+        , DEMO_DECISION_2		/*민주적의사결정 구조 - 이사회 개최 횟수*/
+        , DEMO_DECISION_3		/*민주적의사결정 구조 - 운영위원회 개최 횟수*/
+        , DEMO_DECISION_4		/*민주적의사결정 구조 - 기타 개최 횟수*/
+        , SOCIAL_REINVEST_1	/*사회적목적 재투자 금액 - 일자리창출 금액*/
+        , SOCIAL_REINVEST_2	/*사회적목적 재투자 금액 - 사회서비스제공 금액*/
+        , SOCIAL_REINVEST_3	/*사회적목적 재투자 금액 - 구성원성과급 금액*/
+        , SOCIAL_REINVEST_4	/*사회적목적 재투자 금액 - 지역사회 재투자 금액*/
+        , SOCIAL_REINVEST_5	/*사회적목적 재투자 금액 - 기타 금액*/
+        , SOCIAL_SERVICE_WEAK	/*사회서비스 제공 인원 -취약계층*/
+        , SOCIAL_SERVICE_GENERAL	/*사회서비스 제공 인원 - 일반*/
         )
         VALUES
         (
@@ -418,6 +464,29 @@
         , #{p.FUNDS_SUPP}
         , #{p.FUNDS_LOAN}
         , #{p.FUNDS_ETC}
+        , #{p.NETWORK_TARGET_YN}
+        , #{p.NETWORK_TARGET_COUNT}
+        , #{p.NETWORK_BUNIT_YN}
+        , #{p.NETWORK_BUNIT_COUNT}
+        , #{p.NETWORK_GUNIT_YN}
+        , #{p.NETWORK_GUNIT_COUNT}
+        , #{p.NETWORK_TYPE_YN}
+        , #{p.NETWORK_TYPE_COUNT}
+        , #{p.NETWORK_ISSUE_YN}
+        , #{p.NETWORK_ISSUE_COUNT}
+        , #{p.YOUTH_COUNT}
+        , #{p.SALES_EMP_RATE}
+        , #{p.DEMO_DECISION_1}
+        , #{p.DEMO_DECISION_2}
+        , #{p.DEMO_DECISION_3}
+        , #{p.DEMO_DECISION_4}
+        , #{p.SOCIAL_REINVEST_1}
+        , #{p.SOCIAL_REINVEST_2}
+        , #{p.SOCIAL_REINVEST_3}
+        , #{p.SOCIAL_REINVEST_4}
+        , #{p.SOCIAL_REINVEST_5}
+        , #{p.SOCIAL_SERVICE_WEAK}
+        , #{p.SOCIAL_SERVICE_GENERAL}
         , #{u.userId}
         , now()
         )
@@ -551,6 +620,29 @@
         , FUNDS_SUPP		= #{p.FUNDS_SUPP}
         , FUNDS_LOAN		= #{p.FUNDS_LOAN}
         , FUNDS_ETC		= #{p.FUNDS_ETC}
+        , NETWORK_TARGET_YN = #{p.NETWORK_TARGET_YN}
+        , NETWORK_TARGET_COUNT = #{p.NETWORK_TARGET_COUNT}
+        , NETWORK_BUNIT_YN = NETWORK_BUNIT_YN = #{p.NETWORK_BUNIT_YN}
+        , NETWORK_BUNIT_COUNT = #{p.NETWORK_BUNIT_COUNT}
+        , NETWORK_GUNIT_YN = #{p.NETWORK_GUNIT_YN}
+        , NETWORK_GUNIT_COUNT = #{p.NETWORK_GUNIT_COUNT}
+        , NETWORK_TYPE_YN = #{p.NETWORK_TYPE_YN}
+        , NETWORK_TYPE_COUNT = #{p.NETWORK_TYPE_COUNT}
+        , NETWORK_ISSUE_YN = #{p.NETWORK_ISSUE_YN}
+        , NETWORK_ISSUE_COUNT = #{p.NETWORK_ISSUE_COUNT}
+        , YOUTH_COUNT = #{p.YOUTH_COUNT}
+        , SALES_EMP_RATE = #{p.SALES_EMP_RATE}
+        , DEMO_DECISION_1 =  #{p.DEMO_DECISION_1}
+        , DEMO_DECISION_2 = #{p.DEMO_DECISION_2}
+        , DEMO_DECISION_3 = #{p.DEMO_DECISION_3}
+        , DEMO_DECISION_4 = #{p.DEMO_DECISION_4}
+        , SOCIAL_REINVEST_1 = #{p.SOCIAL_REINVEST_1}
+        , SOCIAL_REINVEST_2 = #{p.SOCIAL_REINVEST_2}
+        , SOCIAL_REINVEST_3 = #{p.SOCIAL_REINVEST_3}
+        , SOCIAL_REINVEST_4 = #{p.SOCIAL_REINVEST_4}
+        , SOCIAL_REINVEST_5 = #{p.SOCIAL_REINVEST_5}
+        , SOCIAL_SERVICE_WEAK = #{p.SOCIAL_SERVICE_WEAK}
+        , SOCIAL_SERVICE_GENERAL = #{p.SOCIAL_SERVICE_GENERAL}
         , MOD_ID            = #{u.userId}
         , MOD_DT            = now()
         WHERE CORP_SEQ = #{p.CORP_SEQ}
@@ -560,15 +652,6 @@
         DELETE FROM CORP_INFO
         WHERE CORP_SEQ = #{p.CORP_SEQ} AND CORP_TYPE = #{p.CORP_TYPE}
     </delete>
-
-
-
-
-
-
-
-
-
 
 
 
