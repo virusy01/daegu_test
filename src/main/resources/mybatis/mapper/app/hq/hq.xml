@@ -178,6 +178,8 @@
         , SOCIAL_REINVEST_5	/*사회적목적 재투자 금액 - 기타 금액*/
         , SOCIAL_SERVICE_WEAK	/*사회서비스 제공 인원 -취약계층*/
         , SOCIAL_SERVICE_GENERAL	/*사회서비스 제공 인원 - 일반*/
+        , PROFIT_SURPLUS 		/*이익잉여금*/
+		, NON_OP_INCOM		/* 영업외이익 */
         FROM CORP_INFO
         WHERE CORP_SEQ = #{p.CORP_SEQ} AND CORP_TYPE = #{p.CORP_TYPE}
     </select>
@@ -335,6 +337,8 @@
         , SOCIAL_REINVEST_5	/*사회적목적 재투자 금액 - 기타 금액*/
         , SOCIAL_SERVICE_WEAK	/*사회서비스 제공 인원 -취약계층*/
         , SOCIAL_SERVICE_GENERAL	/*사회서비스 제공 인원 - 일반*/
+        , PROFIT_SURPLUS 		/*이익잉여금*/
+		, NON_OP_INCOM		/* 영업외이익 */
         )
         VALUES
         (
@@ -487,6 +491,8 @@
         , #{p.SOCIAL_REINVEST_5}
         , #{p.SOCIAL_SERVICE_WEAK}
         , #{p.SOCIAL_SERVICE_GENERAL}
+        , #{p.PROFIT_SURPLUS}
+        , #{p.NON_OP_INCOM}
         , #{u.userId}
         , now()
         )
@@ -643,6 +649,8 @@
         , SOCIAL_REINVEST_5 = #{p.SOCIAL_REINVEST_5}
         , SOCIAL_SERVICE_WEAK = #{p.SOCIAL_SERVICE_WEAK}
         , SOCIAL_SERVICE_GENERAL = #{p.SOCIAL_SERVICE_GENERAL}
+        , PROFIT_SURPLUS = #{p.PROFIT_SURPLUS}
+        , NON_OP_INCOM = #{p.NON_OP_INCOM}
         , MOD_ID            = #{u.userId}
         , MOD_DT            = now()
         WHERE CORP_SEQ = #{p.CORP_SEQ}
