@@ -92,4 +92,10 @@ public class CorpController
 		return service.gridCorp(RequestParams.map(),corpKind);
 	}
 
+	// 성과지표 유형별 분석
+	@RequestMapping(value="/analytics/type", method= RequestMethod.GET)
+	public List<Map<String, Object>> chartType(){
+		return service.chartType();
+	}
+
 }

@@ -219,5 +219,9 @@ public class CorpService {
 		return result;
 	}
 
+	// 성과지표 유형별 분석
+	public List<Map<String, Object>> chartType() {
+		return repository.chartType(Security.user());
+	}
 
 }

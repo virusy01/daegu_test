@@ -1,0 +1,306 @@
+<link rel="import" href="/bower_components/iron-form/iron-form.html">
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/bower_components/paper-checkbox/paper-checkbox.html">
+
+<link rel="import" href="/src/components/common/number-input.html">
+<link rel="import" href="/src/components/common/normal-input.html">
+<link rel="import" href="/src/components/common/normal-select.html">
+<link rel="import" href="/src/components/common/date-input.html">
+<link rel="import" href="/src/components/behaviors/behavior-grid.html">
+<link rel="import" href="/src/components/behaviors/behavior-loader.html">
+
+<dom-module id="page-analytics-corp">
+    <style>
+        :host {
+            --paper-checkbox-vertical-align: bottom;
+            --paper-checkbox-size: 16px;
+            --paper-checkbox-unchecked-color: #ccc;
+            --paper-checkbox-checked-color: #FD7400;
+        }
+    </style>
+    <template>
+        <iron-ajax id="getData" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
+                   on-request="_startLoader"
+                   url="/api/corp/analytics/corp"
+                   on-response="_assignData">
+        </iron-ajax>
+        <div class="horizontal-margin-20"></div>
+
+        <div class="page-header">
+            <h2>성과지표 기업별 분석<small> By Corporation KPI Analytics</small></h2>
+        </div>
+
+        <div class="horizontal-margin-20"></div>
+
+        <div class="row">
+            <div class="col-xs-3">
+                <normal-select id="year" on-change="_fetchData" value="{{_corpType}}" items="{{_corpTypeList}}"></normal-select>
+            </div>
+        </div>
+
+        <div class="horizontal-margin-20"></div>
+
+        <div class="row">
+            <div class="col-xs-12 text-right">
+                <label>양호 :</label>
+                <button type="ponter" class="legend-good"> </button>
+                <label>주의 :</label>
+                <button type="ponter" class="legend-warning"> </button>
+                <label>위험 :</label>
+                <button type="ponter" class="legend-danger"> </button>
+                <label> 해당없음 : N/A </label>
+            </div>
+        </div>
+
+        <table id="corp_analytics" class="table table-bordered">
+            <thead>
+            <tr>
+                <th>NO</th>
+                <th>기업명</th>
+                <th>기업유형</th>
+                <th>등급 KPI 평균</th>
+                <th>등급 KPI GRADE</th>
+                <th>비율 KPI 평균</th>
+                <th>비율 KPI GRADE</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+            </tfoot>
+        </table>
+
+    </template>
+    <script>
+        Polymer({
+            is: 'page-analytics-corp',
+
+            behaviors: [Lunch.GridBehavior, Lunch.LoaderBehavior],
+
+            properties: {
+                _corpTypeList: {
+                    type: Array,
+                    value: function() {
+                        return [
+                            {cdNm: '전체', cd: 0},
+                            {cdNm: '사회적기업', cd: 1},
+                            {cdNm: '마을기업', cd: 2},
+                            {cdNm: '협동조합', cd: 3},
+                        ];
+                    }
+                },
+                _corpType: {
+                    type: Number,
+                    value: function() {
+                        return 0;
+                    }
+                },
+                _grade: {
+                    type: Object,
+                    value: function() {
+                        return {B: 'legend-danger', W: 'legend-warning', G: 'legend-good'};
+                    }
+                },
+                _data: {
+                    type: Array,
+                    value: function () {
+                        return [];
+                    }
+                },
+                _totalCount: {
+                    type: Number,
+                    value: 0
+                },
+                _absoluteRowNum: {
+                    type: Number,
+                    value: 0
+                },
+                _guideTop: {
+                    type: Array,
+                    value: function () {
+                        return [
+                            'CORP_NM',
+                            'CORP_TYPE',
+                            'GRADE_RESULT',
+                            'RATE_RESULT',
+                        ];
+                    }
+                },
+            },
+            _fetchData: function() {
+                this.$.getData.params = {
+                    CORP_KIND: this._corpType
+                };
+                this.$.getData.generateRequest();
+            },
+
+            attached: function() {
+                this._fetchData();
+            },
+
+            _assignData: function(e) {
+                this._data = e.target.lastResponse;
+
+                if (this._data) {
+                    this._assignDataToTable('tableA', this.$.corp_analytics, this._data, this._guideTop);
+                    this._stopLoader();
+                }
+            },
+
+            _clearData: function() {
+                Polymer.dom(this.$.corp_analytics.querySelector('tbody')).innerHTML = '';
+                Polymer.dom(this.$.corp_analytics.querySelector('tfoot')).innerHTML = '';
+            },
+
+            _assignDataToTable: function(prefix, table, data, guide) {
+                var body = table.querySelector('tbody');
+                var tr, th, td, value;
+                var input;
+                var total = {};
+
+                Polymer.dom(body).innerHTML = '';
+
+                this._absoluteRowNum = this._data.length;
+
+                for (var i = 0; i < this._data.length; i++) {
+
+                    tr = document.createElement('tr');
+                    tr.setAttribute('id', 'row_' + prefix + '_' + i);
+
+                    Polymer.dom(body).appendChild(tr);
+
+                    td = document.createElement('td');
+                    Polymer.dom(tr).appendChild(td);
+                    td.setAttribute("style", "text-align:center;");
+                    td.innerHTML = i+1;
+
+                    for (var attribute in guide) {
+
+                        td = document.createElement('td');
+                        Polymer.dom(tr).appendChild(td);
+
+                        value = data[i][guide[attribute]];
+
+                        switch (guide[attribute]) {
+                            case 'CORP_NM':
+                                td.innerHTML = value;
+                                td.setAttribute('id', prefix + '_' + guide[attribute] + i);
+                                td.setAttribute('name', prefix + '_' + guide[attribute]);
+                                td.setAttribute("style", "background-color:#ebe9e9; text-align:center;");
+                                break;
+                            case 'CORP_TYPE':
+                                td.innerHTML = value;
+                                td.setAttribute('id', prefix + '_' + guide[attribute] + i);
+                                td.setAttribute('name', prefix + '_' + guide[attribute]);
+                                td.setAttribute("style", "text-align:center;");
+                                break;
+                            case 'GRADE_RESULT':
+                                td.setAttribute("style", "padding-right: 15px !important; text-align: right");
+                                td.innerHTML = value;
+                                td.setAttribute('id', prefix + '_' + guide[attribute] + i);
+                                td.setAttribute('name', prefix + '_' + guide[attribute]);
+
+                                td = document.createElement('td');
+                                Polymer.dom(tr).appendChild(td);
+                                if (value > 0 && value <= 2)
+                                {
+                                    var legend = document.createElement('div');
+                                    legend.setAttribute('class', this._grade['B']);
+                                    Polymer.dom(td).appendChild(legend);
+                                }
+                                else if ( value > 2 && value <= 5 ){
+                                    var legend = document.createElement('div');
+                                    legend.setAttribute('class', this._grade['W']);
+                                    Polymer.dom(td).appendChild(legend);
+                                    console.log ('value : ' + value);
+
+                                }
+                                else if ( value > 5 && value <= 7 ){
+                                    var legend = document.createElement('div');
+                                    legend.setAttribute('class', this._grade['G']);
+                                    Polymer.dom(td).appendChild(legend);
+                                }
+                                else{
+                                    var legend = document.createElement('div');
+                                    td.innerHTML = 'N/A';
+                                }
+                             break;
+
+                            case 'RATE_RESULT':
+                                td.setAttribute("style", "padding-right: 15px !important; text-align: right");
+                                td.innerHTML = value;
+                                td.setAttribute('id', prefix + '_' + guide[attribute] + i);
+                                td.setAttribute('name', prefix + '_' + guide[attribute]);
+
+                                td = document.createElement('td');
+                                Polymer.dom(tr).appendChild(td);
+                                if (value <= 50 )
+                                {
+                                    var legend = document.createElement('div');
+                                    legend.setAttribute('class', this._grade['B']);
+                                    Polymer.dom(td).appendChild(legend);
+                                }
+                                else if ( value > 50  && value <= 100){
+                                    var legend = document.createElement('div');
+                                    legend.setAttribute('class', this._grade['G']);
+                                    Polymer.dom(td).appendChild(legend);
+                                    console.log ('value : ' + value);
+                                }
+                                else{
+                                    var legend = document.createElement('div');
+                                    td.innerHTML = 'N/A';
+                                }
+                                break;
+
+                            default:
+                                break;
+                        }
+
+                    }
+                  //  Polymer.dom(td).appendChild(input);
+
+                }
+                this._recalculateTotal();
+
+            },
+
+            _recalculateTotal: function(e) {
+                var total = 0, sum;
+                this._totalCount = this.$.corp_analytics.querySelector('tbody').children.length;
+            },
+
+            _parseDataBeforeSubmit: function(e) {
+                var data = this.$.gridForm.serialize();
+                var parsedData = [];
+                var inc = 0;
+
+
+                for (var i = 0; i <= this._absoluteRowNum; i++) {
+
+                    if (this.$$('#tableA_CORP_TYPE' + i)) {
+                        for (var key in data) {
+                            var keySplit = key.split('_');
+                            var category = keySplit[0];
+                            var insertKey = keySplit.splice(1, keySplit.length).join('_');
+                            var insertValue = Array.isArray(data[key]) ? data[key][inc] : data[key];
+
+
+                            if (!parsedData[inc])
+                                parsedData[inc] = {};
+
+
+                            parsedData[inc][insertKey] = insertValue;
+                        }
+                        inc++;
+
+                    }
+
+                }
+
+                this.$.gridForm.request.body = parsedData;
+
+            },
+
+        });
+    </script>
+</dom-module>
