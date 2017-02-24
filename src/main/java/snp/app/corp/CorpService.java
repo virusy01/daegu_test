@@ -204,4 +204,20 @@ public class CorpService {
 		return repository.chartAllTotal(Security.user());
 	}
 
+
+	// 성과지표 업종별 분석
+	public List<Map<String, Object>>gridCorp(Map<String, Object> params,String corpKind) {
+		List<Map<String, Object>> result;
+		switch (corpKind) {
+			case "0":
+				result = repository.gridCorpAll(params, Security.user()); //전체
+				break;
+			default:
+				result = repository.gridCorpEach(params, Security.user()); //사회적기업,마을기업, 협동조합
+				break;
+		}
+		return result;
+	}
+
+
 }

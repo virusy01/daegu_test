@@ -10,13 +10,13 @@
 				   on-response="_drawChart">
 		</iron-ajax>
 		<div class="page-header">
-			<h2>성과지표 등급별 분석 <small>KPI Severity Analytics</small></h2>
+			<h2>성과지표 등급별 분석 <small> By Severity KPI Analytics</small></h2>
 		</div>
 
 		<div class="horizontal-margin-20"></div>
 
 		<div class="col-xs-3">
-			<normal-select id="year" on-change="_fetchData" value="{{_corpType}}" items="{{_corpTypeList}}"></normal-select>
+			<normal-select id="corpType" on-change="_fetchData" value="{{_corpType}}" items="{{_corpTypeList}}"></normal-select>
 		</div>
 
 		<div class="horizontal-margin-20"></div>

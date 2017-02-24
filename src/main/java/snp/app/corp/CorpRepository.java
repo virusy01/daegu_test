@@ -55,8 +55,9 @@ public interface CorpRepository
 	List<Map<String, Object>> chartAllCooperation(@Param("u") User user);
 	List<Map<String, Object>> chartAllTotal(@Param("u") User user);
 
-
-
+	// 성과지표 기업별 분석
+	List<Map<String, Object>>gridCorpAll(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>gridCorpEach(@Param("p") Map<String, Object> params,@Param("u") User user);
 
 }
 	

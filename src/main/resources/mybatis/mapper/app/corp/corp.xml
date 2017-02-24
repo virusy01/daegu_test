@@ -4,7 +4,7 @@
 
 <mapper namespace="snp.app.corp.CorpRepository">
 
-	<!-- 협동조합 성과지표 조회 -->
+	<!-- 사회적기업 성과지표 조회 -->
 	<select id="findSocialKpi" resultType="hashmap">
 		SELECT
 		L1.KPI_CD AS L1_KPI_CD
@@ -42,6 +42,7 @@
 		, CORP_TYPE
 		, YEAR
 		, KPI_CD
+		, IS_GRADE
 		, RESULT
 		, REG_ID
 		, REG_DT
@@ -52,6 +53,7 @@
 		, #{p.CORP_TYPE}
 		, #{p.YEAR}
 		, #{p.KPI_CD}
+		, #{p.IS_GRADE}
 		, #{p.RESULT}
 		, #{u.userId}
 		, now()
@@ -134,14 +136,6 @@
 		ORDER BY L3.LEVEL, L3.DISP_ORD
 
 	</select>
-
-
-
-
-
-
-
-
 
 
 	<!-- 성과지표 등급별 분석 - 전체기업-->
@@ -569,5 +563,46 @@
 		OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
 		AND RESULT != 0 AND CORP_TYPE = 3
 	</select>
+
+    <!-- 성과지표 기업별 분석 사회적기업/마을기업/협동조합-->
+    <select id="gridCorpEach" resultType="hashmap">
+        SELECT
+            CASE KRY.CORP_TYPE WHEN 1 THEN '사회적기업'
+            WHEN 2 THEN '마을기업'
+            ELSE '협동조합' END AS CORP_TYPE
+            , KRY.CORP_SEQ AS CORP_SEQ
+            , (SELECT CORP_NM FROM CORP_INFO WHERE CORP_SEQ = KRY.CORP_SEQ) AS CORP_NM
+            , ROUND(KRY.RESULT,1) AS GRADE_RESULT
+            , ROUND(KRN.RESULT,1) AS RATE_RESULT
+        FROM
+        ( SELECT CI.CORP_TYPE, CI.CORP_SEQ, AVG(KR.RESULT) AS RESULT FROM (SELECT * FROM KPI_RESULT WHERE IS_GRADE = 'Y' AND RESULT !=0 ) AS KR
+                    RIGHT JOIN CORP_INFO AS CI ON ( KR.CORP_SEQ = CI.CORP_SEQ ) GROUP BY CORP_TYPE, CORP_SEQ  ) AS KRY
+        LEFT JOIN
+        ( SELECT CI.CORP_TYPE, CI.CORP_SEQ, AVG(KR.RESULT) AS RESULT FROM  (SELECT * FROM KPI_RESULT WHERE IS_GRADE = 'N' AND RESULT !=0) AS KR
+                    RIGHT JOIN CORP_INFO AS CI ON ( KR.CORP_SEQ = CI.CORP_SEQ )  GROUP BY CORP_TYPE, CORP_SEQ) AS KRN
+        ON ( KRY.CORP_SEQ = KRN.CORP_SEQ )
+        WHERE KRN.CORP_TYPE = #{p.CORP_KIND}
+        ORDER BY CORP_NM
+    </select>
+
+    <!-- 성과지표 기업별 분석 전체-->
+    <select id="gridCorpAll" resultType="hashmap">
+        SELECT
+        CASE KRY.CORP_TYPE WHEN 1 THEN '사회적기업'
+        WHEN 2 THEN '마을기업'
+        ELSE '협동조합' END AS CORP_TYPE
+        , KRY.CORP_SEQ AS CORP_SEQ
+        , (SELECT CORP_NM FROM CORP_INFO WHERE CORP_SEQ = KRY.CORP_SEQ) AS CORP_NM
+        , ROUND(KRY.RESULT,1) AS GRADE_RESULT
+        , ROUND(KRN.RESULT,1) AS RATE_RESULT
+        FROM
+        ( SELECT CI.CORP_TYPE, CI.CORP_SEQ, AVG(KR.RESULT) AS RESULT FROM (SELECT * FROM KPI_RESULT WHERE  IS_GRADE = 'Y' AND RESULT !=0 ) AS KR
+        RIGHT JOIN CORP_INFO AS CI ON ( KR.CORP_SEQ = CI.CORP_SEQ ) GROUP BY CORP_TYPE, CORP_SEQ  ) AS KRY
+        LEFT JOIN
+        ( SELECT CI.CORP_TYPE, CI.CORP_SEQ, AVG(KR.RESULT) AS RESULT FROM  (SELECT * FROM KPI_RESULT WHERE IS_GRADE = 'N' AND RESULT !=0) AS KR
+        RIGHT JOIN CORP_INFO AS CI ON ( KR.CORP_SEQ = CI.CORP_SEQ )  GROUP BY CORP_TYPE, CORP_SEQ) AS KRN
+        ON ( KRY.CORP_SEQ = KRN.CORP_SEQ )
+        ORDER BY CORP_NM
+    </select>
 
 </mapper>

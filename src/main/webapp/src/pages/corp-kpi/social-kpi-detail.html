@@ -254,6 +254,7 @@ Polymer({
 			this._formData[key].CORP_SEQ = row.CORP_SEQ;
             this._formData[key].YEAR = row.YEAR;
             this._formData[key].KPI_CD = row.L3_KPI_CD;
+            this._formData[key].IS_GRADE = row.IS_GRADE;
 
 
 		}
@@ -321,6 +322,7 @@ Polymer({
 			parsedData[inc].CORP_SEQ = this._formData[inc].CORP_SEQ;
 			parsedData[inc].YEAR = this._formData[inc].YEAR;
 			parsedData[inc].KPI_CD = this._formData[inc].KPI_CD;
+            parsedData[inc].IS_GRADE = this._formData[inc].IS_GRADE;
 			parsedData[inc].CORP_TYPE = 1;  // 사회적기업
 			parsedData[inc].RESULT = insertValue;
 			inc++;

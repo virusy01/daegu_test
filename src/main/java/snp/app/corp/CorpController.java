@@ -86,5 +86,10 @@ public class CorpController
         return service.chartAll();
     }
 
+	// 성과지표 기업별 분석
+	@RequestMapping(value="/analytics/corp", method= RequestMethod.GET)
+	public List<Map<String, Object>>gridCorp(@RequestParam(name = "CORP_KIND") String corpKind){
+		return service.gridCorp(RequestParams.map(),corpKind);
+	}
 
 }
