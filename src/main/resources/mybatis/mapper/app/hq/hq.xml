@@ -212,13 +212,13 @@
         , PROD_NM2_PCT	/*f26 주요제품명2 %*/
         , PROD_NM3_PCT	/*f27 주요제품명3 %*/
         , PROD_ETC_PCT	/*f28 기타 생산제품 %*/
-        , SERVICE_NM1		/*f22 주요 서비스명 1*/
-        , SERVICE_NM2		/*f23 주요 서비스명 1*/
-        , SERVICE_NM3		/*f24 주요 서비스명 1*/
-        , SERVICE_NM1_PCT	/*f25 주요 서비스명1 %*/
-        , SERVICE_NM2_PCT	/*f26 주요 서비스명 %*/
-        , SERVICE_NM3_PCT	/*f27 주요 서비스명 %*/
-        , SERVICE_ETC_PCT	/*f28 기타 서비스명 %*/
+        , SERVICE_NM1		/*f29 주요 서비스명 1*/
+        , SERVICE_NM2		/*f30 주요 서비스명 1*/
+        , SERVICE_NM3		/*f31 주요 서비스명 1*/
+        , SERVICE_NM1_PCT	/*f32 주요 서비스명1 %*/
+        , SERVICE_NM2_PCT	/*f33 주요 서비스명 %*/
+        , SERVICE_NM3_PCT	/*f34 주요 서비스명 %*/
+        , SERVICE_ETC_PCT	/*f35 기타 서비스명 %*/
         , IN_TOT1		/*f36 원재료 구입처 대구 */
         , IN_SEE1		/*f44 원재료 구입처 사회적경제기업 */
         , IN_TOT2		/*f37 원재료 구입처 경북 */
