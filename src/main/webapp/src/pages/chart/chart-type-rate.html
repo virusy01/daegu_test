@@ -1,0 +1,157 @@
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/src/components/common/normal-select.html">
+<link rel="import" href="/src/components/behaviors/behavior-loader.html">
+
+<dom-module id="chart-type-rate">
+	<template>
+		<iron-ajax auto id="getData" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
+				   on-request="_startLoader"
+				   url="/api/corp/chart-type/rate"
+				   on-response="_drawChart">
+		</iron-ajax>
+
+		<div class="row">
+			<div class="horizontal-margin-20"></div>
+			<div class="col-xs-12">
+				<canvas id="barChart"  width="600" height="550"></canvas>
+			</div>
+		</div>
+	</template>
+	<script>
+        Polymer({
+            is: 'chart-type-rate',
+
+            behaviors: [Lunch.LoaderBehavior],
+
+            properties: {
+
+                data: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+
+                _labels: {
+                    type: Object,
+                    value: function() {
+                        return {'1':'노동통합형', '2':'문제해결형', '3':'지역사회혁신형', '4':'고용창출형'};
+                    }
+                },
+                apiTrigger: {
+                    type: Boolean,
+                    value: false
+                },
+                _myBarChart: Object,
+
+            },
+
+            _drawChart: function(e) {
+                this._data = e.currentTarget.lastResponse;
+                var labels = [];
+                var data = [];
+
+
+                for (var key in this._data) {
+                    labels.push(this._labels[this._data[key].TYPE]);
+                    data.push(this._data[key].RESULT);
+                }
+
+                var data = {
+                    labels: labels,
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: '사회적목적 유형별 분석',
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.9)',
+                                'rgba(54, 162, 235, 0.9)',
+                                'rgba(255, 206, 86, 0.9)',
+                                'rgba(75, 192, 192, 0.9)',
+                                'rgba(153, 102, 255, 0.9)',
+                                'rgba(255, 159, 64, 0.9)',
+                                'rgba(200, 99, 132, 0.9)',
+                                'rgba(160, 162, 235, 0.9)'
+                            ],
+                            borderColor: [
+                                'rgba(255,99,132,1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)',
+                                'rgba(200,99,132,1)',
+                                'rgba(160, 162, 235, 1)'
+                            ],
+                            borderWidth: 1,
+                            data: data,
+                            spanGaps: false
+                        },
+                    ]
+                };
+                if (this._myBarChart)
+                    this._myBarChart.destroy();
+
+                this._myBarChart = new Chart(this.$.barChart, {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    callback: function(value) {
+                                        return accounting.formatNumber(value);
+                                    },
+                                    fontSize: 16,
+                                    beginAtZero: true,
+									max: 100,
+                                }
+                            }],
+                            xAxes: [{
+                                ticks: {
+                                    fontSize: 16
+                                },
+                                barThickness : 60
+                            }]
+                        },
+
+                        legend: {
+                            display: false
+                        },
+                        animation: {
+                            duration: 500,
+                            easing: "easeOutQuart",
+                            onComplete: function () {
+                                var ctx = this.chart.ctx;
+                                ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontFamily, 'normal', Chart.defaults.global.defaultFontFamily);
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'bottom';
+
+                                this.data.datasets.forEach(function (dataset) {
+                                    for (var i = 0; i < dataset.data.length; i++) {
+                                        var model = dataset._meta[Object.keys(dataset._meta)[0]].data[i]._model,
+                                            scale_max = dataset._meta[Object.keys(dataset._meta)[0]].data[i]._yScale.maxHeight;
+                                        ctx.fillStyle = '#444';
+                                        var y_pos = model.y - 5;
+                                        // Make sure data value does not get overflown and hidden
+                                        // when the bar's value is too close to max value of scale
+                                        // Note: The y value is reverse, it counts from top down
+                                        if ((scale_max - model.y) / scale_max >= 0.93)
+                                            y_pos = model.y + 20;
+                                        ctx.fillText(dataset.data[i], model.x, y_pos);
+                                    }
+                                });
+                            }
+                        },
+                        maintainAspectRatio: false
+                    }
+                });
+
+                this._stopLoader();
+            },
+
+
+        });
+	</script>
+</dom-module>
+
