@@ -49,11 +49,20 @@ public interface CorpRepository
 	List<Map<String, Object>>chartSectorEach(@Param("p") Map<String, Object> params,@Param("u") User user);
 
 
-	// 성과지표 유형별 분석 - ALL
-	List<Map<String, Object>> chartAllSocial(@Param("u") User user);
-	List<Map<String, Object>> chartAllVillage(@Param("u") User user);
-	List<Map<String, Object>> chartAllCooperation(@Param("u") User user);
-	List<Map<String, Object>> chartAllTotal(@Param("u") User user);
+	// 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계
+	List<Map<String, Object>> chartAllGradeSocial(@Param("u") User user);
+	List<Map<String, Object>> chartAllGradeVillage(@Param("u") User user);
+	List<Map<String, Object>> chartAllGradeCooperation(@Param("u") User user);
+	List<Map<String, Object>> chartAllGradeTotal(@Param("u") User user);
+
+	// 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계
+	List<Map<String, Object>> chartAllRateSocial(@Param("u") User user);
+	List<Map<String, Object>> chartAllRateVillage(@Param("u") User user);
+	List<Map<String, Object>> chartAllRateCooperation(@Param("u") User user);
+	List<Map<String, Object>> chartAllRateTotal(@Param("u") User user);
+
+
+
 
 	// 성과지표 기업별 분석
 	List<Map<String, Object>>gridCorpAll(@Param("p") Map<String, Object> params,@Param("u") User user);

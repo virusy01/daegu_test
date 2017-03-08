@@ -80,11 +80,7 @@ public class CorpController
 		return service.chartSector(RequestParams.map(),corpKind);
 	}
 
-    // 성과지표 유형별 분석- 각각 세개의 서비스로 되 있던걸 각각 하나로 통합
-    @RequestMapping(value="/analytics/all", method= RequestMethod.GET)
-    public Map<String, Object> chartAll(){
-        return service.chartAll();
-    }
+
 
 	// 성과지표 기업별 분석
 	@RequestMapping(value="/analytics/corp", method= RequestMethod.GET)
@@ -97,5 +93,23 @@ public class CorpController
 	public List<Map<String, Object>> chartType(){
 		return service.chartType();
 	}
+
+
+
+	// 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계
+	@RequestMapping(value="/chart-all/grade", method= RequestMethod.GET)
+	public Map<String, Object> chartAllGrade(){
+		return service.chartAllGrade();
+	}
+
+	// 성과지표 사회적경제조직 유형별 분석 비율항목 통계
+	@RequestMapping(value="/chart-all/rate", method= RequestMethod.GET)
+	public Map<String, Object> chartAllRate(){
+		return service.chartAllRate();
+	}
+
+
+
+
 
 }

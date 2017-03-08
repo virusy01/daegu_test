@@ -175,34 +175,63 @@ public class CorpService {
 		return result;
 	}
 
-	// 성과지표 유형별
-	public Map<String, Object> chartAll() {
+	 // 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계
+	public Map<String, Object> chartAllGrade() {
 		Map<String, Object> nestedData = new HashMap<>();
 
-		nestedData.put("socialData", chartAllSocial());
-		nestedData.put("villageData", chartAllVillage());
-		nestedData.put("cooperationData", chartAllCooperation());
-		nestedData.put("totalData", chartAllTotal());
+		nestedData.put("socialData", chartAllGradeSocial());
+		nestedData.put("villageData", chartAllGradeVillage());
+		nestedData.put("cooperationData", chartAllGradeCooperation());
+		nestedData.put("totalData", chartAllGradeTotal());
 
 		return nestedData;
 	}
 
-	// 성과지표 유형별 상세 - 사회적 기업
-	public List<Map<String, Object>> chartAllSocial() {
-		return repository.chartAllSocial(Security.user());
+	// 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계 - 사회적 기업
+	public List<Map<String, Object>> chartAllGradeSocial() {
+		return repository.chartAllGradeSocial(Security.user());
 	}
-	// 성과지표 유형별 상세 - 마을기업
-	public List<Map<String, Object>> chartAllVillage() {
-		return repository.chartAllVillage(Security.user());
+	// 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계 - 마을기업
+	public List<Map<String, Object>> chartAllGradeVillage() {
+		return repository.chartAllGradeVillage(Security.user());
 	}
-	// 성과지표 유형별 상세 - 협동조합
-	public List<Map<String, Object>> chartAllCooperation() {
-		return repository.chartAllCooperation(Security.user());
+	// 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계 - 협동조합
+	public List<Map<String, Object>> chartAllGradeCooperation() {return repository.chartAllGradeCooperation(Security.user());
 	}
-	// 성과지표 유형별 상세 - 합계
-	public List<Map<String, Object>> chartAllTotal() {
-		return repository.chartAllTotal(Security.user());
+	// 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계 - 합계
+	public List<Map<String, Object>> chartAllGradeTotal() {
+		return repository.chartAllGradeTotal(Security.user());
 	}
+
+
+	// 성과지표 사회적경제조직 유형별 분석 - 비율항목 통계
+	public Map<String, Object> chartAllRate() {
+		Map<String, Object> nestedData = new HashMap<>();
+
+		nestedData.put("socialData", chartAllRateSocial());
+		nestedData.put("villageData", chartAllRateVillage());
+		nestedData.put("cooperationData", chartAllRateCooperation());
+		nestedData.put("totalData", chartAllRateTotal());
+
+		return nestedData;
+	}
+
+	// 성과지표 사회적경제조직 유형별 분석 - 비율항목 통계 - 사회적 기업
+	public List<Map<String, Object>> chartAllRateSocial() {
+		return repository.chartAllRateSocial(Security.user());
+	}
+	// 성과지표 사회적경제조직 유형별 분석 - 비율항목 통계 - 마을기업
+	public List<Map<String, Object>> chartAllRateVillage() {
+		return repository.chartAllRateVillage(Security.user());
+	}
+	// 성과지표 사회적경제조직 유형별 분석 - 비율항목 통계 - 협동조합
+	public List<Map<String, Object>> chartAllRateCooperation() {return repository.chartAllRateCooperation(Security.user());
+	}
+	// 성과지표 사회적경제조직 유형별 분석 - 비율항목 통계 - 합계
+	public List<Map<String, Object>> chartAllRateTotal() {
+		return repository.chartAllRateTotal(Security.user());
+	}
+
 
 
 	// 성과지표 업종별 분석
