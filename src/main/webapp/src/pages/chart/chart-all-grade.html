@@ -1,0 +1,189 @@
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/src/components/common/normal-select.html">
+<link rel="import" href="/src/components/behaviors/behavior-loader.html">
+
+<dom-module id="chart-all-grade">
+	<template>
+		<iron-ajax  auto id="getData" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
+				   on-request="_startLoader"
+				   url="/api/corp/chart-all/grade"
+				   on-response="_drawChart">
+		</iron-ajax>
+
+		<div class="row">
+			<div class="horizontal-margin-20"></div>
+			<div class="col-xs-12">
+				<canvas id="barChart"  width="500" height="550"></canvas>
+			</div>
+		</div>
+	</template>
+	<script>
+        Polymer({
+            is: 'chart-all-grade',
+
+            behaviors: [Lunch.LoaderBehavior],
+
+            properties: {
+
+                data: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _socialData: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _villageData: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _cooperationData: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _totalData: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                apiTrigger: {
+                    type: Boolean,
+                    value: false
+                },
+
+                _myBarChart: Object,
+            },
+
+            _drawChart: function(e) {
+
+                var data = e.currentTarget.lastResponse;
+
+                if (data) {
+                    this._socialData = data.socialData;
+                    this._villageData = data.villageData;
+                    this._cooperationData = data.cooperationData;
+                    this._totalData = data.totalData;
+                }
+
+
+                var data = {
+                    labels: ['사회적기업', '마을기업', '협동조합', '전체평균'],
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: '사회적/경제적 성과',
+                            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1,
+                            data: [this._socialData[0].RESULT,this._villageData[0].RESULT, this._cooperationData[0].RESULT, this._totalData[0].RESULT]
+                        },
+                        {
+                            type: 'bar',
+                            label: '기업 건전성',
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1,
+                            data: [this._socialData[1].RESULT,this._villageData[1].RESULT, 0, this._totalData[1].RESULT]
+                        },
+                        {
+                            type: 'bar',
+                            label: '사회가치 창출 역량',
+                            backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                            borderColor: 'rgba(255, 206, 86, 1)',
+                            borderWidth: 1,
+                            data: [this._socialData[2].RESULT,this._villageData[2].RESULT, 0, this._totalData[2].RESULT]
+                        },
+                        {
+                            type: 'bar',
+                            label: '비즈니스 역량',
+                            backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1,
+                            data: [this._socialData[3].RESULT,this._villageData[3].RESULT, 0, this._totalData[3].RESULT]
+                        },
+                        {
+                            type: 'bar',
+                            label: '전체 평균',
+                            backgroundColor: 'rgba(255, 80, 40, 0.8)',
+                            borderColor: 'rgba(255, 80, 40, 1)',
+                            borderWidth: 1,
+                            data: [this._socialData[4].RESULT,this._villageData[4].RESULT, this._cooperationData[4].RESULT, this._totalData[4].RESULT]
+                        },
+                    ]
+                };
+
+                this._myBarChart = new Chart(this.$.barChart, {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    callback: function(value) {
+                                        return accounting.formatNumber(value);
+                                    },
+                                    fontSize: 16,
+                                    beginAtZero: true,
+                                    stacked: true,
+									max: 7,
+                                }
+                            }],
+                            xAxes: [{
+                                ticks: {
+                                    fontSize: 16
+                                }
+                            }]
+                        },
+
+                        legend: {
+                            display: true,
+                            labels: {
+                                fontSize : 16
+                            }
+                        },
+                        animation: {
+                            duration: 500,
+                            easing: "easeOutQuart",
+                            onComplete: function () {
+                                var ctx = this.chart.ctx;
+                                ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontFamily, 'normal', Chart.defaults.global.defaultFontFamily);
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'bottom';
+
+                                this.data.datasets.forEach(function (dataset) {
+                                    for (var i = 0; i < dataset.data.length; i++) {
+                                        var model = dataset._meta[Object.keys(dataset._meta)[0]].data[i]._model,
+                                            scale_max = dataset._meta[Object.keys(dataset._meta)[0]].data[i]._yScale.maxHeight;
+                                        ctx.fillStyle = '#444';
+                                        var y_pos = model.y - 5;
+                                        // Make sure data value does not get overflown and hidden
+                                        // when the bar's value is too close to max value of scale
+                                        // Note: The y value is reverse, it counts from top down
+                                        if ((scale_max - model.y) / scale_max >= 0.93)
+                                            y_pos = model.y + 20;
+                                        ctx.fillText(dataset.data[i], model.x, y_pos);
+                                    }
+                                });
+                            }
+                        },
+                        maintainAspectRatio: false
+                    }
+                });
+
+                this._stopLoader();
+            },
+
+
+        });
+	</script>
+</dom-module>
+
