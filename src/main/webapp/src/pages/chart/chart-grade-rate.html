@@ -2,20 +2,18 @@
 <link rel="import" href="/src/components/common/normal-select.html">
 <link rel="import" href="/src/components/behaviors/behavior-loader.html">
 
-<dom-module id="page-analytics-grade">
+<dom-module id="chart-grade-rate">
 	<template>
 		<iron-ajax id="getData" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
 				   on-request="_startLoader"
-				   url="/api/corp/analytics/grade"
+				   url="/api/corp/chart-grade/rate"
 				   on-response="_drawChart">
 		</iron-ajax>
-		<div class="page-header">
-			<h2>성과지표 등급별 분석 <small> By Severity KPI Analytics</small></h2>
-		</div>
 
 		<div class="horizontal-margin-20"></div>
 
 		<div class="row">
+			<div class="horizontal-margin-20"></div>
 			<div class="col-xs-3">
 				<normal-select id="corpType" on-change="_fetchData" value="{{_corpType}}" items="{{_corpTypeList}}"></normal-select>
 			</div>
@@ -30,7 +28,7 @@
 	</template>
 	<script>
         Polymer({
-            is: 'page-analytics-grade',
+            is: 'chart-grade-rate',
 
             behaviors: [Lunch.LoaderBehavior],
 
@@ -65,7 +63,7 @@
                 _labels: {
                     type: Object,
                     value: function() {
-                        return {B: '위험(1~2)', W: '주의(3~5)', G: '양호(6~7)'};
+                        return {B: '위험(50% 미만)', G: '양호(50% 이상)'};
                     }
                 },
             },
@@ -97,12 +95,10 @@
                             data: data,
                             backgroundColor: [
                                 "#FF6384",
-                                "#FFCE56",
                                 "#36A2EB"
                             ],
                             hoverBackgroundColor: [
                                 "#FF6384",
-                                "#FFCE56",
                                 "#36A2EB"
                             ],
                             spanGaps: false,

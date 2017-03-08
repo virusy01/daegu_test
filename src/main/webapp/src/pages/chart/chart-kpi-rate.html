@@ -2,35 +2,31 @@
 <link rel="import" href="/src/components/common/normal-select.html">
 <link rel="import" href="/src/components/behaviors/behavior-loader.html">
 
-<dom-module id="page-analytics-region">
+<dom-module id="chart-kpi-rate">
 	<template>
 		<iron-ajax id="getData" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
 				   on-request="_startLoader"
-				   url="/api/corp/analytics/region"
+				   url="/api/corp/chart-kpi/rate"
 				   on-response="_drawChart">
 		</iron-ajax>
-		<div class="page-header">
-			<h2>성과지표 지역별 분석 <small>By Region Analytics</small></h2>
-		</div>
-
-		<div class="horizontal-margin-20"></div>
 
 		<div class="row">
+			<div class="horizontal-margin-20"></div>
 			<div class="col-xs-3">
 				<normal-select id="year" on-change="_fetchData" value="{{_corpType}}" items="{{_corpTypeList}}"></normal-select>
 			</div>
 		</div>
-		<div class="horizontal-margin-20"></div>
 
 		<div class="row">
+			<div class="horizontal-margin-20"></div>
 			<div class="col-xs-12">
-				<canvas id="barChart"  width="600" height="550"></canvas>
+				<canvas id="barChart"  width="500" height="500"></canvas>
 			</div>
 		</div>
 	</template>
 	<script>
         Polymer({
-            is: 'page-analytics-region',
+            is: 'chart-kpi-rate',
 
             behaviors: [Lunch.LoaderBehavior],
 
@@ -50,6 +46,7 @@
                             {cdNm: '사회적기업', cd: 1},
                             {cdNm: '마을기업', cd: 2},
                             {cdNm: '협동조합', cd: 3},
+
                         ];
                     }
                 },
@@ -59,14 +56,7 @@
                         return 0;
                     }
                 },
-                _labels: {
-                    type: Object,
-                    value: function() {
-                        return {'01':'중구', '02':'동구', '03':'서구', '04':'남구', '05':'북구', '06':'수성구', '07':'달서구', '08':'달성군'};
-                    }
-                },
                 _myBarChart: Object,
-
             },
 
             attached: function() {
@@ -80,31 +70,22 @@
 
             },
             _drawChart: function(e) {
+
                 this._data = e.currentTarget.lastResponse;
-                var labels = [];
-                var data = [];
-
-
-                for (var key in this._data) {
-                    labels.push(this._labels[this._data[key].REGION]);
-                    data.push(this._data[key].RESULT);
-                }
 
                 var data = {
-                    labels: labels,
+                    labels: ['사회적/경제적 성과', '기업 건전성', '사회 가치창출 역량', '비즈니스 역량'],
                     datasets: [
                         {
                             type: 'bar',
-                            label: '성과지표 지역별 분석',
+                            label: '성과지표 항목별 분석',
                             backgroundColor: [
                                 'rgba(255, 99, 132, 0.9)',
                                 'rgba(54, 162, 235, 0.9)',
                                 'rgba(255, 206, 86, 0.9)',
                                 'rgba(75, 192, 192, 0.9)',
                                 'rgba(153, 102, 255, 0.9)',
-                                'rgba(255, 159, 64, 0.9)',
-                                'rgba(200, 99, 132, 0.9)',
-                                'rgba(160, 162, 235, 0.9)'
+                                'rgba(255, 159, 64, 0.9)'
                             ],
                             borderColor: [
                                 'rgba(255,99,132,1)',
@@ -112,16 +93,15 @@
                                 'rgba(255, 206, 86, 1)',
                                 'rgba(75, 192, 192, 1)',
                                 'rgba(153, 102, 255, 1)',
-                                'rgba(255, 159, 64, 1)',
-                                'rgba(200,99,132,1)',
-                                'rgba(160, 162, 235, 1)'
+                                'rgba(255, 159, 64, 1)'
                             ],
                             borderWidth: 1,
-                            data: data,
-                            spanGaps: false
+                            data: [this._data[0].RESULT, this._data[1].RESULT, this._data[2].RESULT,this._data[3].RESULT],
+                            spanGaps: false,
                         },
                     ]
                 };
+
                 if (this._myBarChart)
                     this._myBarChart.destroy();
 
@@ -137,19 +117,15 @@
                                     },
                                     fontSize: 16,
                                     beginAtZero: true,
-									max: 7,
+									max: 100,
                                 }
                             }],
                             xAxes: [{
                                 ticks: {
                                     fontSize: 16
                                 },
-                                barThickness : 60
+                                barThickness : 70
                             }]
-                        },
-
-                        legend: {
-                            display: false
                         },
                         animation: {
                             duration: 500,
@@ -176,7 +152,10 @@
                                 });
                             }
                         },
-                        maintainAspectRatio: false
+                        maintainAspectRatio: false,
+                        legend: {
+                            display: false
+                        }
                     }
                 });
 

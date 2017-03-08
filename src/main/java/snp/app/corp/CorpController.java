@@ -56,22 +56,37 @@ public class CorpController
 
 
 
-	// 성과지표 등급별 분석
-	@RequestMapping(value="/analytics/grade", method= RequestMethod.GET)
-	public List<Map<String, Object>>chartDemo1(@RequestParam(name = "CORP_KIND") String corpKind){
-		return service.chartGrade(corpKind);
+	// 성과지표 등급별 분석 - 등급항목별
+	@RequestMapping(value="/chart-grade/grade", method= RequestMethod.GET)
+	public List<Map<String, Object>>chartGradeGrade(@RequestParam(name = "CORP_KIND") String corpKind){
+		return service.chartGradeGrade(corpKind);
+	}
+	// 성과지표 등급별 분석 - 비율항목별
+	@RequestMapping(value="/chart-grade/rate", method= RequestMethod.GET)
+	public List<Map<String, Object>>chartGradeRate(@RequestParam(name = "CORP_KIND") String corpKind){
+		return service.chartGradeRate(corpKind);
 	}
 
-	// 성과지표 KPI 항목별 분석
-	@RequestMapping(value="/analytics/kpi", method= RequestMethod.GET)
-	public List<Map<String, Object>>chartKpi(@RequestParam(name = "CORP_KIND") String corpKind){
-		return service.chartKpi(RequestParams.map(), corpKind);
+	// 성과지표 KPI 항목별 분석 - 등급항목별
+	@RequestMapping(value="/chart-kpi/grade", method= RequestMethod.GET)
+	public List<Map<String, Object>>chartKpiGrade(@RequestParam(name = "CORP_KIND") String corpKind){
+		return service.chartKpiGrade(RequestParams.map(), corpKind);
+	}
+	// 성과지표 KPI 항목별 분석 - 비율항목별
+	@RequestMapping(value="/chart-kpi/rate", method= RequestMethod.GET)
+	public List<Map<String, Object>>chartKpiRate(@RequestParam(name = "CORP_KIND") String corpKind){
+		return service.chartKpiRate(RequestParams.map(), corpKind);
 	}
 
-	// 성과지표 지역별 분석
-	@RequestMapping(value="/analytics/region", method= RequestMethod.GET)
-	public List<Map<String, Object>>chartRegion(@RequestParam(name = "CORP_KIND") String corpKind){
-		return service.chartRegion(RequestParams.map(),corpKind);
+	// 성과지표 지역별 분석  - 등급항목별
+	@RequestMapping(value="/chart-region/grade", method= RequestMethod.GET)
+	public List<Map<String, Object>>chartRegionGrade(@RequestParam(name = "CORP_KIND") String corpKind){
+		return service.chartRegionGrade(RequestParams.map(),corpKind);
+	}
+	// 성과지표 지역별 분석  - 비율항목별
+	@RequestMapping(value="/chart-region/rate", method= RequestMethod.GET)
+	public List<Map<String, Object>>chartRegionRate(@RequestParam(name = "CORP_KIND") String corpKind){
+		return service.chartRegionRate(RequestParams.map(),corpKind);
 	}
 
 	// 성과지표 업종별 분석 - 등급항목별

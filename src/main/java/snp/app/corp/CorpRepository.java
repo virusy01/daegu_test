@@ -29,19 +29,33 @@ public interface CorpRepository
 
 
 
-	// 성과지표 등급별 분석
-	List<Map<String, Object>>chartGrade1(@Param("u") User user);
-	List<Map<String, Object>>chartGrade2(@Param("u") User user);
-	List<Map<String, Object>>chartGrade3(@Param("u") User user);
-	List<Map<String, Object>>chartGrade4(@Param("u") User user);
+	// 성과지표 등급별 분석 - 등급항목별
+	List<Map<String, Object>>chartGrade1Grade(@Param("u") User user);
+	List<Map<String, Object>>chartGrade2Grade(@Param("u") User user);
+	List<Map<String, Object>>chartGrade3Grade(@Param("u") User user);
+	List<Map<String, Object>>chartGrade4Grade(@Param("u") User user);
 
-	// 성과지표 항목별 분석
-	List<Map<String, Object>>chartKpiAll(@Param("p") Map<String, Object> params,@Param("u") User user);
-	List<Map<String, Object>>chartKpiEach(@Param("p") Map<String, Object> params,@Param("u") User user);
+	// 성과지표 등급별 분석 - 비율항목별
+	List<Map<String, Object>>chartGrade1Rate(@Param("u") User user);
+	List<Map<String, Object>>chartGrade2Rate(@Param("u") User user);
+	List<Map<String, Object>>chartGrade3Rate(@Param("u") User user);
+	List<Map<String, Object>>chartGrade4Rate(@Param("u") User user);
 
-	// 성과지표 지역별 분석
-	List<Map<String, Object>>chartRegionAll(@Param("p") Map<String, Object> params,@Param("u") User user);
-	List<Map<String, Object>>chartRegionEach(@Param("p") Map<String, Object> params,@Param("u") User user);
+	// 성과지표 항목별 분석 - 등급항목별
+	List<Map<String, Object>>chartKpiAllGrade(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartKpiEachGrade(@Param("p") Map<String, Object> params,@Param("u") User user);
+
+	// 성과지표 항목별 분석 - 비율항목별
+	List<Map<String, Object>>chartKpiAllRate(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartKpiEachRate(@Param("p") Map<String, Object> params,@Param("u") User user);
+
+	// 성과지표 지역별 분석 - 등급항목별
+	List<Map<String, Object>>chartRegionAllGrade(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionEachGrade(@Param("p") Map<String, Object> params,@Param("u") User user);
+
+	// 성과지표 지역별 분석 - 비율항목별
+	List<Map<String, Object>>chartRegionAllRate(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionEachRate(@Param("p") Map<String, Object> params,@Param("u") User user);
 
 
 	// 성과지표 업종별 분석 - 등급항목별

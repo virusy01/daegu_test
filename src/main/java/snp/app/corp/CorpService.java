@@ -112,50 +112,97 @@ public class CorpService {
 
 
 
-	// 성과지표 등급별 분석 데모용
-	public List<Map<String, Object>>chartGrade(String corpKind) {
+	// 성과지표 등급별 분석 - 등급항목별
+	public List<Map<String, Object>>chartGradeGrade(String corpKind) {
 		List<Map<String, Object>> result;
 		switch (corpKind) {
 			case "0":
-				result = repository.chartGrade1(Security.user()); //전체
+				result = repository.chartGrade1Grade(Security.user()); //전체
 				break;
 			case "1":
-				result = repository.chartGrade2(Security.user()); //사회적기업
+				result = repository.chartGrade2Grade(Security.user()); //사회적기업
 				break;
 			case "2":
-				result = repository.chartGrade3(Security.user()); //협동조합
+				result = repository.chartGrade3Grade(Security.user()); //협동조합
 				break;
 			default:
-				result = repository.chartGrade4(Security.user()); //마을기업
+				result = repository.chartGrade4Grade(Security.user()); //마을기업
 				break;
 		}
 
 		return result;
 	}
-	// 성과지표 항목별 분석 데모용
-	public List<Map<String, Object>>chartKpi(Map<String, Object> params,String corpKind) {
+
+	// 성과지표 등급별 분석 -비율항목별
+	public List<Map<String, Object>>chartGradeRate(String corpKind) {
 		List<Map<String, Object>> result;
 		switch (corpKind) {
 			case "0":
-				result = repository.chartKpiAll(params, Security.user()); //전체
+				result = repository.chartGrade1Rate(Security.user()); //전체
+				break;
+			case "1":
+				result = repository.chartGrade2Rate(Security.user()); //사회적기업
+				break;
+			case "2":
+				result = repository.chartGrade3Rate(Security.user()); //협동조합
 				break;
 			default:
-				result = repository.chartKpiEach(params, Security.user()); //사회적기업,마을기업, 협동조합
+				result = repository.chartGrade4Rate(Security.user()); //마을기업
+				break;
+		}
+
+		return result;
+	}
+	// 성과지표 항목별 분석 등급항목별
+	public List<Map<String, Object>>chartKpiGrade(Map<String, Object> params,String corpKind) {
+		List<Map<String, Object>> result;
+		switch (corpKind) {
+			case "0":
+				result = repository.chartKpiAllGrade(params, Security.user()); //전체
+				break;
+			default:
+				result = repository.chartKpiEachGrade(params, Security.user()); //사회적기업,마을기업, 협동조합
+				break;
+		}
+		return result;
+	}
+	// 성과지표 항목별 분석 비율항목별
+	public List<Map<String, Object>>chartKpiRate(Map<String, Object> params,String corpKind) {
+		List<Map<String, Object>> result;
+		switch (corpKind) {
+			case "0":
+				result = repository.chartKpiAllRate(params, Security.user()); //전체
+				break;
+			default:
+				result = repository.chartKpiEachRate(params, Security.user()); //사회적기업,마을기업, 협동조합
 				break;
 		}
 		return result;
 	}
 
-
-	// 성과지표 지역별 분석
-	public List<Map<String, Object>>chartRegion(Map<String, Object> params,String corpKind) {
+	// 성과지표 지역별 분석 - 등급항목
+	public List<Map<String, Object>>chartRegionGrade(Map<String, Object> params,String corpKind) {
 		List<Map<String, Object>> result;
 		switch (corpKind) {
 			case "0":
-				result = repository.chartRegionAll(params, Security.user()); //전체
+				result = repository.chartRegionAllGrade(params, Security.user()); //전체
 				break;
 			default:
-				result = repository.chartRegionEach(params, Security.user()); //사회적기업,마을기업, 협동조합
+				result = repository.chartRegionEachGrade(params, Security.user()); //사회적기업,마을기업, 협동조합
+				break;
+		}
+		return result;
+	}
+
+	// 성과지표 지역별 분석 - 비율항목
+	public List<Map<String, Object>>chartRegionRate(Map<String, Object> params,String corpKind) {
+		List<Map<String, Object>> result;
+		switch (corpKind) {
+			case "0":
+				result = repository.chartRegionAllRate(params, Security.user()); //전체
+				break;
+			default:
+				result = repository.chartRegionEachRate(params, Security.user()); //사회적기업,마을기업, 협동조합
 				break;
 		}
 		return result;

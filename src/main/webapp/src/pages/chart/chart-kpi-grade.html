@@ -2,35 +2,31 @@
 <link rel="import" href="/src/components/common/normal-select.html">
 <link rel="import" href="/src/components/behaviors/behavior-loader.html">
 
-<dom-module id="page-analytics-sector">
+<dom-module id="chart-kpi-grade">
 	<template>
 		<iron-ajax id="getData" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
 				   on-request="_startLoader"
-				   url="/api/corp/analytics/sector"
+				   url="/api/corp/chart-kpi/grade"
 				   on-response="_drawChart">
 		</iron-ajax>
-		<div class="page-header">
-			<h2>성과지표 업종별 분석 <small>By Sector Analytics</small></h2>
-		</div>
-
-		<div class="horizontal-margin-20"></div>
 
 		<div class="row">
+			<div class="horizontal-margin-20"></div>
 			<div class="col-xs-3">
 				<normal-select id="year" on-change="_fetchData" value="{{_corpType}}" items="{{_corpTypeList}}"></normal-select>
 			</div>
 		</div>
-		<div class="horizontal-margin-20"></div>
 
 		<div class="row">
+			<div class="horizontal-margin-20"></div>
 			<div class="col-xs-12">
-				<canvas id="barChart"  width="600" height="550"></canvas>
+				<canvas id="barChart"  width="500" height="500"></canvas>
 			</div>
 		</div>
 	</template>
 	<script>
         Polymer({
-            is: 'page-analytics-sector',
+            is: 'chart-kpi-grade',
 
             behaviors: [Lunch.LoaderBehavior],
 
@@ -50,6 +46,7 @@
                             {cdNm: '사회적기업', cd: 1},
                             {cdNm: '마을기업', cd: 2},
                             {cdNm: '협동조합', cd: 3},
+
                         ];
                     }
                 },
@@ -59,16 +56,7 @@
                         return 0;
                     }
                 },
-                _labels: {
-                    type: Object,
-                    value: function() {
-                        return {'01':'농업, 임업 및 어업', '02':'제조업', '03':'도매 및 소매업', '04':'운수업', '05':'숙박 및 음식점업', '06':'사업시설관리 및 사업지원서비스업',
-								'07':'교육 서비스업', '08':'보건업 및 사회복지서비스업','09':'예술/스포츠/여가관련 서비스업', '10':'협회/단체/수리/기타 개인서비스업',
-								'11':'인쇄/출판/디자인', '12':' 운송/배달',	'13':'기타' };
-                    }
-                },
                 _myBarChart: Object,
-
             },
 
             attached: function() {
@@ -82,31 +70,22 @@
 
             },
             _drawChart: function(e) {
+
                 this._data = e.currentTarget.lastResponse;
-                var labels = [];
-                var data = [];
-
-
-                for (var key in this._data) {
-                    labels.push(this._labels[this._data[key].SECTOR]);
-                    data.push(this._data[key].RESULT);
-                }
 
                 var data = {
-                    labels: labels,
+                    labels: ['사회적/경제적 성과', '기업 건전성', '사회 가치창출 역량', '비즈니스 역량'],
                     datasets: [
                         {
                             type: 'bar',
-                            label: '성과지표 업종별 분석',
+                            label: '성과지표 항목별 분석',
                             backgroundColor: [
                                 'rgba(255, 99, 132, 0.9)',
                                 'rgba(54, 162, 235, 0.9)',
                                 'rgba(255, 206, 86, 0.9)',
                                 'rgba(75, 192, 192, 0.9)',
                                 'rgba(153, 102, 255, 0.9)',
-                                'rgba(255, 159, 64, 0.9)',
-                                'rgba(200, 99, 132, 0.9)',
-                                'rgba(160, 162, 235, 0.9)'
+                                'rgba(255, 159, 64, 0.9)'
                             ],
                             borderColor: [
                                 'rgba(255,99,132,1)',
@@ -114,16 +93,15 @@
                                 'rgba(255, 206, 86, 1)',
                                 'rgba(75, 192, 192, 1)',
                                 'rgba(153, 102, 255, 1)',
-                                'rgba(255, 159, 64, 1)',
-                                'rgba(200,99,132,1)',
-                                'rgba(160, 162, 235, 1)'
+                                'rgba(255, 159, 64, 1)'
                             ],
                             borderWidth: 1,
-                            data: data,
-                            spanGaps: false
+                            data: [this._data[0].RESULT, this._data[1].RESULT, this._data[2].RESULT,this._data[3].RESULT],
+                            spanGaps: false,
                         },
                     ]
                 };
+
                 if (this._myBarChart)
                     this._myBarChart.destroy();
 
@@ -146,12 +124,8 @@
                                 ticks: {
                                     fontSize: 16
                                 },
-                                barThickness : 60
+                                barThickness : 70
                             }]
-                        },
-
-                        legend: {
-                            display: false
                         },
                         animation: {
                             duration: 500,
@@ -178,7 +152,10 @@
                                 });
                             }
                         },
-                        maintainAspectRatio: false
+                        maintainAspectRatio: false,
+                        legend: {
+                            display: false
+                        }
                     }
                 });
 

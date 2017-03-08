@@ -1,0 +1,80 @@
+<link rel="import" href="/bower_components/app-route/app-route.html">
+
+<link rel="import" href="/src/components/common/normal-select.html">
+
+<dom-module id="page-chart-region">
+    <template>
+        <app-route route="{{route}}"
+                   pattern="/app/chart-region/:tab"
+                   data="{{routeData}}">
+        </app-route>
+
+        <div class="horizontal-margin-20"></div>
+
+        <div class="page-header">
+            <h2>지역별 분석<small>By Region Analytics</small></h2>
+        </div>
+
+        <ul id="pageTab" class="nav nav-tabs">
+            <li name="grade"><a href="/app/chart-region/grade">7점 척도 항목</a></li>
+            <li name="rate"><a href="/app/chart-region/rate">100% 대비 항목</a></li>
+        </ul>
+
+        <iron-pages id="reportTabs" role="monthly-tab" selected="[[tab]]" attr-for-selected="name">
+            <chart-region-grade name="grade" ></chart-region-grade>
+            <chart-region-rate name="rate" ></chart-region-rate>
+        </iron-pages>
+    </template>
+    <script>
+        Polymer({
+            is: 'page-chart-region',
+
+            properties: {
+                route: String,
+                tab: {
+                    type: String,
+                    observer: "_selectTab"
+                },
+            },
+
+            observers: [
+                '_determineTab(routeData.tab)'
+            ],
+
+            _determineTab: function(value) {
+                this.tab = value || "grade";
+            },
+
+            _selectTab: function(newValue, oldValue) {
+                var newTab = this.$.pageTab.querySelector("li[name='" + newValue + "']");
+                var oldTab = this.$.pageTab.querySelector("li[name='" + oldValue +"']");
+
+                if (oldTab)
+                    oldTab.classList.remove('active');
+                else
+                    this._deselectAllTabs();
+
+                if (newTab)
+                    newTab.classList.add('active');
+
+                this.importHref(
+                    this.resolveUrl('chart/chart-region-' + newValue + '.html'), null, null, true);
+            },
+
+
+            _deselectAllTabs: function() {
+                var child;
+
+                for (var key in Polymer.dom(this.$.pageTab).children) {
+                    child = Polymer.dom(this.$.pageTab).children[key];
+                    child.classList.remove('active');
+                }
+            },
+            _getData: function(e) {
+
+                this.$.reportTabs.selectedItem.requestAllData();
+            },
+
+        });
+    </script>
+</dom-module>
