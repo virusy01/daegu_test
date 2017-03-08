@@ -390,12 +390,16 @@
 
 			<div class="form-group">
 				<label class="col-xs-2 control-label">전체 참여자 수(명)</label>
-				<div class="col-xs-4">
+				<div class="col-xs-2">
 					<number-input name="TOT_PAR" value="{{_data.TOT_PAR}}"></number-input>
 				</div>
 				<label class="col-xs-2 control-label">전체 근로자 수(명)</label>
-				<div class="col-xs-4">
+				<div class="col-xs-2">
 					<number-input name="TOT_EMP" value="{{_data.TOT_EMP}}"></number-input>
+				</div>
+				<label class="col-xs-2 control-label">청년층 근로자 수(명)</label>
+				<div class="col-xs-2">
+					<number-input name="YOUTH_COUNT" value="{{_data.YOUTH_COUNT}}"></number-input>
 				</div>
 			</div>
 
@@ -776,7 +780,7 @@
 
 			<div class="row">
 				<div class="col-xs-10 col-xs-offset-2">
-					<h5>취약계층 유형별 및 청년 고용인원 수</h5>
+					<h5>취약계층 유형별 고용인원 </h5>
 				</div>
 			</div>
 			<div class="form-group">
@@ -808,10 +812,6 @@
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="col-xs-2 control-label">청년층 근로자(명)</label>
-				<div class="col-xs-2">
-					<number-input name="YOUTH_COUNT" value="{{_data.YOUTH_COUNT}}"></number-input>
-				</div>
 				<label class="col-xs-2 control-label">기타(명)</label>
 				<div class="col-xs-2">
 					<number-input name="WEAK_TYPE7_CNT" value="{{_data.WEAK_TYPE7_CNT}}"></number-input>
