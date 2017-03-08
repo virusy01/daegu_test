@@ -44,10 +44,13 @@ public interface CorpRepository
 	List<Map<String, Object>>chartRegionEach(@Param("p") Map<String, Object> params,@Param("u") User user);
 
 
-	// 성과지표 업종별 분석
-	List<Map<String, Object>>chartSectorAll(@Param("p") Map<String, Object> params,@Param("u") User user);
-	List<Map<String, Object>>chartSectorEach(@Param("p") Map<String, Object> params,@Param("u") User user);
+	// 성과지표 업종별 분석 - 등급항목별
+	List<Map<String, Object>>chartSectorAllGrade(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorEachGrade(@Param("p") Map<String, Object> params,@Param("u") User user);
 
+	// 성과지표 업종별 분석 비율항목별
+	List<Map<String, Object>>chartSectorAllRate(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorEachRate(@Param("p") Map<String, Object> params,@Param("u") User user);
 
 	// 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계
 	List<Map<String, Object>> chartAllGradeSocial(@Param("u") User user);
@@ -68,8 +71,14 @@ public interface CorpRepository
 	List<Map<String, Object>>gridCorpAll(@Param("p") Map<String, Object> params,@Param("u") User user);
 	List<Map<String, Object>>gridCorpEach(@Param("p") Map<String, Object> params,@Param("u") User user);
 
-	// 성과지표 유형별 분석 - 노동통합형, 문제해결형, 지역사회혁신형, 고용창출형
-	List<Map<String, Object>>chartType(@Param("u") User user);
+	// 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계 - 노동통합형, 문제해결형, 지역사회혁신형, 고용창출형
+	List<Map<String, Object>>chartTypeGrade(@Param("u") User user);
+
+	// 성과지표 사회적경제조직 유형별 분석 - 비율항목 통계 - 노동통합형, 문제해결형, 지역사회혁신형, 고용창출형
+	List<Map<String, Object>>chartTypeRate(@Param("u") User user);
+
+
+
 
 }
 	

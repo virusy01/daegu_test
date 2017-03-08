@@ -161,15 +161,29 @@ public class CorpService {
 		return result;
 	}
 
-	// 성과지표 업종별 분석
-	public List<Map<String, Object>>chartSector(Map<String, Object> params,String corpKind) {
+	// 성과지표 업종별 분석 - 등급항목
+	public List<Map<String, Object>>chartSectorGrade(Map<String, Object> params,String corpKind) {
 		List<Map<String, Object>> result;
 		switch (corpKind) {
 			case "0":
-				result = repository.chartSectorAll(params, Security.user()); //전체
+				result = repository.chartSectorAllGrade(params, Security.user()); //전체
 				break;
 			default:
-				result = repository.chartSectorEach(params, Security.user()); //사회적기업,마을기업, 협동조합
+				result = repository.chartSectorEachGrade(params, Security.user()); //사회적기업,마을기업, 협동조합
+				break;
+		}
+		return result;
+	}
+
+	// 성과지표 업종별 분석 - 비율항목
+	public List<Map<String, Object>>chartSectorRate(Map<String, Object> params,String corpKind) {
+		List<Map<String, Object>> result;
+		switch (corpKind) {
+			case "0":
+				result = repository.chartSectorAllRate(params, Security.user()); //전체
+				break;
+			default:
+				result = repository.chartSectorEachRate(params, Security.user()); //사회적기업,마을기업, 협동조합
 				break;
 		}
 		return result;
@@ -248,9 +262,18 @@ public class CorpService {
 		return result;
 	}
 
-	// 성과지표 유형별 분석
-	public List<Map<String, Object>> chartType() {
-		return repository.chartType(Security.user());
+	// 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계
+	public List<Map<String, Object>> chartTypeGrade() {
+		return repository.chartTypeGrade(Security.user());
 	}
+
+	// 성과지표 사회적경제조직 유형별 분석 - 비율항목 통계
+	public List<Map<String, Object>> chartTypeRate() {
+		return repository.chartTypeRate(Security.user());
+	}
+
+
+
+
 
 }

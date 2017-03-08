@@ -1,0 +1,198 @@
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/src/components/common/normal-select.html">
+<link rel="import" href="/src/components/behaviors/behavior-loader.html">
+
+<dom-module id="chart-sector-grade">
+	<template>
+		<iron-ajax id="getData" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
+				   on-request="_startLoader"
+				   url="/api/corp/chart-sector/grade"
+				   on-response="_drawChart">
+		</iron-ajax>
+
+		<div class="row">
+			<div class="horizontal-margin-20"></div>
+			<div class="col-xs-3">
+				<normal-select id="year" on-change="_fetchData" value="{{_corpType}}" items="{{_corpTypeList}}"></normal-select>
+			</div>
+		</div>
+		<div class="horizontal-margin-20"></div>
+
+		<div class="row">
+			<div class="col-xs-12">
+				<canvas id="barChart"  width="600" height="550"></canvas>
+			</div>
+		</div>
+	</template>
+	<script>
+        Polymer({
+            is: 'chart-sector-grade',
+
+            behaviors: [Lunch.LoaderBehavior],
+
+            properties: {
+
+                data: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _corpTypeList: {
+                    type: Array,
+                    value: function() {
+                        return [
+                            {cdNm: '전체', cd: 0},
+                            {cdNm: '사회적기업', cd: 1},
+                            {cdNm: '마을기업', cd: 2},
+                            {cdNm: '협동조합', cd: 3},
+                        ];
+                    }
+                },
+                _corpType: {
+                    type: Number,
+                    value: function() {
+                        return 0;
+                    }
+                },
+                _labels: {
+                    type: Object,
+                    value: function() {
+                        return {'1':'농업, 임업 및 어업', '2':'제조업', '3':'도매 및 소매업', '4':'운수업', '5':'숙박 및 음식점업', '6':'사업시설관리 및 사업지원서비스업',
+								'7':'교육 서비스업', '8':'보건업 및 사회복지서비스업','9':'예술/스포츠/여가관련 서비스업', '10':'협회/단체/수리/기타 개인서비스업',
+								'11':'인쇄/출판/디자인', '12':' 운송/배달',	'13':'기타' };
+                    }
+                },
+                _myBarChart: Object,
+
+            },
+
+            attached: function() {
+                this._fetchData();
+            },
+            _fetchData: function() {
+                this.$.getData.params = {
+                    CORP_KIND: this._corpType
+                };
+                this.$.getData.generateRequest();
+
+            },
+            _drawChart: function(e) {
+                this._data = e.currentTarget.lastResponse;
+                var labels = [];
+                var data = [];
+
+
+                for (var key in this._data) {
+                    labels.push(this._labels[this._data[key].SECTOR]);
+                    data.push(this._data[key].RESULT);
+                }
+
+                var data = {
+                    labels: labels,
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: '성과지표 업종별 분석',
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.9)',
+                                'rgba(54, 162, 235, 0.9)',
+                                'rgba(255, 206, 86, 0.9)',
+                                'rgba(75, 192, 192, 0.9)',
+                                'rgba(153, 102, 255, 0.9)',
+                                'rgba(255, 159, 64, 0.9)',
+                                'rgba(200, 99, 132, 0.9)',
+                                'rgba(160, 162, 235, 0.9)',
+                                'rgba(15, 92, 112, 0.9)',
+                                'rgba(83, 212, 255, 0.9)',
+                                'rgba(255, 59, 64, 0.9)',
+                                'rgba(200, 9, 132, 0.9)',
+                                'rgba(60, 62, 135, 0.9)'
+                            ],
+                            borderColor: [
+                                'rgba(255,99,132,1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)',
+                                'rgba(200,99,132,1)',
+                                'rgba(160, 162, 235, 1)',
+                                'rgba(15, 92, 112, 1)',
+                                'rgba(83, 212, 255, 1)',
+                                'rgba(255, 59, 64, 1)',
+                                'rgba(200, 9, 132, 1)',
+                                'rgba(60, 62, 135, 1)'
+                            ],
+                            borderWidth: 1,
+                            data: data,
+                            spanGaps: false
+                        },
+                    ]
+                };
+                if (this._myBarChart)
+                    this._myBarChart.destroy();
+
+                this._myBarChart = new Chart(this.$.barChart, {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    callback: function(value) {
+                                        return accounting.formatNumber(value);
+                                    },
+                                    fontSize: 16,
+                                    beginAtZero: true,
+									max: 7,
+                                }
+                            }],
+                            xAxes: [{
+                                ticks: {
+                                    fontSize: 16
+                                },
+                                barThickness : 60
+                            }]
+                        },
+
+                        legend: {
+                            display: false
+                        },
+                        animation: {
+                            duration: 500,
+                            easing: "easeOutQuart",
+                            onComplete: function () {
+                                var ctx = this.chart.ctx;
+                                ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontFamily, 'normal', Chart.defaults.global.defaultFontFamily);
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'bottom';
+
+                                this.data.datasets.forEach(function (dataset) {
+                                    for (var i = 0; i < dataset.data.length; i++) {
+                                        var model = dataset._meta[Object.keys(dataset._meta)[0]].data[i]._model,
+                                            scale_max = dataset._meta[Object.keys(dataset._meta)[0]].data[i]._yScale.maxHeight;
+                                        ctx.fillStyle = '#444';
+                                        var y_pos = model.y - 5;
+                                        // Make sure data value does not get overflown and hidden
+                                        // when the bar's value is too close to max value of scale
+                                        // Note: The y value is reverse, it counts from top down
+                                        if ((scale_max - model.y) / scale_max >= 0.93)
+                                            y_pos = model.y + 20;
+                                        ctx.fillText(dataset.data[i], model.x, y_pos);
+                                    }
+                                });
+                            }
+                        },
+                        maintainAspectRatio: false
+                    }
+                });
+
+                this._stopLoader();
+            },
+
+
+        });
+	</script>
+</dom-module>
+

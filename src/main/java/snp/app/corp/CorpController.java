@@ -74,12 +74,16 @@ public class CorpController
 		return service.chartRegion(RequestParams.map(),corpKind);
 	}
 
-	// 성과지표 업종별 분석
-	@RequestMapping(value="/analytics/sector", method= RequestMethod.GET)
-	public List<Map<String, Object>>chartSector(@RequestParam(name = "CORP_KIND") String corpKind){
-		return service.chartSector(RequestParams.map(),corpKind);
+	// 성과지표 업종별 분석 - 등급항목별
+	@RequestMapping(value="/chart-sector/grade", method= RequestMethod.GET)
+	public List<Map<String, Object>>chartSectorGrade(@RequestParam(name = "CORP_KIND") String corpKind){
+		return service.chartSectorGrade(RequestParams.map(),corpKind);
 	}
-
+    // 성과지표 업종별 분석 - 비율항목별
+    @RequestMapping(value="/chart-sector/rate", method= RequestMethod.GET)
+    public List<Map<String, Object>>chartSectorRate(@RequestParam(name = "CORP_KIND") String corpKind){
+        return service.chartSectorRate(RequestParams.map(),corpKind);
+    }
 
 
 	// 성과지표 기업별 분석
@@ -88,12 +92,17 @@ public class CorpController
 		return service.gridCorp(RequestParams.map(),corpKind);
 	}
 
-	// 성과지표 유형별 분석
-	@RequestMapping(value="/analytics/type", method= RequestMethod.GET)
-	public List<Map<String, Object>> chartType(){
-		return service.chartType();
+	// 사회적목적 유형별 분석 - 등급항목 통계
+	@RequestMapping(value="/chart-type/grade", method= RequestMethod.GET)
+	public List<Map<String, Object>> chartTypeGrade(){
+		return service.chartTypeGrade();
 	}
 
+    // 사회적목적 유형별 분석 - 비율항목 통계
+    @RequestMapping(value="/chart-type/rate", method= RequestMethod.GET)
+    public List<Map<String, Object>> chartTypeRate(){
+        return service.chartTypeRate();
+    }
 
 
 	// 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계

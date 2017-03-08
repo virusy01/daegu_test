@@ -346,8 +346,8 @@
 		GROUP BY REGION) AS THR RIGHT JOIN (SELECT CD, CD_NM FROM CODE WHERE GRP_CD ='REGION' and CD_NM IS NOT NULL) AS FOUR ON ( FOUR.CD = THR.REGION )
 	</select>
 
-    <!-- 성과지표 업종별 분석 -->
-    <select id="chartSectorAll" resultType="hashmap">
+    <!-- 성과지표 업종별 분석 등급항목별-->
+    <select id="chartSectorAllGrade" resultType="hashmap">
     SELECT FOUR.CD AS SECTOR, IFNULL(THR.RESULT,0) AS RESULT
         FROM
             (SELECT SEC.SECTOR AS SECTOR, ROUND(AVG(FIR.RESULT),1) AS RESULT
@@ -360,10 +360,11 @@
                 ) AS FIR INNER JOIN CORP_INFO AS SEC ON ( FIR.CORP_SEQ = SEC.CORP_SEQ )
             WHERE FIR.RESULT != 0  AND SEC.SECTOR IS NOT NULL
             GROUP BY SECTOR) AS THR RIGHT JOIN (SELECT CD, CD_NM FROM CODE WHERE GRP_CD ='SECTOR' and CD_NM IS NOT NULL) AS FOUR ON ( FOUR.CD = THR.SECTOR )
+            ORDER BY RESULT DESC
     </select>
 
-    <!-- 성과지표 업종별 분석 사회적기업,마을기업,협동조합 -->
-    <select id="chartSectorEach" resultType="hashmap">
+    <!-- 성과지표 업종별 분석 등급항목별 - 사회적기업,마을기업,협동조합 -->
+    <select id="chartSectorEachGrade" resultType="hashmap">
     SELECT FOUR.CD AS SECTOR, IFNULL(THR.RESULT,0) AS RESULT
         FROM
             (SELECT SEC.SECTOR AS SECTOR, ROUND(AVG(FIR.RESULT),1) AS RESULT
@@ -377,7 +378,47 @@
                 ) AS FIR INNER JOIN CORP_INFO AS SEC ON ( FIR.CORP_SEQ = SEC.CORP_SEQ )
             WHERE FIR.RESULT != 0  AND SEC.SECTOR IS NOT NULL
             GROUP BY SECTOR) AS THR RIGHT JOIN (SELECT CD, CD_NM FROM CODE WHERE GRP_CD ='SECTOR' and CD_NM IS NOT NULL) AS FOUR ON ( FOUR.CD = THR.SECTOR )
+            ORDER BY RESULT DESC
     </select>
+
+
+	<!-- 성과지표 업종별 분석 비율항목별-->
+	<select id="chartSectorAllRate" resultType="hashmap">
+		SELECT FOUR.CD AS SECTOR, IFNULL(THR.RESULT,0) AS RESULT
+		FROM
+		(SELECT SEC.SECTOR AS SECTOR, ROUND(AVG(FIR.RESULT),1) AS RESULT
+		FROM
+		(
+		SELECT CORP_SEQ, RESULT FROM KPI_RESULT
+		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
+		OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
+		OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
+		) AS FIR INNER JOIN CORP_INFO AS SEC ON ( FIR.CORP_SEQ = SEC.CORP_SEQ )
+		WHERE FIR.RESULT != 0  AND SEC.SECTOR IS NOT NULL
+		GROUP BY SECTOR) AS THR RIGHT JOIN (SELECT CD, CD_NM FROM CODE WHERE GRP_CD ='SECTOR' and CD_NM IS NOT NULL) AS FOUR ON ( FOUR.CD = THR.SECTOR )
+		ORDER BY RESULT DESC
+	</select>
+
+	<!-- 성과지표 업종별 분석 비율항목별 - 사회적기업,마을기업,협동조합 -->
+	<select id="chartSectorEachRate" resultType="hashmap">
+		SELECT FOUR.CD AS SECTOR, IFNULL(THR.RESULT,0) AS RESULT
+		FROM
+		(SELECT SEC.SECTOR AS SECTOR, ROUND(AVG(FIR.RESULT),1) AS RESULT
+		FROM
+		(
+		SELECT CORP_SEQ, RESULT FROM KPI_RESULT
+		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
+		OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
+		OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
+		AND CORP_TYPE = #{p.CORP_KIND}
+		) AS FIR INNER JOIN CORP_INFO AS SEC ON ( FIR.CORP_SEQ = SEC.CORP_SEQ )
+		WHERE FIR.RESULT != 0  AND SEC.SECTOR IS NOT NULL
+		GROUP BY SECTOR) AS THR RIGHT JOIN (SELECT CD, CD_NM FROM CODE WHERE GRP_CD ='SECTOR' and CD_NM IS NOT NULL) AS FOUR ON ( FOUR.CD = THR.SECTOR )
+		ORDER BY RESULT DESC
+	</select>
+
+
+
 
 	<!-- 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계 전체기업-->
 	<select id="chartAllGradeTotal" resultType="hashmap">
@@ -791,8 +832,8 @@
         ORDER BY CORP_NM
     </select>
 
-	<!-- 성과지표 업종별 분석 : 노동통합형, 문제해결형, 지역사회혁신형, 고용창출형 -->
-	<select id="chartType" resultType="hashmap">
+	<!-- 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계  : 노동통합형, 문제해결형, 지역사회혁신형, 고용창출형 -->
+	<select id="chartTypeGrade" resultType="hashmap">
 		SELECT FOUR.CD AS TYPE, IFNULL(THR.RESULT,0) AS RESULT
         FROM
             (SELECT SEC.LEG_TYPE2 AS LEG_TYPE2, ROUND(AVG(FIR.RESULT),1) AS RESULT
@@ -806,6 +847,25 @@
 			WHERE FIR.RESULT != 0  AND SEC.LEG_TYPE2 IS NOT NULL
 			GROUP BY LEG_TYPE2) AS THR RIGHT JOIN (SELECT CD, CD_NM FROM CODE WHERE GRP_CD ='LEG_TYPE2' and CD_NM IS NOT NULL) AS FOUR ON ( FOUR.CD = THR.LEG_TYPE2 )
 	</select>
+
+	<!-- 성과지표 사회적경제조직 유형별 분석 - 비율항목 통계  : 노동통합형, 문제해결형, 지역사회혁신형, 고용창출형 -->
+	<select id="chartTypeRate" resultType="hashmap">
+		SELECT FOUR.CD AS TYPE, IFNULL(THR.RESULT,0) AS RESULT
+		FROM
+		(SELECT SEC.LEG_TYPE2 AS LEG_TYPE2, ROUND(AVG(FIR.RESULT),1) AS RESULT
+		FROM
+		(
+		SELECT CORP_SEQ, RESULT FROM KPI_RESULT
+		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
+		OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
+		OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
+		) AS FIR INNER JOIN CORP_INFO AS SEC ON ( FIR.CORP_SEQ = SEC.CORP_SEQ )
+		WHERE FIR.RESULT != 0  AND SEC.LEG_TYPE2 IS NOT NULL
+		GROUP BY LEG_TYPE2) AS THR RIGHT JOIN (SELECT CD, CD_NM FROM CODE WHERE GRP_CD ='LEG_TYPE2' and CD_NM IS NOT NULL) AS FOUR ON ( FOUR.CD = THR.LEG_TYPE2 )
+	</select>
+
+
+
 
 
 </mapper>
