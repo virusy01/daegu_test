@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import snp.infra.helper.RequestParams;
 import snp.infra.security.Security;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -132,7 +133,12 @@ public class CorpController
 		return service.chartAllRate();
 	}
 
+	// 기업별 통계 -  Excel
+	@RequestMapping(value="/analytics-corp/excel", method= RequestMethod.GET)
+	public void findCorpAvg2Excel(HttpServletResponse response, @RequestParam(name = "CORP_KIND") int corpKind) throws Exception{
 
+		service.findCorpAvg2Excel(response,RequestParams.map(),corpKind);
+	}
 
 
 
