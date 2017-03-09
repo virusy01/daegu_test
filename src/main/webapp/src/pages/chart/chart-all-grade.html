@@ -125,13 +125,15 @@
                     type: 'bar',
                     data: data,
                     options: {
+                        "hover": {
+                            "animationDuration": 0
+                        },
                         scales: {
                             yAxes: [{
                                 ticks: {
                                     callback: function(value) {
                                         return accounting.formatNumber(value);
                                     },
-                                    fontSize: 16,
                                     beginAtZero: true,
                                     stacked: true,
 									max: 7,
@@ -139,7 +141,6 @@
                             }],
                             xAxes: [{
                                 ticks: {
-                                    fontSize: 16
                                 }
                             }]
                         },
@@ -147,7 +148,6 @@
                         legend: {
                             display: true,
                             labels: {
-                                fontSize : 16
                             }
                         },
                         animation: {

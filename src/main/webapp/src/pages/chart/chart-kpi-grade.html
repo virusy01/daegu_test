@@ -109,20 +109,21 @@
                     type: 'bar',
                     data: data,
                     options: {
+                        "hover": {
+                            "animationDuration": 0
+                        },
                         scales: {
                             yAxes: [{
                                 ticks: {
                                     callback: function(value) {
                                         return accounting.formatNumber(value);
                                     },
-                                    fontSize: 16,
                                     beginAtZero: true,
 									max: 7,
                                 }
                             }],
                             xAxes: [{
                                 ticks: {
-                                    fontSize: 16
                                 },
                                 barThickness : 70
                             }]
