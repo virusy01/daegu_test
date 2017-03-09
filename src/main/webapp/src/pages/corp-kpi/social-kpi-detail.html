@@ -25,7 +25,10 @@
 		  class="form-horizontal">
 
 	<div class="row">
-		<div class="col-xs-12 text-right">
+		<div class="col-xs-8">
+			<h3> {{_corpName}}<small> _ 성과지표</small></h3>
+		</div>
+		<div class="col-xs-4 text-right">
 			<button type="button" on-tap="_submitForm" class="btn btn-sm btn-primary">저   장</button>
 		</div>
 	</div>
@@ -111,6 +114,7 @@ Polymer({
 				return {B: 'legend-danger', W: 'legend-warning', G: 'legend-good'};
 			}
 		},
+		_corpName : String,
 	},
 
 	_callAPI: function(value) {
@@ -145,7 +149,7 @@ Polymer({
 		var row;
 
 
-
+		this._corpName = this._data[0].CORP_NM;
 
 		Polymer.dom(table).innerHTML = '';
 
@@ -153,6 +157,8 @@ Polymer({
 
 
 			row = this._data[key];
+
+			//this._corpName = row.CORP_NM;
 
            	tr = document.createElement('tr');
 
