@@ -27,7 +27,7 @@
         <div class="horizontal-margin-20"></div>
 
         <div class="page-header">
-            <h2>성과지표 기업별 분석<small> By Corporation KPI Analytics</small></h2>
+            <h2>성과지표 기업별 통계<small> By Corporation KPI Analytics</small></h2>
         </div>
 
         <div class="horizontal-margin-20"></div>
@@ -42,13 +42,13 @@
 
         <div class="row">
             <div class="col-xs-12 text-right">
-                <label>양호 :</label>
+                <label>양호(6~7) :</label>
                 <button type="ponter" class="legend-good"> </button>
-                <label>주의 :</label>
+                <label>주의(3~5) :</label>
                 <button type="ponter" class="legend-warning"> </button>
-                <label>위험 :</label>
+                <label>위험(1~2) :</label>
                 <button type="ponter" class="legend-danger"> </button>
-                <label> 해당없음 : N/A </label>
+            </div>
             </div>
         </div>
 
@@ -58,10 +58,9 @@
                 <th>NO</th>
                 <th>기업명</th>
                 <th>기업유형</th>
-                <th>등급 KPI 평균</th>
-                <th>등급 KPI GRADE</th>
-                <th>비율 KPI 평균</th>
-                <th>비율 KPI GRADE</th>
+                <th>7점 척도 항목 평균</th>
+                <th>7점 척도 항목 GRADE</th>
+                <th>100% 대비 항목 평균</th>
             </tr>
             </thead>
             <tbody>
@@ -212,8 +211,6 @@
                                     var legend = document.createElement('div');
                                     legend.setAttribute('class', this._grade['W']);
                                     Polymer.dom(td).appendChild(legend);
-
-
                                 }
                                 else if ( value > 5 && value <= 7 ){
                                     var legend = document.createElement('div');
@@ -221,8 +218,6 @@
                                     Polymer.dom(td).appendChild(legend);
                                 }
                                 else{
-                                    var legend = document.createElement('div');
-                                    td.innerHTML = 'N/A';
                                 }
                              break;
 
@@ -232,24 +227,6 @@
                                 td.setAttribute('id', prefix + '_' + guide[attribute] + i);
                                 td.setAttribute('name', prefix + '_' + guide[attribute]);
 
-                                td = document.createElement('td');
-                                Polymer.dom(tr).appendChild(td);
-                                if (value <= 50 )
-                                {
-                                    var legend = document.createElement('div');
-                                    legend.setAttribute('class', this._grade['B']);
-                                    Polymer.dom(td).appendChild(legend);
-                                }
-                                else if ( value > 50  && value <= 100){
-                                    var legend = document.createElement('div');
-                                    legend.setAttribute('class', this._grade['G']);
-                                    Polymer.dom(td).appendChild(legend);
-
-                                }
-                                else{
-                                    var legend = document.createElement('div');
-                                    td.innerHTML = 'N/A';
-                                }
                                 break;
 
                             default:

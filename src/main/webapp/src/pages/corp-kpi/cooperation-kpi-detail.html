@@ -35,13 +35,13 @@
 			<div class="horizontal-margin-20"></div>
 			<div class="row">
 				<div class="col-xs-12 text-right">
-					<label>양호 :</label>
+					<label>양호(6~7) :</label>
 					<button type="ponter" class="legend-good"> </button>
-					<label>주의 :</label>
+					<label>주의(3~5) :</label>
 					<button type="ponter" class="legend-warning"> </button>
-					<label>위험 :</label>
+					<label>위험(1~2) :</label>
 					<button type="ponter" class="legend-danger"> </button>
-					<label> 해당없음 : N/A</label>
+				</div>
 				</div>
 			</div>
 
@@ -191,7 +191,9 @@
 
                     input = document.createElement('number-input');
                     input.setAttribute('transparent', true);
-                    input.setAttribute('value', accounting.formatNumber(row.RESULT));
+                    if (row.RESULT){
+                        input.setAttribute('value', accounting.formatNumber(row.RESULT));
+                    }
                     input.setAttribute('id', 'TABLE' + '_' + key + i);
                     input.setAttribute('name', 'TABLE' + '_' + key);
                     Polymer.dom(td).appendChild(input);
@@ -225,22 +227,10 @@
                                 Polymer.dom(td).appendChild(legend);
                                 break;
                             default:
-                                td.innerHTML = 'N/A';
                                 break;
                         }
                     }
                     else {
-
-                        if ( row.RESULT > 50 ){
-                            var legend = document.createElement('div');
-                            legend.setAttribute('class', this._grade['G']);
-                            Polymer.dom(td).appendChild(legend);
-                        }
-                        else {
-                            var legend = document.createElement('div');
-                            legend.setAttribute('class', this._grade['B']);
-                            Polymer.dom(td).appendChild(legend);
-                        }
 
                     }
 

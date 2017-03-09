@@ -71,7 +71,7 @@
 	<select id="findKpi_detail" resultType="hashmap">
 		<![CDATA[
 		SELECT
-		IFNULL(RESULT, 0) AS RESULT
+		RESULT AS RESULT
 		FROM KPI_RESULT
 		WHERE CORP_SEQ = #{p.CORP_SEQ}
 		  AND YEAR = #{p.YEAR} AND KPI_CD = #{LEVEL3CODE}
