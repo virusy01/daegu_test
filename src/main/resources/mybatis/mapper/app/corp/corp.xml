@@ -1015,7 +1015,7 @@
         ( SELECT CI.CORP_TYPE, CI.CORP_SEQ, AVG(KR.RESULT) AS RESULT FROM  (SELECT * FROM KPI_RESULT WHERE IS_GRADE = 'N' AND RESULT !=0) AS KR
         RIGHT JOIN CORP_INFO AS CI ON ( KR.CORP_SEQ = CI.CORP_SEQ )  GROUP BY CORP_TYPE, CORP_SEQ) AS KRN
         ON ( KRY.CORP_SEQ = KRN.CORP_SEQ )
-        ORDER BY CORP_NM
+        ORDER BY KRY.CORP_TYPE,CORP_NM
     </select>
 
 	<!-- 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계  : 노동통합형, 문제해결형, 지역사회혁신형, 고용창출형 -->
