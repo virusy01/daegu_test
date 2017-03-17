@@ -2,32 +2,32 @@
 
 <link rel="import" href="/src/components/common/normal-select.html">
 
-<dom-module id="page-chart-kpi">
+<dom-module id="page-chart-kpidetail">
     <template>
         <app-route route="{{route}}"
-                   pattern="/app/chart-kpi/:tab"
+                   pattern="/app/chart-kpidetail/:tab"
                    data="{{routeData}}">
         </app-route>
 
         <div class="horizontal-margin-20"></div>
 
         <div class="page-header">
-            <h2>KPI 항목별 분석(1단계)<small>By KPI Analytics</small></h2>
+            <h2>KPI 항목별 분석(2단계)<small>By KPI Analytics</small></h2>
         </div>
 
         <ul id="pageTab" class="nav nav-tabs">
-            <li name="grade"><a href="/app/chart-kpi/grade">7점 척도 항목</a></li>
-            <li name="rate"><a href="/app/chart-kpi/rate">100% 대비 항목</a></li>
+            <li name="grade"><a href="/app/chart-kpidetail/grade">7점 척도 항목</a></li>
+            <li name="rate"><a href="/app/chart-kpidetail/rate">100% 대비 항목</a></li>
         </ul>
 
         <iron-pages id="reportTabs" role="monthly-tab" selected="[[tab]]" attr-for-selected="name">
-            <chart-kpi-grade name="grade" ></chart-kpi-grade>
-            <chart-kpi-rate name="rate" ></chart-kpi-rate>
+            <chart-kpidetail-grade name="grade" ></chart-kpidetail-grade>
+            <chart-kpidetail-rate name="rate" ></chart-kpidetail-rate>
         </iron-pages>
     </template>
     <script>
         Polymer({
-            is: 'page-chart-kpi',
+            is: 'page-chart-kpidetail',
 
             properties: {
                 route: String,
@@ -58,7 +58,7 @@
                     newTab.classList.add('active');
 
                 this.importHref(
-                    this.resolveUrl('chart/chart-kpi-' + newValue + '.html'), null, null, true);
+                    this.resolveUrl('chart/chart-kpidetail-' + newValue + '.html'), null, null, true);
             },
 
 

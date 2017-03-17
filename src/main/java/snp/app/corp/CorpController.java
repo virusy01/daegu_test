@@ -68,15 +68,26 @@ public class CorpController
 		return service.chartGradeRate(corpKind);
 	}
 
-	// 성과지표 KPI 항목별 분석 - 등급항목별
+	// 성과지표 1단계 KPI 항목별 분석 - 등급항목별
 	@RequestMapping(value="/chart-kpi/grade", method= RequestMethod.GET)
 	public List<Map<String, Object>>chartKpiGrade(@RequestParam(name = "CORP_KIND") String corpKind){
 		return service.chartKpiGrade(RequestParams.map(), corpKind);
 	}
-	// 성과지표 KPI 항목별 분석 - 비율항목별
+	// 성과지표 1단계 KPI 항목별 분석 - 비율항목별
 	@RequestMapping(value="/chart-kpi/rate", method= RequestMethod.GET)
 	public List<Map<String, Object>>chartKpiRate(@RequestParam(name = "CORP_KIND") String corpKind){
 		return service.chartKpiRate(RequestParams.map(), corpKind);
+	}
+
+	// 성과지표 2단계 KPI 항목별 분석 - 등급항목별
+	@RequestMapping(value="/chart-kpidetail/grade", method= RequestMethod.GET)
+	public List<Map<String, Object>>chartKpiDetailGrade(@RequestParam(name = "CORP_KIND") String corpKind){
+		return service.chartKpiDetailGrade(RequestParams.map(), corpKind);
+	}
+	// 성과지표 3단계 KPI 항목별 분석 - 비율항목별
+	@RequestMapping(value="/chart-kpidetail/rate", method= RequestMethod.GET)
+	public List<Map<String, Object>>chartKpiDetailRate(@RequestParam(name = "CORP_KIND") String corpKind){
+		return service.chartKpiDetailRate(RequestParams.map(), corpKind);
 	}
 
 	// 성과지표 지역별 분석  - 등급항목별

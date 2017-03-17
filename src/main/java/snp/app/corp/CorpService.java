@@ -165,7 +165,7 @@ public class CorpService {
 
 		return result;
 	}
-	// 성과지표 항목별 분석 등급항목별
+	// 성과지표 1단계 항목별 분석 등급항목별
 	public List<Map<String, Object>>chartKpiGrade(Map<String, Object> params,String corpKind) {
 		List<Map<String, Object>> result;
 		switch (corpKind) {
@@ -178,7 +178,7 @@ public class CorpService {
 		}
 		return result;
 	}
-	// 성과지표 항목별 분석 비율항목별
+	// 성과지표 1단계 항목별 분석 비율항목별
 	public List<Map<String, Object>>chartKpiRate(Map<String, Object> params,String corpKind) {
 		List<Map<String, Object>> result;
 		switch (corpKind) {
@@ -191,6 +191,34 @@ public class CorpService {
 		}
 		return result;
 	}
+
+	// 성과지표 2단계 항목별 분석 등급항목별
+	public List<Map<String, Object>>chartKpiDetailGrade(Map<String, Object> params,String corpKind) {
+		List<Map<String, Object>> result;
+		switch (corpKind) {
+			case "0":
+				result = repository.chartKpiDetailAllGrade(params, Security.user()); //전체
+				break;
+			default:
+				result = repository.chartKpiDetailEachGrade(params, Security.user()); //사회적기업,마을기업, 협동조합
+				break;
+		}
+		return result;
+	}
+	// 성과지표 2단계 항목별 분석 비율항목별
+	public List<Map<String, Object>>chartKpiDetailRate(Map<String, Object> params,String corpKind) {
+		List<Map<String, Object>> result;
+		switch (corpKind) {
+			case "0":
+				result = repository.chartKpiDetailAllRate(params, Security.user()); //전체
+				break;
+			default:
+				result = repository.chartKpiDetailEachRate(params, Security.user()); //사회적기업,마을기업, 협동조합
+				break;
+		}
+		return result;
+	}
+
 
 	// 성과지표 지역별 분석 - 등급항목
 	public List<Map<String, Object>>chartRegionGrade(Map<String, Object> params,String corpKind) {

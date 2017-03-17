@@ -34,7 +34,7 @@
 	</select>
 
 
-
+    <!-- 사회적기업 성과지표 입력 -->
 	<insert id="insertKpi">
 		INSERT INTO KPI_RESULT
 		(
@@ -60,6 +60,7 @@
 		)
 	</insert>
 
+    <!-- 사회적기업 성과지표 삭제 -->
 	<delete id="deleteKpi">
 		DELETE FROM  KPI_RESULT
 		WHERE CORP_SEQ = #{p.CORP_SEQ} AND CORP_TYPE = #{p.CORP_TYPE} AND YEAR = #{p.YEAR}
@@ -67,7 +68,7 @@
 
 
 
-
+    <!-- 전체기업 성과지표 데이터 조회 -->
 	<select id="findKpi_detail" resultType="hashmap">
 		<![CDATA[
 		SELECT
@@ -139,7 +140,9 @@
 	</select>
 
 
-	<!-- 성과지표 등급별 분석 등급항목별 - 전체기업-->
+
+
+	<!-- 성과지표 등급별 분석 - 등급항목별 - 전체기업-->
 	<select id="chartGrade1Grade" resultType="hashmap">
 		SELECT 'B' AS STATUS, count(*) AS COUNT
 		FROM kpi_result
@@ -238,6 +241,8 @@
 
 
 
+
+
 	<!-- 성과지표 등급별 분석 비율항목별 - 전체기업-->
 	<select id="chartGrade1Rate" resultType="hashmap">
 		SELECT 'B' AS STATUS, count(*) AS COUNT
@@ -310,18 +315,30 @@
 
 
 
-	<!-- 성과지표 항목별  분석 등급항목 -  전체기업-->
+
+
+	<!-- 성과지표 1단계 항목별  분석 등급항목 -  전체기업-->
 	<select id="chartKpiAllGrade" resultType="hashmap">
-	SELECT 0 AS STATUS, ROUND(AVG(result),1) AS RESULT
-	FROM kpi_result
+	  SELECT 0 AS STATUS, ROUND(AVG(result),1) AS RESULT
+	  FROM kpi_result
 		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
 				OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
 				OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
-			 AND KPI_CD like '01%' AND ( RESULT >= 1 AND 7 >= RESULT )
+			 AND (KPI_CD like '0101%' OR KPI_CD like '0102%') AND ( RESULT >= 1 AND 7 >= RESULT )
 
 		UNION ALL
 
-		SELECT 1 AS STATUS, ROUND(AVG(result),1) AS RESULT
+      SELECT 1 AS STATUS, ROUND(AVG(result),1) AS RESULT
+	  FROM kpi_result
+		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+				OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+			 AND KPI_CD like '0103%' AND ( RESULT >= 1 AND 7 >= RESULT )
+
+		UNION ALL
+
+
+		SELECT 2 AS STATUS, ROUND(AVG(result),1) AS RESULT
 		FROM kpi_result
 		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
 				OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
@@ -330,7 +347,7 @@
 
 		UNION ALL
 
-			 SELECT 2 AS STATUS, ROUND(AVG(result),1) AS RESULT
+			 SELECT 3 AS STATUS, ROUND(AVG(result),1) AS RESULT
 		FROM kpi_result
 		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
 				OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
@@ -339,7 +356,7 @@
 
 		UNION ALL
 
-			 SELECT 3 AS STATUS, ROUND(AVG(result),1) AS RESULT
+			 SELECT 4 AS STATUS, ROUND(AVG(result),1) AS RESULT
 		FROM kpi_result
 		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
 				OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
@@ -347,18 +364,27 @@
 			 AND KPI_CD like '04%' AND ( RESULT >= 1 AND 7 >= RESULT )
 	</select>
 
-	<!-- 성과지표 항목별 분석 등급항목 - 사회적기업,마을기업,협동조합-->
+	<!-- 성과지표 1단계 항목별 분석 등급항목 - 사회적기업,마을기업,협동조합-->
 	<select id="chartKpiEachGrade" resultType="hashmap">
 		SELECT 0 AS STATUS, ROUND(AVG(result),1) AS RESULT
 		FROM kpi_result
 		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
 		OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
 		OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
-		AND CORP_TYPE = #{p.CORP_KIND}	AND KPI_CD like '01%' AND ( RESULT >= 1 AND 7 >= RESULT )
+		AND CORP_TYPE = #{p.CORP_KIND}	AND (KPI_CD like '0101%' OR KPI_CD like '0102%') AND ( RESULT >= 1 AND 7 >= RESULT )
 
 		UNION ALL
 
-		SELECT 1 AS STATUS, ROUND(AVG(result),1) AS RESULT
+				SELECT 1 AS STATUS, ROUND(AVG(result),1) AS RESULT
+		FROM kpi_result
+		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+		OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+		OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+		AND CORP_TYPE = #{p.CORP_KIND}	AND KPI_CD like '0103%' AND ( RESULT >= 1 AND 7 >= RESULT )
+
+		UNION ALL
+
+		SELECT 2 AS STATUS, ROUND(AVG(result),1) AS RESULT
 		FROM kpi_result
 		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
 		OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
@@ -367,7 +393,7 @@
 
 		UNION ALL
 
-		SELECT 2 AS STATUS, ROUND(AVG(result),1) AS RESULT
+		SELECT 3 AS STATUS, ROUND(AVG(result),1) AS RESULT
 		FROM kpi_result
 		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
 		OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
@@ -376,7 +402,7 @@
 
 		UNION ALL
 
-		SELECT 3 AS STATUS, ROUND(AVG(result),1) AS RESULT
+		SELECT 4 AS STATUS, ROUND(AVG(result),1) AS RESULT
 		FROM kpi_result
 		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
 		OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
@@ -384,18 +410,27 @@
 		AND CORP_TYPE = #{p.CORP_KIND}   AND KPI_CD like '04%' AND ( RESULT >= 1 AND 7 >= RESULT )
 	</select>
 
-	<!-- 성과지표 항목별  분석 비율항목 -  전체기업-->
+	<!-- 성과지표 1단계 항목별  분석 비율항목 -  전체기업-->
 	<select id="chartKpiAllRate" resultType="hashmap">
-		SELECT 0 AS STATUS, ROUND(AVG(result),1) AS RESULT
-		FROM kpi_result
+	  SELECT 0 AS STATUS, ROUND(AVG(result),1) AS RESULT
+	  FROM kpi_result
 		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
-		OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
-		OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
-		AND KPI_CD like '01%' AND ( RESULT >= 0 AND 100 >= RESULT )
+				OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
+				OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
+			 AND KPI_CD like '0104%' AND ( RESULT >= 0 AND 100 >= RESULT )
 
 		UNION ALL
 
-		SELECT 1 AS STATUS, ROUND(AVG(result),1) AS RESULT
+      SELECT 1 AS STATUS, ROUND(AVG(result),1) AS RESULT
+	  FROM kpi_result
+		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
+				OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
+				OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
+			 AND KPI_CD like '0104%' AND ( RESULT >= 0 AND 100 >= RESULT )
+
+		UNION ALL
+
+		SELECT 2  AS STATUS, ROUND(AVG(result),1) AS RESULT
 		FROM kpi_result
 		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
 		OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
@@ -404,7 +439,7 @@
 
 		UNION ALL
 
-		SELECT 2 AS STATUS, ROUND(AVG(result),1) AS RESULT
+		SELECT 3 AS STATUS, ROUND(AVG(result),1) AS RESULT
 		FROM kpi_result
 		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
 		OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
@@ -413,7 +448,7 @@
 
 		UNION ALL
 
-		SELECT 3 AS STATUS, ROUND(AVG(result),1) AS RESULT
+		SELECT 4 AS STATUS, ROUND(AVG(result),1) AS RESULT
 		FROM kpi_result
 		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
 		OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
@@ -421,14 +456,14 @@
 		AND KPI_CD like '04%' AND ( RESULT >= 0 AND 100 >= RESULT )
 	</select>
 
-	<!-- 성과지표 항목별 분석 비율항목 - 사회적기업,마을기업,협동조합-->
+	<!-- 성과지표 1단계 항목별 분석 비율항목 - 사회적기업,마을기업,협동조합-->
 	<select id="chartKpiEachRate" resultType="hashmap">
 		SELECT 0 AS STATUS, ROUND(AVG(result),1) AS RESULT
 		FROM kpi_result
 		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
 		OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
 		OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
-		AND CORP_TYPE = #{p.CORP_KIND}	AND KPI_CD like '01%' AND ( RESULT >= 0 AND 100 >= RESULT )
+		AND CORP_TYPE = #{p.CORP_KIND}	AND KPI_CD like '0104%' AND ( RESULT >= 0 AND 100 >= RESULT )
 
 		UNION ALL
 
@@ -437,7 +472,7 @@
 		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
 		OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
 		OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
-		AND CORP_TYPE = #{p.CORP_KIND}   AND KPI_CD like '02%' AND ( RESULT >= 0 AND 100 >= RESULT )
+		AND CORP_TYPE = #{p.CORP_KIND}	AND KPI_CD like '0104%' AND ( RESULT >= 0 AND 100 >= RESULT )
 
 		UNION ALL
 
@@ -446,7 +481,7 @@
 		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
 		OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
 		OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
-		AND CORP_TYPE = #{p.CORP_KIND}   AND KPI_CD like '03%' AND ( RESULT >= 0 AND 100 >= RESULT )
+		AND CORP_TYPE = #{p.CORP_KIND}   AND KPI_CD like '02%' AND ( RESULT >= 0 AND 100 >= RESULT )
 
 		UNION ALL
 
@@ -455,8 +490,308 @@
 		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
 		OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
 		OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
+		AND CORP_TYPE = #{p.CORP_KIND}   AND KPI_CD like '03%' AND ( RESULT >= 0 AND 100 >= RESULT )
+
+		UNION ALL
+
+		SELECT 4 AS STATUS, ROUND(AVG(result),1) AS RESULT
+		FROM kpi_result
+		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
+		OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
+		OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
 		AND CORP_TYPE = #{p.CORP_KIND}   AND KPI_CD like '04%' AND ( RESULT >= 0 AND 100 >= RESULT )
 	</select>
+
+
+
+
+
+
+
+
+    <!-- 성과지표 2단계 항목별  분석 등급항목 -  전체기업-->
+    <select id="chartKpiDetailAllGrade" resultType="hashmap">
+        SELECT 0 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+        AND KPI_CD like '0101%' AND ( RESULT >= 1 AND 7 >= RESULT )
+
+        UNION ALL
+
+        SELECT 1 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+        AND KPI_CD like '0102%' AND ( RESULT >= 1 AND 7 >= RESULT )
+
+        UNION ALL
+
+        SELECT 2 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+        AND KPI_CD like '0103%' AND ( RESULT >= 1 AND 7 >= RESULT )
+
+        UNION ALL
+
+        SELECT 3 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+        AND KPI_CD like '0201%' AND ( RESULT >= 1 AND 7 >= RESULT )
+
+        UNION ALL
+
+        SELECT 4 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+        AND KPI_CD like '0301%' AND ( RESULT >= 1 AND 7 >= RESULT )
+
+        UNION ALL
+
+        SELECT 5 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+        AND KPI_CD like '0401%' AND ( RESULT >= 1 AND 7 >= RESULT )
+
+        UNION ALL
+
+        SELECT 6 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+        AND KPI_CD like '0402%' AND ( RESULT >= 1 AND 7 >= RESULT )
+
+        UNION ALL
+
+        SELECT 7 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+        AND KPI_CD like '0403%' AND ( RESULT >= 1 AND 7 >= RESULT )
+
+        UNION ALL
+
+        SELECT 8 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+        AND KPI_CD like '0404%' AND ( RESULT >= 1 AND 7 >= RESULT )
+
+    </select>
+
+    <!-- 성과지표 2단계 항목별 분석 등급항목 - 사회적기업,마을기업,협동조합-->
+    <select id="chartKpiDetailEachGrade" resultType="hashmap">
+        SELECT 0 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+        AND CORP_TYPE = #{p.CORP_KIND}	AND KPI_CD like '0101%'  AND ( RESULT >= 1 AND 7 >= RESULT )
+
+        UNION ALL
+
+        SELECT 1 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+        AND CORP_TYPE = #{p.CORP_KIND}	AND KPI_CD like '0102%' AND ( RESULT >= 1 AND 7 >= RESULT )
+
+        UNION ALL
+
+        SELECT 2 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+        AND CORP_TYPE = #{p.CORP_KIND}   AND KPI_CD like '0103%' AND ( RESULT >= 1 AND 7 >= RESULT )
+
+        UNION ALL
+
+        SELECT 3 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+        AND CORP_TYPE = #{p.CORP_KIND}   AND KPI_CD like '0201%' AND ( RESULT >= 1 AND 7 >= RESULT )
+
+        UNION ALL
+
+        SELECT 4 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+        AND CORP_TYPE = #{p.CORP_KIND}   AND KPI_CD like '0301%' AND ( RESULT >= 1 AND 7 >= RESULT )
+
+         UNION ALL
+
+        SELECT 5 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+        AND CORP_TYPE = #{p.CORP_KIND}	AND KPI_CD like '0401%' AND ( RESULT >= 1 AND 7 >= RESULT )
+
+        UNION ALL
+
+        SELECT 6 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+        AND CORP_TYPE = #{p.CORP_KIND}   AND KPI_CD like '0402%' AND ( RESULT >= 1 AND 7 >= RESULT )
+
+        UNION ALL
+
+        SELECT 7 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+        AND CORP_TYPE = #{p.CORP_KIND}   AND KPI_CD like '0403%' AND ( RESULT >= 1 AND 7 >= RESULT )
+
+        UNION ALL
+
+        SELECT 8 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
+        AND CORP_TYPE = #{p.CORP_KIND}   AND KPI_CD like '0404%' AND ( RESULT >= 1 AND 7 >= RESULT )
+
+
+
+    </select>
+
+    <!-- 성과지표 2단계 항목별  분석 비율항목 -  전체기업-->
+    <select id="chartKpiDetailAllRate" resultType="hashmap">
+       SELECT 0 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
+        AND KPI_CD like '0104%' AND ( RESULT >= 0 AND 100 >= RESULT )
+
+        UNION ALL
+
+        SELECT 1 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
+        AND KPI_CD like '0202%' AND ( RESULT >= 0 AND 100 >= RESULT )
+
+        UNION ALL
+
+        SELECT 2 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
+        AND KPI_CD like '0302%' AND ( RESULT >= 0 AND 100 >= RESULT )
+
+        UNION ALL
+
+        SELECT 3 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
+        AND KPI_CD like '0303%' AND ( RESULT >= 0 AND 100 >= RESULT )
+
+        UNION ALL
+
+        SELECT 4 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
+        AND KPI_CD like '0405%' AND ( RESULT >= 0 AND 100 >= RESULT )
+
+        UNION ALL
+
+        SELECT 5 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
+        AND KPI_CD like '0406%' AND ( RESULT >= 0 AND 100 >= RESULT )
+    </select>
+
+    <!-- 성과지표 2단계 항목별 분석 비율항목 - 사회적기업,마을기업,협동조합-->
+    <select id="chartKpiDetailEachRate" resultType="hashmap">
+        SELECT 0 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
+        AND CORP_TYPE = #{p.CORP_KIND}	AND KPI_CD like '0104%' AND ( RESULT >= 0 AND 100 >= RESULT )
+
+        UNION ALL
+
+        SELECT 1 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
+        AND CORP_TYPE = #{p.CORP_KIND}	AND KPI_CD like '0202%' AND ( RESULT >= 0 AND 100 >= RESULT )
+
+        UNION ALL
+
+        SELECT 2 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
+        AND CORP_TYPE = #{p.CORP_KIND}   AND KPI_CD like '0302%' AND ( RESULT >= 0 AND 100 >= RESULT )
+
+        UNION ALL
+
+        SELECT 3 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
+        AND CORP_TYPE = #{p.CORP_KIND}   AND KPI_CD like '0303%' AND ( RESULT >= 0 AND 100 >= RESULT )
+
+        UNION ALL
+
+        SELECT 4 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
+        AND CORP_TYPE = #{p.CORP_KIND}   AND KPI_CD like '0405%' AND ( RESULT >= 0 AND 100 >= RESULT )
+
+        UNION ALL
+
+        SELECT 5 AS STATUS, ROUND(AVG(result),1) AS RESULT
+        FROM kpi_result
+        WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
+        OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
+        AND CORP_TYPE = #{p.CORP_KIND}   AND KPI_CD like '0406%' AND ( RESULT >= 0 AND 100 >= RESULT )
+    </select>
+
+
+
+
+
+
 
 
 
@@ -477,7 +812,7 @@
   		ORDER BY RESULT DESC
 	</select>
 
-	<!-- 성과지표 지역별 분석 비율항목 - 사회적기업,마을기업,협동조합 -->
+	<!-- 성과지표 지역별 분석 등급항목 - 사회적기업,마을기업,협동조합 -->
 	<select id="chartRegionEachGrade" resultType="hashmap">
 	SELECT FOUR.CD AS REGION, IFNULL(THR.RESULT,0) AS RESULT
 	FROM
@@ -495,7 +830,7 @@
 		ORDER BY RESULT DESC
 	</select>
 
-	<!-- 성과지표 지역별 분석 등급항목 전체 -->
+	<!-- 성과지표 지역별 분석 비율항목 전체 -->
 	<select id="chartRegionAllRate" resultType="hashmap">
 		SELECT FOUR.CD AS REGION, IFNULL(THR.RESULT,0) AS RESULT
 		FROM
@@ -532,7 +867,10 @@
 
 
 
-    <!-- 성과지표 업종별 분석 등급항목별-->
+
+
+
+    <!-- 성과지표 업종별 분석 등급항목별 전체-->
     <select id="chartSectorAllGrade" resultType="hashmap">
     SELECT FOUR.CD AS SECTOR, IFNULL(THR.RESULT,0) AS RESULT
         FROM
@@ -548,6 +886,8 @@
             GROUP BY SECTOR) AS THR RIGHT JOIN (SELECT CD, CD_NM FROM CODE WHERE GRP_CD ='SECTOR' and CD_NM IS NOT NULL) AS FOUR ON ( FOUR.CD = THR.SECTOR )
             ORDER BY RESULT DESC
     </select>
+
+
 
     <!-- 성과지표 업종별 분석 등급항목별 - 사회적기업,마을기업,협동조합 -->
     <select id="chartSectorEachGrade" resultType="hashmap">
@@ -568,7 +908,8 @@
     </select>
 
 
-	<!-- 성과지표 업종별 분석 비율항목별-->
+
+	<!-- 성과지표 업종별 분석 비율항목별 전체-->
 	<select id="chartSectorAllRate" resultType="hashmap">
 		SELECT FOUR.CD AS SECTOR, IFNULL(THR.RESULT,0) AS RESULT
 		FROM
@@ -602,6 +943,10 @@
 		GROUP BY SECTOR) AS THR RIGHT JOIN (SELECT CD, CD_NM FROM CODE WHERE GRP_CD ='SECTOR' and CD_NM IS NOT NULL) AS FOUR ON ( FOUR.CD = THR.SECTOR )
 		ORDER BY RESULT DESC
 	</select>
+
+
+
+
 
 
 
@@ -977,26 +1322,13 @@
 	</select>
 
 
-    <!-- 성과지표 기업별 분석 사회적기업/마을기업/협동조합-->
-    <select id="gridCorpEach" resultType="hashmap">
-        SELECT
-            CASE KRY.CORP_TYPE WHEN 1 THEN '사회적기업'
-            WHEN 2 THEN '마을기업'
-            ELSE '협동조합' END AS CORP_TYPE
-            , KRY.CORP_SEQ AS CORP_SEQ
-            , (SELECT CORP_NM FROM CORP_INFO WHERE CORP_SEQ = KRY.CORP_SEQ) AS CORP_NM
-            , ROUND(KRY.RESULT,1) AS GRADE_RESULT
-            , ROUND(KRN.RESULT,1) AS RATE_RESULT
-        FROM
-        ( SELECT CI.CORP_TYPE, CI.CORP_SEQ, AVG(KR.RESULT) AS RESULT FROM (SELECT * FROM KPI_RESULT WHERE IS_GRADE = 'Y' AND RESULT !=0 ) AS KR
-                    RIGHT JOIN CORP_INFO AS CI ON ( KR.CORP_SEQ = CI.CORP_SEQ ) GROUP BY CORP_TYPE, CORP_SEQ  ) AS KRY
-        LEFT JOIN
-        ( SELECT CI.CORP_TYPE, CI.CORP_SEQ, AVG(KR.RESULT) AS RESULT FROM  (SELECT * FROM KPI_RESULT WHERE IS_GRADE = 'N' AND RESULT !=0) AS KR
-                    RIGHT JOIN CORP_INFO AS CI ON ( KR.CORP_SEQ = CI.CORP_SEQ )  GROUP BY CORP_TYPE, CORP_SEQ) AS KRN
-        ON ( KRY.CORP_SEQ = KRN.CORP_SEQ )
-        WHERE KRN.CORP_TYPE = #{p.CORP_KIND}
-        ORDER BY CORP_NM
-    </select>
+
+
+
+
+
+
+
 
     <!-- 성과지표 기업별 분석 전체-->
     <select id="gridCorpAll" resultType="hashmap">
@@ -1018,7 +1350,37 @@
         ORDER BY KRY.CORP_TYPE,CORP_NM
     </select>
 
-	<!-- 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계  : 노동통합형, 문제해결형, 지역사회혁신형, 고용창출형 -->
+
+
+    <!-- 성과지표 기업별 분석 사회적기업/마을기업/협동조합-->
+    <select id="gridCorpEach" resultType="hashmap">
+        SELECT
+        CASE KRY.CORP_TYPE WHEN 1 THEN '사회적기업'
+        WHEN 2 THEN '마을기업'
+        ELSE '협동조합' END AS CORP_TYPE
+        , KRY.CORP_SEQ AS CORP_SEQ
+        , (SELECT CORP_NM FROM CORP_INFO WHERE CORP_SEQ = KRY.CORP_SEQ) AS CORP_NM
+        , ROUND(KRY.RESULT,1) AS GRADE_RESULT
+        , ROUND(KRN.RESULT,1) AS RATE_RESULT
+        FROM
+        ( SELECT CI.CORP_TYPE, CI.CORP_SEQ, AVG(KR.RESULT) AS RESULT FROM (SELECT * FROM KPI_RESULT WHERE IS_GRADE = 'Y' AND RESULT !=0 ) AS KR
+        RIGHT JOIN CORP_INFO AS CI ON ( KR.CORP_SEQ = CI.CORP_SEQ ) GROUP BY CORP_TYPE, CORP_SEQ  ) AS KRY
+        LEFT JOIN
+        ( SELECT CI.CORP_TYPE, CI.CORP_SEQ, AVG(KR.RESULT) AS RESULT FROM  (SELECT * FROM KPI_RESULT WHERE IS_GRADE = 'N' AND RESULT !=0) AS KR
+        RIGHT JOIN CORP_INFO AS CI ON ( KR.CORP_SEQ = CI.CORP_SEQ )  GROUP BY CORP_TYPE, CORP_SEQ) AS KRN
+        ON ( KRY.CORP_SEQ = KRN.CORP_SEQ )
+        WHERE KRN.CORP_TYPE = #{p.CORP_KIND}
+        ORDER BY CORP_NM
+    </select>
+
+
+
+
+
+
+
+
+	<!-- 성과지표 사회적목적 유형별 분석 - 등급항목 통계  : 노동통합형, 문제해결형, 지역사회혁신형, 고용창출형 -->
 	<select id="chartTypeGrade" resultType="hashmap">
 		SELECT FOUR.CD AS TYPE, IFNULL(THR.RESULT,0) AS RESULT
         FROM
@@ -1035,7 +1397,7 @@
 			ORDER BY RESULT DESC
 	</select>
 
-	<!-- 성과지표 사회적경제조직 유형별 분석 - 비율항목 통계  : 노동통합형, 문제해결형, 지역사회혁신형, 고용창출형 -->
+	<!-- 성과지표 사회적목적 유형별 분석 - 비율항목 통계  : 노동통합형, 문제해결형, 지역사회혁신형, 고용창출형 -->
 	<select id="chartTypeRate" resultType="hashmap">
 		SELECT FOUR.CD AS TYPE, IFNULL(THR.RESULT,0) AS RESULT
 		FROM

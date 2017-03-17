@@ -74,11 +74,11 @@
                 this._data = e.currentTarget.lastResponse;
 
                 var data = {
-                    labels: ['사회적/경제적 성과', '기업 건전성', '사회 가치창출 역량', '비즈니스 역량'],
+                    labels: ['사회적 성과', '경제적 성과', '기업 건전성', '사회 가치창출 역량', '비즈니스 역량'],
                     datasets: [
                         {
                             type: 'bar',
-                            label: '성과지표 항목별 분석',
+                            label: '성과지표 1단계 항목별 분석',
                             backgroundColor: [
                                 'rgba(255, 99, 132, 0.9)',
                                 'rgba(54, 162, 235, 0.9)',
@@ -96,7 +96,7 @@
                                 'rgba(255, 159, 64, 1)'
                             ],
                             borderWidth: 1,
-                            data: [this._data[0].RESULT, this._data[1].RESULT, this._data[2].RESULT,this._data[3].RESULT],
+                            data: [this._data[0].RESULT, this._data[1].RESULT, this._data[2].RESULT,this._data[3].RESULT,this._data[4].RESULT],
                             spanGaps: false,
                         },
                     ]
