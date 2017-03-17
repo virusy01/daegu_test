@@ -80,43 +80,51 @@
                     datasets: [
                         {
                             type: 'bar',
-                            label: '사회적/경제적 성과',
-                            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                            label: '사회적 성과',
+                            backgroundColor: 'rgba(255, 99, 132, 0.9)',
                             borderColor: 'rgba(255, 99, 132, 1)',
                             borderWidth: 1,
                             data: [this._socialData[0].RESULT,this._villageData[0].RESULT, this._cooperationData[0].RESULT, this._totalData[0].RESULT]
                         },
                         {
                             type: 'bar',
-                            label: '기업 건전성',
-                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            label: '경제적 성과',
+                            backgroundColor: 'rgba(54, 162, 235, 0.9)',
                             borderColor: 'rgba(54, 162, 235, 1)',
                             borderWidth: 1,
-                            data: [this._socialData[1].RESULT,this._villageData[1].RESULT, 0, this._totalData[1].RESULT]
+                            data: [this._socialData[1].RESULT,this._villageData[1].RESULT, this._cooperationData[1].RESULT, this._totalData[1].RESULT]
                         },
                         {
                             type: 'bar',
-                            label: '사회가치 창출 역량',
-                            backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                            label: '기업 건전성',
+                            backgroundColor: 'rgba(255, 206, 86, 0.9)',
                             borderColor: 'rgba(255, 206, 86, 1)',
                             borderWidth: 1,
                             data: [this._socialData[2].RESULT,this._villageData[2].RESULT, 0, this._totalData[2].RESULT]
                         },
                         {
                             type: 'bar',
-                            label: '비즈니스 역량',
-                            backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                            label: '사회가치 창출 역량',
+                            backgroundColor: 'rgba(75, 192, 192, 0.9)',
                             borderColor: 'rgba(75, 192, 192, 1)',
                             borderWidth: 1,
-                            data: [this._socialData[3].RESULT,this._villageData[3].RESULT, this._cooperationData[3].RESULT, this._totalData[3].RESULT]
+                            data: [this._socialData[3].RESULT,this._villageData[3].RESULT, 0, this._totalData[3].RESULT]
+                        },
+                        {
+                            type: 'bar',
+                            label: '비즈니스 역량',
+                            backgroundColor: 'rgba(153, 102, 255, 0.9)',
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            borderWidth: 1,
+                            data: [this._socialData[4].RESULT,this._villageData[4].RESULT, this._cooperationData[4].RESULT, this._totalData[4].RESULT]
                         },
                         {
                             type: 'bar',
                             label: '전체 평균',
-                            backgroundColor: 'rgba(255, 80, 40, 0.8)',
-                            borderColor: 'rgba(255, 80, 40, 1)',
+                            backgroundColor: 'rgba(255, 159, 64, 0.9)',
+                            borderColor: 'rgba(255, 159, 64, 1)',
                             borderWidth: 1,
-                            data: [this._socialData[4].RESULT,this._villageData[4].RESULT, this._cooperationData[4].RESULT, this._totalData[4].RESULT]
+                            data: [this._socialData[5].RESULT,this._villageData[5].RESULT, this._cooperationData[5].RESULT, this._totalData[5].RESULT]
                         },
                     ]
                 };
