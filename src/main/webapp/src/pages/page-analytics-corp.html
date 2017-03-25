@@ -70,9 +70,14 @@
                 <th>NO</th>
                 <th>기업명</th>
                 <th>기업유형</th>
-                <th>7점 척도 항목 평균</th>
-                <th>7점 척도 항목 GRADE</th>
-                <th>100% 대비 항목 평균</th>
+                <th>사회적성과</th>
+                <th>경제적성과</th>
+                <th>기업건전성</th>
+                <th>사회가치 창출역량</th>
+                <th>비즈니스역량</th>
+                <th>7점 척도 평균</th>
+                <th>7점 척도 GRADE</th>
+                <th>100% 대비 평균</th>
             </tr>
             </thead>
             <tbody>
@@ -132,8 +137,13 @@
                         return [
                             'CORP_NM',
                             'CORP_TYPE',
-                            'GRADE_RESULT',
-                            'RATE_RESULT',
+                            'KPI_TYPE_01',
+                            'KPI_TYPE_02',
+                            'KPI_TYPE_03',
+                            'KPI_TYPE_04',
+                            'KPI_TYPE_05',
+                            'KPI_TYPE_GRADE_TOT',
+                            'KPI_TYPE_RATE_TOT',
                         ];
                     }
                 },
@@ -205,7 +215,17 @@
                                 td.setAttribute('name', prefix + '_' + guide[attribute]);
                                 td.setAttribute("style", "text-align:center;");
                                 break;
-                            case 'GRADE_RESULT':
+                            case 'KPI_TYPE_01':
+                            case 'KPI_TYPE_02':
+                            case 'KPI_TYPE_03':
+                            case 'KPI_TYPE_04':
+                            case 'KPI_TYPE_05':
+                                td.setAttribute("style", "padding-right: 15px !important; text-align: right");
+                                td.innerHTML = value;
+                                td.setAttribute('id', prefix + '_' + guide[attribute] + i);
+                                td.setAttribute('name', prefix + '_' + guide[attribute]);
+                                break;
+                            case 'KPI_TYPE_GRADE_TOT':
                                 td.setAttribute("style", "padding-right: 15px !important; text-align: right");
                                 td.innerHTML = value;
                                 td.setAttribute('id', prefix + '_' + guide[attribute] + i);
@@ -233,7 +253,7 @@
                                 }
                              break;
 
-                            case 'RATE_RESULT':
+                            case 'KPI_TYPE_RATE_TOT':
                                 td.setAttribute("style", "padding-right: 15px !important; text-align: right");
                                 td.innerHTML = value;
                                 td.setAttribute('id', prefix + '_' + guide[attribute] + i);

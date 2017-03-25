@@ -366,8 +366,8 @@ public class CorpService {
 
 		ExcelWriter excelWriter = new ExcelWriter();
 
-		TachyonColumn corpNameColumn = new TachyonColumn("기업명", "CORP_NM", false, 300, "center");
-		TachyonColumn corpTypeColumn = new TachyonColumn("기업유형", "CORP_TYPE", false, 200, "center");
+		TachyonColumn corpNameColumn = new TachyonColumn("기업명", "CORP_NM", false, 200, "center");
+		TachyonColumn corpTypeColumn = new TachyonColumn("기업유형", "CORP_TYPE", false, 120, "center");
 
 		DataFormatFunction dataFormatFunction = (item, column, columnIndex, rowIndex) -> {
 			Object value = item.get(column.dataField());
@@ -417,13 +417,24 @@ public class CorpService {
 		List<Map<String, Object>> gridCorpDataEach = repository.gridCorpEach(params, Security.user());
 
 		String[] gripCorpDataColumns = {
-				"GRADE_RESULT",
-				"RATE_RESULT" };
+				"KPI_TYPE_01",
+				"KPI_TYPE_02",
+				"KPI_TYPE_03",
+				"KPI_TYPE_04",
+				"KPI_TYPE_05",
+				"KPI_TYPE_GRADE_TOT",
+				"KPI_TYPE_RATE_TOT" };
 
 		String[] gripCorpDataLabels = {
-				"7점 척도 항목 평균","100% 대비 항목 평균" };
+				"사회적 성과",
+				"경제적 성과",
+				"기업 건전성",
+				"사회가치 창출역량",
+				"비즈니스 역량",
+				"7점 척도 항목 평균",
+				"100% 대비 항목 평균" };
 
-		List<TachyonColumn> headList = TachyonColumn.generateColumns(gripCorpDataLabels, gripCorpDataColumns, 200, "right");
+		List<TachyonColumn> headList = TachyonColumn.generateColumns(gripCorpDataLabels, gripCorpDataColumns, 120, "right");
 		headList.forEach(column -> column.setDataFormatFunction(dataFormatFunction));
 		headList.add(0, corpTypeColumn);
 		headList.add(0, corpNameColumn);
