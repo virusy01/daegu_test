@@ -58,13 +58,47 @@ public interface CorpRepository
 	List<Map<String, Object>>chartKpiDetailEachRate(@Param("p") Map<String, Object> params,@Param("u") User user);
 
 
-	// 성과지표 지역별 분석 - 등급항목별
-	List<Map<String, Object>>chartRegionAllGrade(@Param("p") Map<String, Object> params,@Param("u") User user);
-	List<Map<String, Object>>chartRegionEachGrade(@Param("p") Map<String, Object> params,@Param("u") User user);
+	// 성과지표 지역별 분석 - 등급항목 통계 - 전체
+	List<Map<String, Object>>chartRegionGradeTotalType1(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionGradeTotalType2(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionGradeTotalType3(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionGradeTotalType4(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionGradeTotalType5(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionGradeTotalType6(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionGradeTotalType7(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionGradeTotalType8(@Param("p") Map<String, Object> params,@Param("u") User user);
 
-	// 성과지표 지역별 분석 - 비율항목별
-	List<Map<String, Object>>chartRegionAllRate(@Param("p") Map<String, Object> params,@Param("u") User user);
-	List<Map<String, Object>>chartRegionEachRate(@Param("p") Map<String, Object> params,@Param("u") User user);
+
+	// 성과지표 지역별 분석 - 등급항목 통계 - 개별
+	List<Map<String, Object>>chartRegionGradeType1(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionGradeType2(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionGradeType3(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionGradeType4(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionGradeType5(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionGradeType6(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionGradeType7(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionGradeType8(@Param("p") Map<String, Object> params,@Param("u") User user);
+
+	// 성과지표 지역별 분석 - 비율항목 통계 - 전체
+	List<Map<String, Object>>chartRegionRateTotalType1(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionRateTotalType2(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionRateTotalType3(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionRateTotalType4(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionRateTotalType5(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionRateTotalType6(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionRateTotalType7(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionRateTotalType8(@Param("p") Map<String, Object> params,@Param("u") User user);
+
+
+	// 성과지표 지역별 분석 - 비율항목 통계 - 개별
+	List<Map<String, Object>>chartRegionRateType1(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionRateType2(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionRateType3(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionRateType4(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionRateType5(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionRateType6(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionRateType7(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartRegionRateType8(@Param("p") Map<String, Object> params,@Param("u") User user);
 
 
 	// 성과지표 업종별 분석 - 등급항목별
@@ -81,7 +115,7 @@ public interface CorpRepository
 	List<Map<String, Object>> chartAllGradeCooperation(@Param("u") User user);
 	List<Map<String, Object>> chartAllGradeTotal(@Param("u") User user);
 
-	// 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계
+	// 성과지표 사회적경제조직 유형별 분석 - 비율항목 통계
 	List<Map<String, Object>> chartAllRateSocial(@Param("u") User user);
 	List<Map<String, Object>> chartAllRateVillage(@Param("u") User user);
 	List<Map<String, Object>> chartAllRateCooperation(@Param("u") User user);
@@ -89,16 +123,30 @@ public interface CorpRepository
 
 
 
+	// 성과지표 사회적목적 유형별 분석 - 등급항목 통계
+	List<Map<String, Object>> chartTypeGradeType1(@Param("u") User user);
+	List<Map<String, Object>> chartTypeGradeType2(@Param("u") User user);
+	List<Map<String, Object>> chartTypeGradeType3(@Param("u") User user);
+	List<Map<String, Object>> chartTypeGradeType4(@Param("u") User user);
+	List<Map<String, Object>> chartTypeGradeTotal(@Param("u") User user);
+
+	// 성과지표 사회적목적 유형별 분석 - 비율항목 통계
+	List<Map<String, Object>> chartTypeRateType1(@Param("u") User user);
+	List<Map<String, Object>> chartTypeRateType2(@Param("u") User user);
+	List<Map<String, Object>> chartTypeRateType3(@Param("u") User user);
+	List<Map<String, Object>> chartTypeRateType4(@Param("u") User user);
+	List<Map<String, Object>> chartTypeRateTotal(@Param("u") User user);
+
 
 	// 성과지표 기업별 분석
 	List<Map<String, Object>>gridCorpAll(@Param("p") Map<String, Object> params,@Param("u") User user);
 	List<Map<String, Object>>gridCorpEach(@Param("p") Map<String, Object> params,@Param("u") User user);
 
 	// 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계 - 노동통합형, 문제해결형, 지역사회혁신형, 고용창출형
-	List<Map<String, Object>>chartTypeGrade(@Param("u") User user);
+	//List<Map<String, Object>>chartTypeGrade(@Param("u") User user);
 
 	// 성과지표 사회적경제조직 유형별 분석 - 비율항목 통계 - 노동통합형, 문제해결형, 지역사회혁신형, 고용창출형
-	List<Map<String, Object>>chartTypeRate(@Param("u") User user);
+	//List<Map<String, Object>>chartTypeRate(@Param("u") User user);
 
 
 

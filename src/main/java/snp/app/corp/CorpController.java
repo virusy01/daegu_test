@@ -92,12 +92,12 @@ public class CorpController
 
 	// 성과지표 지역별 분석  - 등급항목별
 	@RequestMapping(value="/chart-region/grade", method= RequestMethod.GET)
-	public List<Map<String, Object>>chartRegionGrade(@RequestParam(name = "CORP_KIND") String corpKind){
+	public Map<String, Object>chartRegionGrade(@RequestParam(name = "CORP_KIND") String corpKind){
 		return service.chartRegionGrade(RequestParams.map(),corpKind);
 	}
 	// 성과지표 지역별 분석  - 비율항목별
 	@RequestMapping(value="/chart-region/rate", method= RequestMethod.GET)
-	public List<Map<String, Object>>chartRegionRate(@RequestParam(name = "CORP_KIND") String corpKind){
+	public Map<String, Object>chartRegionRate(@RequestParam(name = "CORP_KIND") String corpKind){
 		return service.chartRegionRate(RequestParams.map(),corpKind);
 	}
 
@@ -121,13 +121,13 @@ public class CorpController
 
 	// 사회적목적 유형별 분석 - 등급항목 통계
 	@RequestMapping(value="/chart-type/grade", method= RequestMethod.GET)
-	public List<Map<String, Object>> chartTypeGrade(){
+	public Map<String, Object> chartTypeGrade(){
 		return service.chartTypeGrade();
 	}
 
     // 사회적목적 유형별 분석 - 비율항목 통계
     @RequestMapping(value="/chart-type/rate", method= RequestMethod.GET)
-    public List<Map<String, Object>> chartTypeRate(){
+    public  Map<String, Object> chartTypeRate(){
         return service.chartTypeRate();
     }
 
