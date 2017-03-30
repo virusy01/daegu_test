@@ -103,12 +103,12 @@ public class CorpController
 
 	// 성과지표 업종별 분석 - 등급항목별
 	@RequestMapping(value="/chart-sector/grade", method= RequestMethod.GET)
-	public List<Map<String, Object>>chartSectorGrade(@RequestParam(name = "CORP_KIND") String corpKind){
+	public Map<String, Object>chartSectorGrade(@RequestParam(name = "CORP_KIND") String corpKind){
 		return service.chartSectorGrade(RequestParams.map(),corpKind);
 	}
     // 성과지표 업종별 분석 - 비율항목별
     @RequestMapping(value="/chart-sector/rate", method= RequestMethod.GET)
-    public List<Map<String, Object>>chartSectorRate(@RequestParam(name = "CORP_KIND") String corpKind){
+    public Map<String, Object>chartSectorRate(@RequestParam(name = "CORP_KIND") String corpKind){
         return service.chartSectorRate(RequestParams.map(),corpKind);
     }
 

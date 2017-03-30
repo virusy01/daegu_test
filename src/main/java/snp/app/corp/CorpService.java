@@ -321,35 +321,148 @@ public class CorpService {
     public List<Map<String, Object>> chartRegionRateType7(Map<String, Object> params) {return repository.chartRegionRateType7(params,Security.user()); }
     public List<Map<String, Object>> chartRegionRateType8(Map<String, Object> params) {return repository.chartRegionRateType8(params,Security.user()); }
 
-    // 성과지표 업종별 분석 - 등급항목
-	public List<Map<String, Object>>chartSectorGrade(Map<String, Object> params,String corpKind) {
-		List<Map<String, Object>> result;
+
+	// 성과지표 지역별 분석 - 등급항목
+	public Map<String, Object>chartSectorGrade(Map<String, Object> params,String corpKind) {
+		Map<String, Object> nestedData = new HashMap<>();
 		switch (corpKind) {
-			case "0":
-				result = repository.chartSectorAllGrade(params, Security.user()); //전체
+			case "0":  // 전체
+				nestedData.put("type1Data", chartSectorGradeTotalType1(params));
+				nestedData.put("type2Data", chartSectorGradeTotalType2(params));
+				nestedData.put("type3Data", chartSectorGradeTotalType3(params));
+				nestedData.put("type4Data", chartSectorGradeTotalType4(params));
+				nestedData.put("type5Data", chartSectorGradeTotalType5(params));
+				nestedData.put("type6Data", chartSectorGradeTotalType6(params));
+				nestedData.put("type7Data", chartSectorGradeTotalType7(params));
+				nestedData.put("type8Data", chartSectorGradeTotalType8(params));
+				nestedData.put("type9Data", chartSectorGradeTotalType9(params));
+				nestedData.put("type10Data", chartSectorGradeTotalType10(params));
+				nestedData.put("type11Data", chartSectorGradeTotalType11(params));
+				nestedData.put("type12Data", chartSectorGradeTotalType12(params));
+				nestedData.put("type13Data", chartSectorGradeTotalType13(params));
 				break;
-			default:
-				result = repository.chartSectorEachGrade(params, Security.user()); //사회적기업,마을기업, 협동조합
+			default:    // 사회적기업, 마을기업, 협동조합
+				nestedData.put("type1Data", chartSectorGradeType1(params));
+				nestedData.put("type2Data", chartSectorGradeType2(params));
+				nestedData.put("type3Data", chartSectorGradeType3(params));
+				nestedData.put("type4Data", chartSectorGradeType4(params));
+				nestedData.put("type5Data", chartSectorGradeType5(params));
+				nestedData.put("type6Data", chartSectorGradeType6(params));
+				nestedData.put("type7Data", chartSectorGradeType7(params));
+				nestedData.put("type8Data", chartSectorGradeType8(params));
+				nestedData.put("type9Data", chartSectorGradeType9(params));
+				nestedData.put("type10Data", chartSectorGradeType10(params));
+				nestedData.put("type11Data", chartSectorGradeType11(params));
+				nestedData.put("type12Data", chartSectorGradeType12(params));
+				nestedData.put("type13Data", chartSectorGradeType13(params));
 				break;
 		}
-		return result;
+		return nestedData;
 	}
+
+	// 성과지표 지역별 분석 - 등급항목 통계 - 전체
+	public List<Map<String, Object>> chartSectorGradeTotalType1(Map<String, Object> params) {return repository.chartSectorGradeTotalType1(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeTotalType2(Map<String, Object> params) {return repository.chartSectorGradeTotalType2(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeTotalType3(Map<String, Object> params) {return repository.chartSectorGradeTotalType3(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeTotalType4(Map<String, Object> params) {return repository.chartSectorGradeTotalType4(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeTotalType5(Map<String, Object> params) {return repository.chartSectorGradeTotalType5(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeTotalType6(Map<String, Object> params) {return repository.chartSectorGradeTotalType6(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeTotalType7(Map<String, Object> params) {return repository.chartSectorGradeTotalType7(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeTotalType8(Map<String, Object> params) {return repository.chartSectorGradeTotalType8(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeTotalType9(Map<String, Object> params) {return repository.chartSectorGradeTotalType9(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeTotalType10(Map<String, Object> params) {return repository.chartSectorGradeTotalType10(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeTotalType11(Map<String, Object> params) {return repository.chartSectorGradeTotalType11(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeTotalType12(Map<String, Object> params) {return repository.chartSectorGradeTotalType12(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeTotalType13(Map<String, Object> params) {return repository.chartSectorGradeTotalType13(params,Security.user()); }
+
+
+	// 성과지표 지역별 분석 - 등급항목 통계 - 개별
+	public List<Map<String, Object>> chartSectorGradeType1(Map<String, Object> params) {return repository.chartSectorGradeType1(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeType2(Map<String, Object> params) {return repository.chartSectorGradeType2(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeType3(Map<String, Object> params) {return repository.chartSectorGradeType3(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeType4(Map<String, Object> params) {return repository.chartSectorGradeType4(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeType5(Map<String, Object> params) {return repository.chartSectorGradeType5(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeType6(Map<String, Object> params) {return repository.chartSectorGradeType6(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeType7(Map<String, Object> params) {return repository.chartSectorGradeType7(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeType8(Map<String, Object> params) {return repository.chartSectorGradeType8(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeType9(Map<String, Object> params) {return repository.chartSectorGradeType9(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeType10(Map<String, Object> params) {return repository.chartSectorGradeType10(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeType11(Map<String, Object> params) {return repository.chartSectorGradeType11(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeType12(Map<String, Object> params) {return repository.chartSectorGradeType12(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorGradeType13(Map<String, Object> params) {return repository.chartSectorGradeType13(params,Security.user()); }
+
 
 	// 성과지표 업종별 분석 - 비율항목
-	public List<Map<String, Object>>chartSectorRate(Map<String, Object> params,String corpKind) {
-		List<Map<String, Object>> result;
+	public Map<String, Object>chartSectorRate(Map<String, Object> params,String corpKind) {
+		Map<String, Object> nestedData = new HashMap<>();
 		switch (corpKind) {
-			case "0":
-				result = repository.chartSectorAllRate(params, Security.user()); //전체
+			case "0":  // 전체
+				nestedData.put("type1Data", chartSectorRateTotalType1(params));
+				nestedData.put("type2Data", chartSectorRateTotalType2(params));
+				nestedData.put("type3Data", chartSectorRateTotalType3(params));
+				nestedData.put("type4Data", chartSectorRateTotalType4(params));
+				nestedData.put("type5Data", chartSectorRateTotalType5(params));
+				nestedData.put("type6Data", chartSectorRateTotalType6(params));
+				nestedData.put("type7Data", chartSectorRateTotalType7(params));
+				nestedData.put("type8Data", chartSectorRateTotalType8(params));
+				nestedData.put("type9Data", chartSectorRateTotalType9(params));
+				nestedData.put("type10Data", chartSectorRateTotalType10(params));
+				nestedData.put("type11Data", chartSectorRateTotalType11(params));
+				nestedData.put("type12Data", chartSectorRateTotalType12(params));
+				nestedData.put("type13Data", chartSectorRateTotalType13(params));
 				break;
-			default:
-				result = repository.chartSectorEachRate(params, Security.user()); //사회적기업,마을기업, 협동조합
+			default:    // 사회적기업, 마을기업, 협동조합
+				nestedData.put("type1Data", chartSectorRateType1(params));
+				nestedData.put("type2Data", chartSectorRateType2(params));
+				nestedData.put("type3Data", chartSectorRateType3(params));
+				nestedData.put("type4Data", chartSectorRateType4(params));
+				nestedData.put("type5Data", chartSectorRateType5(params));
+				nestedData.put("type6Data", chartSectorRateType6(params));
+				nestedData.put("type7Data", chartSectorRateType7(params));
+				nestedData.put("type8Data", chartSectorRateType8(params));
+				nestedData.put("type9Data", chartSectorRateType9(params));
+				nestedData.put("type10Data", chartSectorRateType10(params));
+				nestedData.put("type11Data", chartSectorRateType11(params));
+				nestedData.put("type12Data", chartSectorRateType12(params));
+				nestedData.put("type13Data", chartSectorRateType13(params));
 				break;
 		}
-		return result;
+		return nestedData;
 	}
 
-	 // 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계
+	// 성과지표 업종별 분석 - 비율항목 통계 - 전체
+	public List<Map<String, Object>> chartSectorRateTotalType1(Map<String, Object> params) {return repository.chartSectorRateTotalType1(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateTotalType2(Map<String, Object> params) {return repository.chartSectorRateTotalType2(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateTotalType3(Map<String, Object> params) {return repository.chartSectorRateTotalType3(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateTotalType4(Map<String, Object> params) {return repository.chartSectorRateTotalType4(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateTotalType5(Map<String, Object> params) {return repository.chartSectorRateTotalType5(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateTotalType6(Map<String, Object> params) {return repository.chartSectorRateTotalType6(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateTotalType7(Map<String, Object> params) {return repository.chartSectorRateTotalType7(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateTotalType8(Map<String, Object> params) {return repository.chartSectorRateTotalType8(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateTotalType9(Map<String, Object> params) {return repository.chartSectorRateTotalType9(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateTotalType10(Map<String, Object> params) {return repository.chartSectorRateTotalType10(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateTotalType11(Map<String, Object> params) {return repository.chartSectorRateTotalType11(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateTotalType12(Map<String, Object> params) {return repository.chartSectorRateTotalType12(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateTotalType13(Map<String, Object> params) {return repository.chartSectorRateTotalType13(params,Security.user()); }
+
+
+	// 성과지표 업종별 분석 - 비율항목 통계 - 개별
+	public List<Map<String, Object>> chartSectorRateType1(Map<String, Object> params) {return repository.chartSectorRateType1(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateType2(Map<String, Object> params) {return repository.chartSectorRateType2(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateType3(Map<String, Object> params) {return repository.chartSectorRateType3(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateType4(Map<String, Object> params) {return repository.chartSectorRateType4(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateType5(Map<String, Object> params) {return repository.chartSectorRateType5(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateType6(Map<String, Object> params) {return repository.chartSectorRateType6(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateType7(Map<String, Object> params) {return repository.chartSectorRateType7(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateType8(Map<String, Object> params) {return repository.chartSectorRateType8(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateType9(Map<String, Object> params) {return repository.chartSectorRateType9(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateType10(Map<String, Object> params) {return repository.chartSectorRateType10(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateType11(Map<String, Object> params) {return repository.chartSectorRateType11(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateType12(Map<String, Object> params) {return repository.chartSectorRateType12(params,Security.user()); }
+	public List<Map<String, Object>> chartSectorRateType13(Map<String, Object> params) {return repository.chartSectorRateType13(params,Security.user()); }
+
+
+	// 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계
 	public Map<String, Object> chartAllGrade() {
 		Map<String, Object> nestedData = new HashMap<>();
 

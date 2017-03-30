@@ -100,15 +100,65 @@ public interface CorpRepository
 	List<Map<String, Object>>chartRegionRateType7(@Param("p") Map<String, Object> params,@Param("u") User user);
 	List<Map<String, Object>>chartRegionRateType8(@Param("p") Map<String, Object> params,@Param("u") User user);
 
+	// 성과지표 업종별 분석 - 등급항목 통계 - 전체
+	List<Map<String, Object>>chartSectorGradeTotalType1(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeTotalType2(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeTotalType3(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeTotalType4(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeTotalType5(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeTotalType6(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeTotalType7(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeTotalType8(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeTotalType9(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeTotalType10(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeTotalType11(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeTotalType12(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeTotalType13(@Param("p") Map<String, Object> params,@Param("u") User user);
 
-	// 성과지표 업종별 분석 - 등급항목별
-	List<Map<String, Object>>chartSectorAllGrade(@Param("p") Map<String, Object> params,@Param("u") User user);
-	List<Map<String, Object>>chartSectorEachGrade(@Param("p") Map<String, Object> params,@Param("u") User user);
+	// 성과지표 업종별 분석 - 등급항목 통계 - 개별
+	List<Map<String, Object>>chartSectorGradeType1(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeType2(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeType3(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeType4(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeType5(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeType6(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeType7(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeType8(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeType9(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeType10(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeType11(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeType12(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorGradeType13(@Param("p") Map<String, Object> params,@Param("u") User user);
 
-	// 성과지표 업종별 분석 비율항목별
-	List<Map<String, Object>>chartSectorAllRate(@Param("p") Map<String, Object> params,@Param("u") User user);
-	List<Map<String, Object>>chartSectorEachRate(@Param("p") Map<String, Object> params,@Param("u") User user);
+	// 성과지표 업종별 분석 - 비율항목 통계 - 전체
+	List<Map<String, Object>>chartSectorRateTotalType1(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateTotalType2(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateTotalType3(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateTotalType4(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateTotalType5(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateTotalType6(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateTotalType7(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateTotalType8(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateTotalType9(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateTotalType10(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateTotalType11(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateTotalType12(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateTotalType13(@Param("p") Map<String, Object> params,@Param("u") User user);
 
+	// 성과지표 업종별 분석 - 비율항목 통계 - 개별
+	List<Map<String, Object>>chartSectorRateType1(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateType2(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateType3(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateType4(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateType5(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateType6(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateType7(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateType8(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateType9(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateType10(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateType11(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateType12(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>chartSectorRateType13(@Param("p") Map<String, Object> params,@Param("u") User user);
 	// 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계
 	List<Map<String, Object>> chartAllGradeSocial(@Param("u") User user);
 	List<Map<String, Object>> chartAllGradeVillage(@Param("u") User user);
