@@ -24,7 +24,11 @@
                    url="/api/corp/analytics/corp"
                    on-response="_assignData">
         </iron-ajax>
-
+        <iron-ajax id="getDataKeyword" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
+                   on-request="_startLoader"
+                   url="/api/corp/analytics/keyword"
+                   on-response="_assignData">
+        </iron-ajax>
         <form id="excelForm" name="excelForm" action="/api/corp/analytics-corp/excel" target="excelframe">
             <input id="excelCorpSeq" type="hidden" name="CORP_KIND">
         </form>
@@ -44,6 +48,12 @@
         <div class="row">
             <div class="col-xs-2">
                 <normal-select id="year" on-change="_fetchData" value="{{_corpType}}" items="{{_corpTypeList}}"></normal-select>
+            </div>
+            <div class="col-xs-2">
+                <normal-input id="keyword" placeholder="기업명" on-keypress="_runFind" value="{{_keyword}}"></normal-input>
+            </div>
+            <div class="col-xs-1">
+                <button type="button" on-tap="_onSearch"  class="btn btn-sm btn-normal">검색</button>
             </div>
             <div class="col-xs-2">
                 <button type="button" on-tap="_downloadExcel" class="btn btn-sm btn-success">엑셀</button>
@@ -111,6 +121,12 @@
                         return 0;
                     }
                 },
+                _keyword: {
+                    type: String,
+                    value: function() {
+                        return "";
+                    }
+                },
                 _grade: {
                     type: Object,
                     value: function() {
@@ -153,6 +169,18 @@
                     CORP_KIND: this._corpType
                 };
                 this.$.getData.generateRequest();
+            },
+
+            _onSearch: function() {
+                this.$.getDataKeyword.params = {
+                    KEYWORD: this._keyword
+                };
+                this.$.getDataKeyword.generateRequest();
+            },
+            _runFind: function(e) {
+                if (e.keyCode == 13) {
+                    this._onSearch();
+                }
             },
 
             attached: function() {

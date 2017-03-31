@@ -118,7 +118,11 @@ public class CorpController
 	public List<Map<String, Object>>gridCorp(@RequestParam(name = "CORP_KIND") String corpKind){
 		return service.gridCorp(RequestParams.map(),corpKind);
 	}
-
+	// 성과지표 기업별 분석 키워드 검색
+	@RequestMapping(value="/analytics/keyword", method= RequestMethod.GET)
+	public List<Map<String, Object>>gridCorpKeyword(@RequestParam(name = "KEYWORD") String keyword){
+		return service.gridCorpKeyword(RequestParams.map());
+	}
 	// 사회적목적 유형별 분석 - 등급항목 통계
 	@RequestMapping(value="/chart-type/grade", method= RequestMethod.GET)
 	public Map<String, Object> chartTypeGrade(){

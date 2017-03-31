@@ -535,6 +535,11 @@ public class CorpService {
 		return result;
 	}
 
+	// 성과지표 기업별 분석 키워드검색
+	public List<Map<String, Object>> gridCorpKeyword(Map<String, Object> params) {
+		return repository.gridCorpKeyword(params,Security.user());
+	}
+
 	// 성과지표 사회적목적 유형별 분석 - 등급항목 통계
 	//public List<Map<String, Object>> chartTypeGrade() {
 	//	return repository.chartTypeGrade(Security.user());
