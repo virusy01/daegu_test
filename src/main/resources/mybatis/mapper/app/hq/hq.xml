@@ -21,6 +21,7 @@
         , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'REGION' AND CD = REGION) AS REGION_NM
         FROM CORP_INFO
         WHERE CORP_TYPE = #{p}
+        ORDER BY CORP_NM
     </select>
 
     <!-- 기업 상세정보 -->
