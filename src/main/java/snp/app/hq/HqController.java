@@ -21,6 +21,16 @@ public class HqController
 		return service.findCorpList(corpType);
 	}
 
+	// 성과지표 기업유형별 현황조회 - 키워드 검색
+	@RequestMapping(value="/keyword", method= RequestMethod.GET)
+	public List<Map<String, Object>> findCorpListKeyword(@RequestParam(name = "KEYWORD") String keyword,
+														   @RequestParam(name = "CORP_TYPE") String corptype)
+	{
+		return service.findCorpListKeyword(RequestParams.map());
+	}
+
+
+
 	//
 	@RequestMapping(value="/corpInfo", method= RequestMethod.GET)
 	public Map<String, Object>findCorpInfo(@RequestParam(name = "CORP_SEQ") int corpSeq,

@@ -1,6 +1,6 @@
 <link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="/src/components/common/normal-table.html">
-
+<link rel="import" href="/src/components/common/normal-input.html">
 <link rel="import" href="/src/components/behaviors/behavior-loader.html">
 
 <dom-module id="cooperation-info-list">
@@ -12,8 +12,24 @@
 		       last-response="{{_data}}">
 	</iron-ajax>
 
-	<normal-table data="{{_data}}" header-labels="{{_headerLabels}}" link-url="{{_linkURL}}"></normal-table>
-</template>
+	<iron-ajax  id="getCorpListKeyword" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
+				url="/api/hq/keyword"
+				on-request="_startLoader"
+				on-response="_stopLoader"
+				last-response="{{_data}}">
+	</iron-ajax>
+	<div class="row">
+		<div class="col-xs-2">
+			<normal-input id="keyword" placeholder="기업명" on-keypress="_runFind" value="{{_keyword}}"></normal-input>
+		</div>
+		<div class="col-xs-1">
+			<button type="button" on-tap="_onSearch"  class="btn btn-sm btn-normal">검색</button>
+		</div>
+	</div>
+	<div class="col">
+		<div class="horizontal-margin-20"></div>
+		<normal-table data="{{_data}}" header-labels="{{_headerLabels}}" link-url="{{_linkURL}}"></normal-table>
+	</div>	</template>
 <script>
 Polymer({
 	is: 'cooperation-info-list',
@@ -27,7 +43,14 @@ Polymer({
 				return [];
 			}
 		},
-		_headerLabels: {
+        _keyword: {
+            type: String,
+            value: function() {
+                return "";
+            }
+        },
+
+        _headerLabels: {
 			type: Object,
 			value: function() {
 				return {
@@ -46,7 +69,18 @@ Polymer({
 		},
 
 	},
-
+    _onSearch: function() {
+        this.$.getCorpListKeyword.params = {
+            KEYWORD: this._keyword,
+            CORP_TYPE: '3'
+        };
+        this.$.getCorpListKeyword.generateRequest();
+    },
+    _runFind: function(e) {
+        if (e.keyCode == 13) {
+            this._onSearch();
+        }
+    },
 });
 </script>
 </dom-module>

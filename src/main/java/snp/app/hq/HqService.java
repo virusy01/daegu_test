@@ -45,7 +45,10 @@ public class HqService
 		return r;
 	}
 
-
+	// // 성과지표 기업유형별 현황조회 - 키워드 검색
+	public List<Map<String, Object>> findCorpListKeyword(Map<String, Object> params) {
+		return repository.findCorpListKeyword(params,Security.user());
+	}
 
 
 	// 사회적기업 리스트

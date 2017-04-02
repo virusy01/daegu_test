@@ -18,7 +18,8 @@ public interface HqRepository
 	int updateCorpInfo(@Param("p") Map<String, Object> params, @Param("u") User user);
 	int deleteCorpInfo(@Param("p") Map<String, Object> params, @Param("u") User user);
 
-
+	// 성과지표 기업유형별 현황조회 - 키워드 검색
+	List<Map<String, Object>>findCorpListKeyword(@Param("p") Map<String, Object> params,@Param("u") User user);
 
 	// 사회적기업 기업 리스트
 	List<Map<String, Object>> findSocialList();

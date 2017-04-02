@@ -24,6 +24,26 @@
         ORDER BY CORP_NM
     </select>
 
+    <!-- 기업 목록 키워드 검색 -->
+    <select id="findCorpListKeyword" resultType="hashmap">
+        SELECT
+        CASE CORP_TYPE WHEN '1' THEN '사회적기업'
+        WHEN '2' THEN '마을기업'
+        ELSE '협동조합' END AS CORP_TYPE
+        ,CORP_SEQ
+        , CORP_NM
+        , DATE_FORMAT(OPEN_DT, '%Y') AS OPEN_DT
+        , SE_YN
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'SE_YN' AND CD = SE_YN) AS SE_YN_NM
+        , ORG_TYPE
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'ORG_TYPE' AND CD = ORG_TYPE) AS ORG_TYPE_NM
+        , REGION
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'REGION' AND CD = REGION) AS REGION_NM
+        FROM CORP_INFO
+        WHERE CORP_TYPE = #{p.CORP_TYPE} AND  CORP_NM LIKE CONCAT('%',#{p.KEYWORD},'%')
+        ORDER BY CORP_NM
+    </select>
+
     <!-- 기업 상세정보 -->
     <select id="findCorpInfo" resultType="hashmap">
         SELECT
