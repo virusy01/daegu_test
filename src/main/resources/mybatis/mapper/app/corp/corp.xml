@@ -5268,42 +5268,93 @@
 
 
 
+	<!-- 전체기업 상세정보 조회 전체-->
+	<select id="allCorpsAll" resultType="hashmap">
+        SELECT
+          CORP_NM		/*기업명*/
+        , CORP_TYPE
+		, CASE CORP_TYPE WHEN 1 THEN '사회적기업'
+		  WHEN 2 THEN '마을기업'
+		  ELSE '협동조합' END AS CORP_TYPE_NM
+        , SUBSTR(OPEN_DT,1,4) AS OPEN_DT		/*f1 설립년도*/
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'SE_YN' AND CD = SE_YN) AS SE_YN			/*f2 인증여부*/
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'ORG_TYPE' AND CD = ORG_TYPE) AS ORG_TYPE 	/*f3 조직형태*/
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'BEFORE_TYPE' AND CD = BEFORE_TYPE) AS BEFORE_TYPE /*f4 사,마:이전 조직형태  협:조합원구성 */
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'LEG_TYPE1' AND CD = LEG_TYPE1) AS LEG_TYPE1  /*f5 법적 유형 1*/
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'LEG_TYPE2' AND CD = LEG_TYPE2) AS LEG_TYPE2  /*f6 법적 유형 2*/
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'MAIN_TYPE' AND CD = MAIN_TYPE) AS MAIN_TYPE /*f7 주요 활동 업종 분야*/
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'SECTOR' AND CD = SECTOR) AS SECTOR /*f8 업종*/
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'HISTORY' AND CD = HISTORY) AS HISTORY /*f9 대표자 과거 경력*/
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'REGION' AND CD = REGION) AS REGION /*f10 회사 소재지*/
+        FROM CORP_INFO
+     	ORDER BY CORP_NM
+	</select>
 
 
-	<!-- 성과지표 사회적목적 유형별 분석 - 등급항목 통계  : 노동통합형, 문제해결형, 지역사회혁신형, 고용창출형
-	<select id="chartTypeGrade" resultType="hashmap">
-		SELECT FOUR.CD AS TYPE, IFNULL(THR.RESULT,0) AS RESULT
-        FROM
-            (SELECT SEC.LEG_TYPE2 AS LEG_TYPE2, ROUND(AVG(FIR.RESULT),1) AS RESULT
-            FROM
-            (
-                SELECT CORP_SEQ, RESULT FROM KPI_RESULT
-                WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'Y' ) )
-                OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'Y' ) )
-                OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'Y' ) ) )
-                ) AS FIR INNER JOIN CORP_INFO AS SEC ON ( FIR.CORP_SEQ = SEC.CORP_SEQ )
-			WHERE FIR.RESULT != 0  AND SEC.LEG_TYPE2 IS NOT NULL
-			GROUP BY LEG_TYPE2) AS THR RIGHT JOIN (SELECT CD, CD_NM FROM CODE WHERE GRP_CD ='LEG_TYPE2' and CD_NM IS NOT NULL) AS FOUR ON ( FOUR.CD = THR.LEG_TYPE2 )
-			ORDER BY RESULT DESC
+	<!-- 전체기업 상세정보 조회 사회적기업/마을기업/협동조합-->
+	<select id="allCorpsEach" resultType="hashmap">
+		SELECT
+          CORP_NM		/*기업명*/
+        , CORP_TYPE
+		, CASE CORP_TYPE WHEN 1 THEN '사회적기업'
+		  WHEN 2 THEN '마을기업'
+		  ELSE '협동조합' END AS CORP_TYPE_NM
+        , SUBSTR(OPEN_DT,1,4) AS OPEN_DT		/*f1 설립년도*/
+		, (SELECT CD_NM FROM CODE WHERE GRP_CD = 'SE_YN' AND CD = SE_YN) AS SE_YN			/*f2 인증여부*/
+		, (SELECT CD_NM FROM CODE WHERE GRP_CD = 'ORG_TYPE' AND CD = ORG_TYPE) AS ORG_TYPE 	/*f3 조직형태*/
+		, (SELECT CD_NM FROM CODE WHERE GRP_CD = 'BEFORE_TYPE' AND CD = BEFORE_TYPE) AS BEFORE_TYPE /*f4 사,마:이전 조직형태  협:조합원구성 */
+		, (SELECT CD_NM FROM CODE WHERE GRP_CD = 'LEG_TYPE1' AND CD = LEG_TYPE1) AS LEG_TYPE1  /*f5 법적 유형 1*/
+		, (SELECT CD_NM FROM CODE WHERE GRP_CD = 'LEG_TYPE2' AND CD = LEG_TYPE2) AS LEG_TYPE2  /*f6 법적 유형 2*/
+		, (SELECT CD_NM FROM CODE WHERE GRP_CD = 'MAIN_TYPE' AND CD = MAIN_TYPE) AS MAIN_TYPE /*f7 주요 활동 업종 분야*/
+		, (SELECT CD_NM FROM CODE WHERE GRP_CD = 'SECTOR' AND CD = SECTOR) AS SECTOR /*f8 업종*/
+		, (SELECT CD_NM FROM CODE WHERE GRP_CD = 'HISTORY' AND CD = HISTORY) AS HISTORY /*f9 대표자 과거 경력*/
+		, (SELECT CD_NM FROM CODE WHERE GRP_CD = 'REGION' AND CD = REGION) AS REGION /*f10 회사 소재지*/
+		FROM CORP_INFO
+		WHERE CORP_TYPE = #{p.CORP_KIND}
+		ORDER BY CORP_NM
 	</select>
--->
-	<!-- 성과지표 사회적목적 유형별 분석 - 비율항목 통계  : 노동통합형, 문제해결형, 지역사회혁신형, 고용창출형
-	<select id="chartTypeRate" resultType="hashmap">
-		SELECT FOUR.CD AS TYPE, IFNULL(THR.RESULT,0) AS RESULT
-		FROM
-		(SELECT SEC.LEG_TYPE2 AS LEG_TYPE2, ROUND(AVG(FIR.RESULT),1) AS RESULT
-		FROM
-		(
-		SELECT CORP_SEQ, RESULT FROM KPI_RESULT
-		WHERE ( ( CORP_TYPE = 1 AND KPI_CD in ( SELECT KPI_CD FROM SOCIAL_KPI WHERE IS_GRADE = 'N' ) )
-		OR ( CORP_TYPE = 2 AND KPI_CD in ( SELECT KPI_CD FROM VILLAGE_KPI WHERE IS_GRADE = 'N' ) )
-		OR ( CORP_TYPE = 3 AND KPI_CD in ( SELECT KPI_CD FROM COOPERATION_KPI WHERE IS_GRADE = 'N' ) ) )
-		) AS FIR INNER JOIN CORP_INFO AS SEC ON ( FIR.CORP_SEQ = SEC.CORP_SEQ )
-		WHERE FIR.RESULT != 0  AND SEC.LEG_TYPE2 IS NOT NULL
-		GROUP BY LEG_TYPE2) AS THR RIGHT JOIN (SELECT CD, CD_NM FROM CODE WHERE GRP_CD ='LEG_TYPE2' and CD_NM IS NOT NULL) AS FOUR ON ( FOUR.CD = THR.LEG_TYPE2 )
-		ORDER BY RESULT DESC
+
+
+	<!-- 전체기업 상세정보 조회 키워드 검색-->
+	<select id="allCorpsKeyword" resultType="hashmap">
+        SELECT
+          CORP_NM		/*기업명*/
+        , CORP_TYPE
+		, CASE CORP_TYPE WHEN 1 THEN '사회적기업'
+		  WHEN 2 THEN '마을기업'
+		  ELSE '협동조합' END AS CORP_TYPE_NM
+        , SUBSTR(OPEN_DT,1,4) AS OPEN_DT		/*f1 설립년도*/
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'SE_YN' AND CD = SE_YN) AS SE_YN			/*f2 인증여부*/
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'ORG_TYPE' AND CD = ORG_TYPE) AS ORG_TYPE 	/*f3 조직형태*/
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'BEFORE_TYPE' AND CD = BEFORE_TYPE) AS BEFORE_TYPE /*f4 사,마:이전 조직형태  협:조합원구성 */
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'LEG_TYPE1' AND CD = LEG_TYPE1) AS LEG_TYPE1  /*f5 법적 유형 1*/
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'LEG_TYPE2' AND CD = LEG_TYPE2) AS LEG_TYPE2  /*f6 법적 유형 2*/
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'MAIN_TYPE' AND CD = MAIN_TYPE) AS MAIN_TYPE /*f7 주요 활동 업종 분야*/
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'SECTOR' AND CD = SECTOR) AS SECTOR /*f8 업종*/
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'HISTORY' AND CD = HISTORY) AS HISTORY /*f9 대표자 과거 경력*/
+        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'REGION' AND CD = REGION) AS REGION /*f10 회사 소재지*/
+        FROM CORP_INFO
+        WHERE CORP_NM LIKE CONCAT('%',#{p.KEYWORD},'%')
+     	ORDER BY CORP_NM
 	</select>
- -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	<!-- 성과지표 사회적목적 유형별 분석 - 등급항목 통계  : 전체 -->
 	<select id="chartTypeGradeTotal" resultType="hashmap">

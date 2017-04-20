@@ -195,6 +195,12 @@ public interface CorpRepository
 	// 성과지표 기업별 분석 키워드
 	List<Map<String, Object>>gridCorpKeyword(@Param("p") Map<String, Object> params,@Param("u") User user);
 
+	// 전체기업 상세정보 조회
+	List<Map<String, Object>>allCorpsAll(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>allCorpsEach(@Param("p") Map<String, Object> params,@Param("u") User user);
+
+	// 전체기업 상세정보 조회 키워드
+	List<Map<String, Object>>allCorpsKeyword(@Param("p") Map<String, Object> params,@Param("u") User user);
 
 	// 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계 - 노동통합형, 문제해결형, 지역사회혁신형, 고용창출형
 	//List<Map<String, Object>>chartTypeGrade(@Param("u") User user);

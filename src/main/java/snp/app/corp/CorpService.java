@@ -521,7 +521,7 @@ public class CorpService {
 
 
 
-	// 성과지표 업종별 분석
+	// 성과지표 기업별 분석
 	public List<Map<String, Object>>gridCorp(Map<String, Object> params,String corpKind) {
 		List<Map<String, Object>> result;
 		switch (corpKind) {
@@ -539,6 +539,27 @@ public class CorpService {
 	public List<Map<String, Object>> gridCorpKeyword(Map<String, Object> params) {
 		return repository.gridCorpKeyword(params,Security.user());
 	}
+
+
+	// 전체기업 상세정보 조회
+	public List<Map<String, Object>>allCorps(Map<String, Object> params,String corpKind) {
+		List<Map<String, Object>> result;
+		switch (corpKind) {
+			case "0":
+				result = repository.allCorpsAll(params, Security.user()); //전체
+				break;
+			default:
+				result = repository.allCorpsEach(params, Security.user()); //사회적기업,마을기업, 협동조합
+				break;
+		}
+		return result;
+	}
+
+	// 전체기업 상세정보 조회 키워드검색
+	public List<Map<String, Object>> allCorpsKeyword(Map<String, Object> params) {
+		return repository.allCorpsKeyword(params,Security.user());
+	}
+
 
 	// 성과지표 사회적목적 유형별 분석 - 등급항목 통계
 	//public List<Map<String, Object>> chartTypeGrade() {
@@ -615,7 +636,7 @@ public class CorpService {
 
 
 
-    // 기업별 통계 -  엑셀
+    // 전체기업 상세정보 조회 -  엑셀
 	public void findCorpAvg2Excel(HttpServletResponse response, Map<String, Object> params, int corpKind) throws Exception {
 
 		ExcelWriter excelWriter = new ExcelWriter();
@@ -711,6 +732,108 @@ public class CorpService {
 		excelWriter.download(response);
 	}
 
+
+	// 전체기업 상세정보 조회 -  엑셀
+	public void allCorps2Excel(HttpServletResponse response, Map<String, Object> params, int corpKind) throws Exception {
+
+		ExcelWriter excelWriter = new ExcelWriter();
+
+		TachyonColumn corpNameColumn = new TachyonColumn("기업명", "CORP_NM", false, 200, "center");
+		TachyonColumn corpTypeColumn = new TachyonColumn("기업유형", "CORP_TYPE_NM", false, 120, "center");
+
+		DataFormatFunction dataFormatFunction = (item, column, columnIndex, rowIndex) -> {
+			Object value = item.get(column.dataField());
+			if (value == null) {
+				return null;
+			}
+
+			try {
+				double doubleValue = Double.valueOf(value.toString());
+				int intValue = (int) doubleValue;
+
+				if (intValue != doubleValue) {
+					return "#,##0.##";
+				} else {
+					return "#,##0";
+				}
+			} catch (Exception e) {
+				return null;
+			}
+		};
+
+
+		String sheetName = "전체기업 상세정보 조회";
+		excelWriter.setFileName(sheetName);
+		SXSSFWorkbook workbook = excelWriter.workbook();
+		// Sheet 생성
+		Sheet sheet = workbook.createSheet(sheetName);
+
+		int createdRowIndex = 1;
+
+		// 제목생성
+
+		int[] topmergeRanges;
+		String[] headerTitles = {"< 전체기업 상세정보 >"};
+
+		int[] mergeRanges = {1};
+		Row row = excelWriter.writeMergedHeader(sheet, headerTitles, mergeRanges, 0, createdRowIndex, HorizontalAlignment.CENTER);
+		final XSSFFont fontHeader = (XSSFFont) workbook.createFont();
+		fontHeader.setColor(new XSSFColor(new java.awt.Color(255, 255, 255)));
+		fontHeader.setBold(true);
+		fontHeader.setFontHeight(16);
+		row.getCell(0).getCellStyle().setFont(fontHeader);
+
+		/*************************************************************************************************************/
+
+		List<Map<String, Object>> allCorpsDataAll = repository.allCorpsAll(params, Security.user());
+		List<Map<String, Object>> allCorpsDataEach = repository.allCorpsEach(params, Security.user());
+
+		String[] allCorpsDataColumns = {
+				"OPEN_DT",
+				"SE_YN",
+				"ORG_TYPE",
+				"BEFORE_TYPE",
+				"LEG_TYPE1",
+				"LEG_TYPE2",
+				"MAIN_TYPE",
+				"SECTOR",
+				"HISTORY",
+				"REGION" };
+
+		String[] allCorpsDataLabels = {
+				"설립연도",
+				"인증여부",
+				"조직형태",
+				"이전조직형태",
+				"법적유형 1",
+				"법적유형 2",
+				"주요 활동 업종 분야",
+				"업종",
+				"대표자 과거 경력",
+				"회사 소재지"};
+
+		List<TachyonColumn> headList = TachyonColumn.generateColumns(allCorpsDataLabels, allCorpsDataColumns, 120, "center");
+		headList.forEach(column -> column.setDataFormatFunction(dataFormatFunction));
+		headList.add(0, corpTypeColumn);
+		headList.add(0, corpNameColumn);
+
+		// 소제목생성
+		createdRowIndex += 3;
+
+		excelWriter.writeHeader(sheet, headList, 0, createdRowIndex);
+
+
+		// 데이터 생성
+		createdRowIndex += 1;
+		if(corpKind == 0)
+			excelWriter.writeData(sheet, headList, allCorpsDataAll, 0, createdRowIndex);
+		else
+			excelWriter.writeData(sheet, headList, allCorpsDataEach, 0, createdRowIndex);
+
+
+		/*************************************************************************************************************/
+		excelWriter.download(response);
+	}
 
 	private Row createSubTitle(Sheet sheet, String title, int rowIndex){
 		// 제목생성

@@ -123,6 +123,18 @@ public class CorpController
 	public List<Map<String, Object>>gridCorpKeyword(@RequestParam(name = "KEYWORD") String keyword){
 		return service.gridCorpKeyword(RequestParams.map());
 	}
+
+	// 전체기업 상세정보 조회
+	@RequestMapping(value="/all/corps", method= RequestMethod.GET)
+	public List<Map<String, Object>>allCorps(@RequestParam(name = "CORP_KIND") String corpKind){
+		return service.allCorps(RequestParams.map(),corpKind);
+	}
+	// 전체기업 상세정보 조회 키워드 검색
+	@RequestMapping(value="/all/keyword", method= RequestMethod.GET)
+	public List<Map<String, Object>>allCorpsKeyword(@RequestParam(name = "KEYWORD") String keyword){
+		return service.allCorpsKeyword(RequestParams.map());
+	}
+
 	// 사회적목적 유형별 분석 - 등급항목 통계
 	@RequestMapping(value="/chart-type/grade", method= RequestMethod.GET)
 	public Map<String, Object> chartTypeGrade(){
@@ -155,6 +167,11 @@ public class CorpController
 		service.findCorpAvg2Excel(response,RequestParams.map(),corpKind);
 	}
 
+	// 전체기업 상세정보 조회 -  Excel
+	@RequestMapping(value="/all-corps/excel", method= RequestMethod.GET)
+	public void allCorps2Excel(HttpServletResponse response, @RequestParam(name = "CORP_KIND") int corpKind) throws Exception{
 
+		service.allCorps2Excel(response,RequestParams.map(),corpKind);
+	}
 
 }
