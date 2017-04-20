@@ -12,17 +12,17 @@
         <div class="horizontal-margin-20"></div>
 
         <div class="page-header">
-            <h2>KPI 항목별 분석(1단계)<small>By KPI Analytics</small></h2>
+            <h2>KPI 항목별 분석<small>By KPI Analytics</small></h2>
         </div>
 
         <ul id="pageTab" class="nav nav-tabs">
-            <li name="grade"><a href="/app/chart-kpi/grade">7점 척도 항목</a></li>
-            <li name="rate"><a href="/app/chart-kpi/rate">100% 대비 항목</a></li>
+            <li name="level1"><a href="/app/chart-kpi/level1">KPI 항목</a></li>
+            <li name="level2"><a href="/app/chart-kpi/level2">KPI 항목(상세)</a></li>
         </ul>
 
         <iron-pages id="reportTabs" role="monthly-tab" selected="[[tab]]" attr-for-selected="name">
-            <chart-kpi-grade name="grade" ></chart-kpi-grade>
-            <chart-kpi-rate name="rate" ></chart-kpi-rate>
+            <chart-kpi-level1 name="level1" ></chart-kpi-level1>
+            <chart-kpi-level2 name="level2" ></chart-kpi-level2>
         </iron-pages>
     </template>
     <script>
@@ -42,7 +42,7 @@
             ],
 
             _determineTab: function(value) {
-                this.tab = value || "grade";
+                this.tab = value || "level1";
             },
 
             _selectTab: function(newValue, oldValue) {

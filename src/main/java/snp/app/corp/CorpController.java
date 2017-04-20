@@ -69,7 +69,7 @@ public class CorpController
 	}
 
 	// 성과지표 1단계 KPI 항목별 분석 - 등급항목별
-	@RequestMapping(value="/chart-kpi/grade", method= RequestMethod.GET)
+	@RequestMapping(value="/chart-kpi/level1", method= RequestMethod.GET)
 	public List<Map<String, Object>>chartKpiGrade(@RequestParam(name = "CORP_KIND") String corpKind){
 		return service.chartKpiGrade(RequestParams.map(), corpKind);
 	}
@@ -80,7 +80,7 @@ public class CorpController
 	}
 
 	// 성과지표 2단계 KPI 항목별 분석 - 등급항목별
-	@RequestMapping(value="/chart-kpidetail/grade", method= RequestMethod.GET)
+	@RequestMapping(value="/chart-kpi/level2", method= RequestMethod.GET)
 	public List<Map<String, Object>>chartKpiDetailGrade(@RequestParam(name = "CORP_KIND") String corpKind){
 		return service.chartKpiDetailGrade(RequestParams.map(), corpKind);
 	}

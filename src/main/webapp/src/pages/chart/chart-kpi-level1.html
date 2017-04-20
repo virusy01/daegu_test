@@ -2,11 +2,11 @@
 <link rel="import" href="/src/components/common/normal-select.html">
 <link rel="import" href="/src/components/behaviors/behavior-loader.html">
 
-<dom-module id="chart-kpidetail-grade">
+<dom-module id="chart-kpi-level1">
 	<template>
 		<iron-ajax id="getData" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
 				   on-request="_startLoader"
-				   url="/api/corp/chart-kpidetail/grade"
+				   url="/api/corp/chart-kpi/level1"
 				   on-response="_drawChart">
 		</iron-ajax>
 
@@ -26,7 +26,7 @@
 	</template>
 	<script>
         Polymer({
-            is: 'chart-kpidetail-grade',
+            is: 'chart-kpi-level1',
 
             behaviors: [Lunch.LoaderBehavior],
 
@@ -74,22 +74,18 @@
                 this._data = e.currentTarget.lastResponse;
 
                 var data = {
-                    labels: ['사회적성과-조직내적측면', '사회적성과-조직외적측면','경제적 성과', '건전성수준', '사회가치 창출역량', '기업가/인적자원관리 역량',
-							'마케팅관리 역량', '생산운영/정보시스템관리 역량', '회계/재무관리 역량'],
+                    labels: ['사회적 성과', '경제적 성과', '기업 건전성', '사회 가치창출 역량', '비즈니스 역량'],
                     datasets: [
                         {
                             type: 'bar',
-                            label: '성과지표 2단계 항목별 분석',
+                            label: 'KPI 항목별 분석',
                             backgroundColor: [
                                 'rgba(255, 99, 132, 0.9)',
                                 'rgba(54, 162, 235, 0.9)',
                                 'rgba(255, 206, 86, 0.9)',
                                 'rgba(75, 192, 192, 0.9)',
                                 'rgba(153, 102, 255, 0.9)',
-                                'rgba(255, 159, 64, 0.9)',
-                                'rgba(200, 99, 132, 0.9)',
-                                'rgba(160, 162, 235, 0.9)',
-                                'rgba(15, 92, 112, 0.9)'
+                                'rgba(255, 159, 64, 0.9)'
                             ],
                             borderColor: [
                                 'rgba(255,99,132,1)',
@@ -97,14 +93,10 @@
                                 'rgba(255, 206, 86, 1)',
                                 'rgba(75, 192, 192, 1)',
                                 'rgba(153, 102, 255, 1)',
-                                'rgba(255, 159, 64, 1)',
-                                'rgba(200,99,132,1)',
-                                'rgba(160, 162, 235, 1)',
-                                'rgba(15, 92, 112, 1)'
+                                'rgba(255, 159, 64, 1)'
                             ],
                             borderWidth: 1,
-                            data: [this._data[0].RESULT, this._data[1].RESULT, this._data[2].RESULT,this._data[3].RESULT, this._data[4].RESULT,
-                                this._data[5].RESULT, this._data[6].RESULT, this._data[7].RESULT,this._data[8].RESULT],
+                            data: [this._data[0].RESULT, this._data[1].RESULT, this._data[2].RESULT,this._data[3].RESULT, this._data[4].RESULT],
                             spanGaps: false,
                         },
                     ]
