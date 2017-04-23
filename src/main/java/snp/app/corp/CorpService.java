@@ -787,32 +787,91 @@ public class CorpService {
 
 		List<Map<String, Object>> allCorpsDataAll = repository.allCorpsAll(params, Security.user());
 		List<Map<String, Object>> allCorpsDataEach = repository.allCorpsEach(params, Security.user());
+		List<Map<String, Object>> allCorpsDataKeyword = repository.allCorpsKeyword(params, Security.user());
 
 		String[] allCorpsDataColumns = {
-				"OPEN_DT",
-				"SE_YN",
-				"ORG_TYPE",
-				"BEFORE_TYPE",
-				"LEG_TYPE1",
-				"LEG_TYPE2",
-				"MAIN_TYPE",
-				"SECTOR",
-				"HISTORY",
-				"REGION" };
+				  "REG_EMP_CNT"	/*g5 정규직 근로자수 */
+				, "REG_WEEK_TIME"	/*g6 정규직 주당평균 근로시간 */
+				, "REG_MONTH_PAY"	/*g7 정규직 월 평균임금 */
+				, "REG_EMP_TIME"	/*g8 정규직 평균 근속기간 */
+				, "NON_EMP_CNT"  /* 비정규직 근로자수 */
+				, "NON_WEEK_TIME" /* 비정규직 주당 평균 근로기간 */
+				, "NON_MONTH_PAY" /* 비정규직 월 평균임금 */
+				, "NON_EMP_TIME" /* 비정규직 평균 근속기간 */
+				, "VOL_EMP_CNT"		/*g25 자원봉사자 근로자수 */
+				, "VOL_WEEK_TIME"		/*g26 자원봉사자 주당평균 근로시간 */
+				, "WEAK_REG_EMP_CNT"		/*g31 정규직 근로자수 */
+				, "WEAK_REG_WEEK_TIME"	/*g32 정규직 주당평균 근로시간 */
+				, "WEAK_REG_MONTH_PAY"	/*g33 정규직 월 평균임금 */
+				, "WEAK_REG_EMP_TIME"		/*g34 정규직 평균 근속기간 */
+				, "WEAK_NON_EMP_CNT"		/* 비정규직 근로자수 */
+				, "WEAK_NON_WEEK_TIME"	/* 비정규직 주당평균 근로시간 */
+				, "WEAK_NON_MONTH_PAY"	/* 비정규직 월 평균임금 */
+				, "WEAK_NON_EMP_TIME"	/* 비정규직 평균 근속기간 */
+				, "WEAK_TYPE1_CNT"	/*g52 취약계층 고령자 고용인원 */
+				, "WEAK_TYPE2_CNT"	/*g53 취약계층 장애인 고용인원 */
+				, "WEAK_TYPE3_CNT"	/*g54 취약계층 저소득 고용인원 */
+				, "WEAK_TYPE4_CNT"	/*g55 취약계층 경력단절여성 고용인원 */
+				, "WEAK_TYPE5_CNT"	/*g56 취약계층 장기실업 고용인원 */
+				, "WEAK_TYPE6_CNT"	/*g57 취약계층 결혼이민 고용인원 */
+				, "WEAK_TYPE7_CNT"	/*g58 취약계층 기타 고용인원 */
+				, "CORP_ASSET"		    /*h3 자산 */
+				, "CORP_CAPITAL"		/*h4 자본 */
+				, "CORP_DEBT"			/*h5 부채 */
+				, "PROFIT_SURPLUS" 	    /*이익잉여금*/
+				, "CORP_SALES"		    /*h6 매출액 */
+				, "CORP_SALES_PROFIT"	/*h7 매출 총이익 */
+				, "CORP_LABOR_COST"	    /*h8 노무비 */
+				, "CORP_TAX"			/*h9 법인세 */
+				, "CORP_OP_PROFIT"	    /*h10 영업이익 */
+				, "CORP_NET_INCOM"	    /*h14 당기순이익 */
+				, "NON_OP_INCOM"		/* 영업외이익 */
+				, "GOV_SUP_ASSET"		/*h12 정부지원금 - 건물 등 자산취득 관련 지원금 */
+				, "GOV_SUP_COST"		/*h11 징부지원금 - 인건비 등 비용관련 지원금 */
+				, "SPONSOR_DONATE"  	/*h13 각종 후원금, 기부금 */ };
 
 		String[] allCorpsDataLabels = {
-				"설립연도",
-				"인증여부",
-				"조직형태",
-				"이전조직형태",
-				"법적유형 1",
-				"법적유형 2",
-				"주요 활동 업종 분야",
-				"업종",
-				"대표자 과거 경력",
-				"회사 소재지"};
+				"근로자수",
+				"주당평균 근로시간",
+				"월 평균임금",
+				"평균 근속기간",
+				"근로자수",
+				"주당평균 근로시간",
+				"월 평균임금",
+				"평균 근속기간",
+				"근로자수",
+				"주당평균 근로시간",
+				"근로자수",
+				"주당평균 근로시간",
+				"월 평균임금",
+				"평균 근속기간",
+				"근로자수",
+				"주당평균 근로시간",
+				"월 평균임금",
+				"평균 근속기간",
+				"고령자",
+				"장애인",
+				"저소득",
+				"경력단절여성",
+				"장기실업",
+				"결혼이민",
+				"기타",
+				"자산",
+				"자본",
+				"부채",
+				"이익잉여금",
+				"매출액",
+				"매출 총이익",
+				"노무비",
+				"법인세",
+				"영업이익",
+				"당기순이익",
+				"영업외 이익",
+				"정부지원금(자산취득)",
+				"정부지원금(비용지원)",
+				"각종 후원금"};
 
-		List<TachyonColumn> headList = TachyonColumn.generateColumns(allCorpsDataLabels, allCorpsDataColumns, 120, "center");
+		List<TachyonColumn> headList = TachyonColumn.generateColumns(allCorpsDataLabels, allCorpsDataColumns, 120, "right");
 		headList.forEach(column -> column.setDataFormatFunction(dataFormatFunction));
 		headList.add(0, corpTypeColumn);
 		headList.add(0, corpNameColumn);
@@ -825,11 +884,19 @@ public class CorpService {
 
 		// 데이터 생성
 		createdRowIndex += 1;
-		if(corpKind == 0)
-			excelWriter.writeData(sheet, headList, allCorpsDataAll, 0, createdRowIndex);
-		else
-			excelWriter.writeData(sheet, headList, allCorpsDataEach, 0, createdRowIndex);
-
+		switch (corpKind) {
+			case 0:
+				excelWriter.writeData(sheet, headList, allCorpsDataAll, 0, createdRowIndex); //전체
+				break;
+			case 1:
+			case 2:
+			case 3:
+				excelWriter.writeData(sheet, headList, allCorpsDataEach, 0, createdRowIndex); //개별
+				break;
+			default:
+				excelWriter.writeData(sheet, headList, allCorpsDataKeyword, 0, createdRowIndex); //키워드
+				break;
+		}
 
 		/*************************************************************************************************************/
 		excelWriter.download(response);

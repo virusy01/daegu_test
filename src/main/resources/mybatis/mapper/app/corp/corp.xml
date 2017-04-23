@@ -5276,16 +5276,45 @@
 		, CASE CORP_TYPE WHEN 1 THEN '사회적기업'
 		  WHEN 2 THEN '마을기업'
 		  ELSE '협동조합' END AS CORP_TYPE_NM
-        , SUBSTR(OPEN_DT,1,4) AS OPEN_DT		/*f1 설립년도*/
-        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'SE_YN' AND CD = SE_YN) AS SE_YN			/*f2 인증여부*/
-        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'ORG_TYPE' AND CD = ORG_TYPE) AS ORG_TYPE 	/*f3 조직형태*/
-        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'BEFORE_TYPE' AND CD = BEFORE_TYPE) AS BEFORE_TYPE /*f4 사,마:이전 조직형태  협:조합원구성 */
-        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'LEG_TYPE1' AND CD = LEG_TYPE1) AS LEG_TYPE1  /*f5 법적 유형 1*/
-        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'LEG_TYPE2' AND CD = LEG_TYPE2) AS LEG_TYPE2  /*f6 법적 유형 2*/
-        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'MAIN_TYPE' AND CD = MAIN_TYPE) AS MAIN_TYPE /*f7 주요 활동 업종 분야*/
-        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'SECTOR' AND CD = SECTOR) AS SECTOR /*f8 업종*/
-        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'HISTORY' AND CD = HISTORY) AS HISTORY /*f9 대표자 과거 경력*/
-        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'REGION' AND CD = REGION) AS REGION /*f10 회사 소재지*/
+		, REG_EMP_CNT	/*g5 정규직 근로자수 */
+		, REG_WEEK_TIME	/*g6 정규직 주당평균 근로시간 */
+		, REG_MONTH_PAY	/*g7 정규직 월 평균임금 */
+		, REG_EMP_TIME	/*g8 정규직 평균 근속기간 */
+		, COM_EMP_CNT + CONTRACT_EMP_CNT + TIME_EMP_CNT AS NON_EMP_CNT  /* 비정규직 근로자수 */
+		, COM_WEEK_TIME + CONTRACT_WEEK_TIME + TIME_WEEK_TIME  AS NON_WEEK_TIME /* 비정규직 주당 평균 근로기간 */
+		, COM_MONTH_PAY + CONTRACT_MONTH_PAY + TIME_MONTH_PAY AS NON_MONTH_PAY /* 비정규직 월 평균임금 */
+		, COM_EMP_TIME + CONTRACT_EMP_TIME + TIME_EMP_TIME AS NON_EMP_TIME /* 비정규직 평균 근속기간 */
+		, VOL_EMP_CNT		/*g25 자원봉사자 근로자수 */
+		, VOL_WEEK_TIME		/*g26 자원봉사자 주당평균 근로시간 */
+		, WEAK_REG_EMP_CNT		/*g31 정규직 근로자수 */
+		, WEAK_REG_WEEK_TIME	/*g32 정규직 주당평균 근로시간 */
+		, WEAK_REG_MONTH_PAY	/*g33 정규직 월 평균임금 */
+		, WEAK_REG_EMP_TIME		/*g34 정규직 평균 근속기간 */
+		, WEAK_COM_EMP_CNT + WEAK_CONTRACT_EMP_CNT + WEAK_TIME_EMP_CNT	AS WEAK_NON_EMP_CNT	/* 비정규직 근로자수 */
+		, WEAK_COM_WEEK_TIME + WEAK_CONTRACT_WEEK_TIME + WEAK_TIME_WEEK_TIME  AS WEAK_NON_WEEK_TIME 	/* 비정규직 주당평균 근로시간 */
+		, WEAK_COM_MONTH_PAY + WEAK_CONTRACT_MONTH_PAY + WEAK_TIME_MONTH_PAY AS WEAK_NON_MONTH_PAY 	/* 비정규직 월 평균임금 */
+		, WEAK_COM_EMP_TIME + WEAK_CONTRACT_EMP_TIME + WEAK_TIME_EMP_TIME AS WEAK_NON_EMP_TIME 	/* 비정규직 평균 근속기간 */
+		, WEAK_TYPE1_CNT	/*g52 취약계층 고령자 고용인원 */
+		, WEAK_TYPE2_CNT	/*g53 취약계층 장애인 고용인원 */
+		, WEAK_TYPE3_CNT	/*g54 취약계층 저소득 고용인원 */
+		, WEAK_TYPE4_CNT	/*g55 취약계층 경력단절여성 고용인원 */
+		, WEAK_TYPE5_CNT	/*g56 취약계층 장기실업 고용인원 */
+		, WEAK_TYPE6_CNT	/*g57 취약계층 결혼이민 고용인원 */
+		, WEAK_TYPE7_CNT	/*g58 취약계층 기타 고용인원 */
+		, CORP_ASSET		/*h3 자산 */
+		, CORP_CAPITAL		/*h4 자본 */
+		, CORP_DEBT			/*h5 부채 */
+		, PROFIT_SURPLUS 	/*이익잉여금*/
+		, CORP_SALES		/*h6 매출액 */
+		, CORP_SALES_PROFIT	/*h7 매출 총이익 */
+		, CORP_LABOR_COST	/*h8 노무비 */
+		, CORP_TAX			/*h9 법인세 */
+		, CORP_OP_PROFIT	/*h10 영업이익 */
+		, CORP_NET_INCOM	/*h14 당기순이익 */
+		, NON_OP_INCOM		/* 영업외이익 */
+		, GOV_SUP_ASSET		/*h12 정부지원금 - 건물 등 자산취득 관련 지원금 */
+		, GOV_SUP_COST		/*h11 징부지원금 - 인건비 등 비용관련 지원금 */
+		, SPONSOR_DONATE	/*h13 각종 후원금, 기부금 */
         FROM CORP_INFO
      	ORDER BY CORP_NM
 	</select>
@@ -5299,16 +5328,45 @@
 		, CASE CORP_TYPE WHEN 1 THEN '사회적기업'
 		  WHEN 2 THEN '마을기업'
 		  ELSE '협동조합' END AS CORP_TYPE_NM
-        , SUBSTR(OPEN_DT,1,4) AS OPEN_DT		/*f1 설립년도*/
-		, (SELECT CD_NM FROM CODE WHERE GRP_CD = 'SE_YN' AND CD = SE_YN) AS SE_YN			/*f2 인증여부*/
-		, (SELECT CD_NM FROM CODE WHERE GRP_CD = 'ORG_TYPE' AND CD = ORG_TYPE) AS ORG_TYPE 	/*f3 조직형태*/
-		, (SELECT CD_NM FROM CODE WHERE GRP_CD = 'BEFORE_TYPE' AND CD = BEFORE_TYPE) AS BEFORE_TYPE /*f4 사,마:이전 조직형태  협:조합원구성 */
-		, (SELECT CD_NM FROM CODE WHERE GRP_CD = 'LEG_TYPE1' AND CD = LEG_TYPE1) AS LEG_TYPE1  /*f5 법적 유형 1*/
-		, (SELECT CD_NM FROM CODE WHERE GRP_CD = 'LEG_TYPE2' AND CD = LEG_TYPE2) AS LEG_TYPE2  /*f6 법적 유형 2*/
-		, (SELECT CD_NM FROM CODE WHERE GRP_CD = 'MAIN_TYPE' AND CD = MAIN_TYPE) AS MAIN_TYPE /*f7 주요 활동 업종 분야*/
-		, (SELECT CD_NM FROM CODE WHERE GRP_CD = 'SECTOR' AND CD = SECTOR) AS SECTOR /*f8 업종*/
-		, (SELECT CD_NM FROM CODE WHERE GRP_CD = 'HISTORY' AND CD = HISTORY) AS HISTORY /*f9 대표자 과거 경력*/
-		, (SELECT CD_NM FROM CODE WHERE GRP_CD = 'REGION' AND CD = REGION) AS REGION /*f10 회사 소재지*/
+		, REG_EMP_CNT	/*g5 정규직 근로자수 */
+		, REG_WEEK_TIME	/*g6 정규직 주당평균 근로시간 */
+		, REG_MONTH_PAY	/*g7 정규직 월 평균임금 */
+		, REG_EMP_TIME	/*g8 정규직 평균 근속기간 */
+		, COM_EMP_CNT + CONTRACT_EMP_CNT + TIME_EMP_CNT AS NON_EMP_CNT  /* 비정규직 근로자수 */
+		, COM_WEEK_TIME + CONTRACT_WEEK_TIME + TIME_WEEK_TIME  AS NON_WEEK_TIME /* 비정규직 주당 평균 근로기간 */
+		, COM_MONTH_PAY + CONTRACT_MONTH_PAY + TIME_MONTH_PAY AS NON_MONTH_PAY /* 비정규직 월 평균임금 */
+		, COM_EMP_TIME + CONTRACT_EMP_TIME + TIME_EMP_TIME AS NON_EMP_TIME /* 비정규직 평균 근속기간 */
+		, VOL_EMP_CNT		/*g25 자원봉사자 근로자수 */
+		, VOL_WEEK_TIME		/*g26 자원봉사자 주당평균 근로시간 */
+		, WEAK_REG_EMP_CNT		/*g31 정규직 근로자수 */
+		, WEAK_REG_WEEK_TIME	/*g32 정규직 주당평균 근로시간 */
+		, WEAK_REG_MONTH_PAY	/*g33 정규직 월 평균임금 */
+		, WEAK_REG_EMP_TIME		/*g34 정규직 평균 근속기간 */
+		, WEAK_COM_EMP_CNT + WEAK_CONTRACT_EMP_CNT + WEAK_TIME_EMP_CNT	AS WEAK_NON_EMP_CNT	/* 비정규직 근로자수 */
+		, WEAK_COM_WEEK_TIME + WEAK_CONTRACT_WEEK_TIME + WEAK_TIME_WEEK_TIME  AS WEAK_NON_WEEK_TIME 	/* 비정규직 주당평균 근로시간 */
+		, WEAK_COM_MONTH_PAY + WEAK_CONTRACT_MONTH_PAY + WEAK_TIME_MONTH_PAY AS WEAK_NON_MONTH_PAY 	/* 비정규직 월 평균임금 */
+		, WEAK_COM_EMP_TIME + WEAK_CONTRACT_EMP_TIME + WEAK_TIME_EMP_TIME AS WEAK_NON_EMP_TIME 	/* 비정규직 평균 근속기간 */
+		, WEAK_TYPE1_CNT	/*g52 취약계층 고령자 고용인원 */
+		, WEAK_TYPE2_CNT	/*g53 취약계층 장애인 고용인원 */
+		, WEAK_TYPE3_CNT	/*g54 취약계층 저소득 고용인원 */
+		, WEAK_TYPE4_CNT	/*g55 취약계층 경력단절여성 고용인원 */
+		, WEAK_TYPE5_CNT	/*g56 취약계층 장기실업 고용인원 */
+		, WEAK_TYPE6_CNT	/*g57 취약계층 결혼이민 고용인원 */
+		, WEAK_TYPE7_CNT	/*g58 취약계층 기타 고용인원 */
+		, CORP_ASSET		/*h3 자산 */
+		, CORP_CAPITAL		/*h4 자본 */
+		, CORP_DEBT			/*h5 부채 */
+		, PROFIT_SURPLUS 	/*이익잉여금*/
+		, CORP_SALES		/*h6 매출액 */
+		, CORP_SALES_PROFIT	/*h7 매출 총이익 */
+		, CORP_LABOR_COST	/*h8 노무비 */
+		, CORP_TAX			/*h9 법인세 */
+		, CORP_OP_PROFIT	/*h10 영업이익 */
+		, CORP_NET_INCOM	/*h14 당기순이익 */
+		, NON_OP_INCOM		/* 영업외이익 */
+		, GOV_SUP_ASSET		/*h12 정부지원금 - 건물 등 자산취득 관련 지원금 */
+		, GOV_SUP_COST		/*h11 징부지원금 - 인건비 등 비용관련 지원금 */
+		, SPONSOR_DONATE	/*h13 각종 후원금, 기부금 */
 		FROM CORP_INFO
 		WHERE CORP_TYPE = #{p.CORP_KIND}
 		ORDER BY CORP_NM
@@ -5323,16 +5381,45 @@
 		, CASE CORP_TYPE WHEN 1 THEN '사회적기업'
 		  WHEN 2 THEN '마을기업'
 		  ELSE '협동조합' END AS CORP_TYPE_NM
-        , SUBSTR(OPEN_DT,1,4) AS OPEN_DT		/*f1 설립년도*/
-        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'SE_YN' AND CD = SE_YN) AS SE_YN			/*f2 인증여부*/
-        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'ORG_TYPE' AND CD = ORG_TYPE) AS ORG_TYPE 	/*f3 조직형태*/
-        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'BEFORE_TYPE' AND CD = BEFORE_TYPE) AS BEFORE_TYPE /*f4 사,마:이전 조직형태  협:조합원구성 */
-        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'LEG_TYPE1' AND CD = LEG_TYPE1) AS LEG_TYPE1  /*f5 법적 유형 1*/
-        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'LEG_TYPE2' AND CD = LEG_TYPE2) AS LEG_TYPE2  /*f6 법적 유형 2*/
-        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'MAIN_TYPE' AND CD = MAIN_TYPE) AS MAIN_TYPE /*f7 주요 활동 업종 분야*/
-        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'SECTOR' AND CD = SECTOR) AS SECTOR /*f8 업종*/
-        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'HISTORY' AND CD = HISTORY) AS HISTORY /*f9 대표자 과거 경력*/
-        , (SELECT CD_NM FROM CODE WHERE GRP_CD = 'REGION' AND CD = REGION) AS REGION /*f10 회사 소재지*/
+		, REG_EMP_CNT	/*g5 정규직 근로자수 */
+		, REG_WEEK_TIME	/*g6 정규직 주당평균 근로시간 */
+		, REG_MONTH_PAY	/*g7 정규직 월 평균임금 */
+		, REG_EMP_TIME	/*g8 정규직 평균 근속기간 */
+		, COM_EMP_CNT + CONTRACT_EMP_CNT + TIME_EMP_CNT AS NON_EMP_CNT  /* 비정규직 근로자수 */
+		, COM_WEEK_TIME + CONTRACT_WEEK_TIME + TIME_WEEK_TIME  AS NON_WEEK_TIME /* 비정규직 주당 평균 근로기간 */
+		, COM_MONTH_PAY + CONTRACT_MONTH_PAY + TIME_MONTH_PAY AS NON_MONTH_PAY /* 비정규직 월 평균임금 */
+		, COM_EMP_TIME + CONTRACT_EMP_TIME + TIME_EMP_TIME AS NON_EMP_TIME /* 비정규직 평균 근속기간 */
+		, VOL_EMP_CNT		/*g25 자원봉사자 근로자수 */
+		, VOL_WEEK_TIME		/*g26 자원봉사자 주당평균 근로시간 */
+		, WEAK_REG_EMP_CNT		/*g31 정규직 근로자수 */
+		, WEAK_REG_WEEK_TIME	/*g32 정규직 주당평균 근로시간 */
+		, WEAK_REG_MONTH_PAY	/*g33 정규직 월 평균임금 */
+		, WEAK_REG_EMP_TIME		/*g34 정규직 평균 근속기간 */
+		, WEAK_COM_EMP_CNT + WEAK_CONTRACT_EMP_CNT + WEAK_TIME_EMP_CNT	AS WEAK_NON_EMP_CNT	/* 비정규직 근로자수 */
+		, WEAK_COM_WEEK_TIME + WEAK_CONTRACT_WEEK_TIME + WEAK_TIME_WEEK_TIME  AS WEAK_NON_WEEK_TIME 	/* 비정규직 주당평균 근로시간 */
+		, WEAK_COM_MONTH_PAY + WEAK_CONTRACT_MONTH_PAY + WEAK_TIME_MONTH_PAY AS WEAK_NON_MONTH_PAY 	/* 비정규직 월 평균임금 */
+		, WEAK_COM_EMP_TIME + WEAK_CONTRACT_EMP_TIME + WEAK_TIME_EMP_TIME AS WEAK_NON_EMP_TIME 	/* 비정규직 평균 근속기간 */
+		, WEAK_TYPE1_CNT	/*g52 취약계층 고령자 고용인원 */
+		, WEAK_TYPE2_CNT	/*g53 취약계층 장애인 고용인원 */
+		, WEAK_TYPE3_CNT	/*g54 취약계층 저소득 고용인원 */
+		, WEAK_TYPE4_CNT	/*g55 취약계층 경력단절여성 고용인원 */
+		, WEAK_TYPE5_CNT	/*g56 취약계층 장기실업 고용인원 */
+		, WEAK_TYPE6_CNT	/*g57 취약계층 결혼이민 고용인원 */
+		, WEAK_TYPE7_CNT	/*g58 취약계층 기타 고용인원 */
+		, CORP_ASSET		/*h3 자산 */
+		, CORP_CAPITAL		/*h4 자본 */
+		, CORP_DEBT			/*h5 부채 */
+		, PROFIT_SURPLUS 	/*이익잉여금*/
+		, CORP_SALES		/*h6 매출액 */
+		, CORP_SALES_PROFIT	/*h7 매출 총이익 */
+		, CORP_LABOR_COST	/*h8 노무비 */
+		, CORP_TAX			/*h9 법인세 */
+		, CORP_OP_PROFIT	/*h10 영업이익 */
+		, CORP_NET_INCOM	/*h14 당기순이익 */
+		, NON_OP_INCOM		/* 영업외이익 */
+		, GOV_SUP_ASSET		/*h12 정부지원금 - 건물 등 자산취득 관련 지원금 */
+		, GOV_SUP_COST		/*h11 징부지원금 - 인건비 등 비용관련 지원금 */
+		, SPONSOR_DONATE	/*h13 각종 후원금, 기부금 */
         FROM CORP_INFO
         WHERE CORP_NM LIKE CONCAT('%',#{p.KEYWORD},'%')
      	ORDER BY CORP_NM

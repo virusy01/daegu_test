@@ -169,7 +169,8 @@ public class CorpController
 
 	// 전체기업 상세정보 조회 -  Excel
 	@RequestMapping(value="/all-corps/excel", method= RequestMethod.GET)
-	public void allCorps2Excel(HttpServletResponse response, @RequestParam(name = "CORP_KIND") int corpKind) throws Exception{
+	public void allCorps2Excel(HttpServletResponse response, @RequestParam(name = "CORP_KIND") int corpKind,
+							   @RequestParam(name = "KEYWORD") String keyword) throws Exception{
 
 		service.allCorps2Excel(response,RequestParams.map(),corpKind);
 	}
