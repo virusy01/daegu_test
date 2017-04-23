@@ -876,9 +876,21 @@ public class CorpService {
 		headList.add(0, corpTypeColumn);
 		headList.add(0, corpNameColumn);
 
-		// 소제목생성
+		// 헤더 생성
 		createdRowIndex += 3;
+		headerTitles = new String [] {"", "전체 고용현황", "취약계층 고용현황", "재무현황"};
+		mergeRanges = new int[] {2, 10, 15, 14};
 
+		excelWriter.writeMergedHeader(sheet, headerTitles, mergeRanges, 0, createdRowIndex, HorizontalAlignment.CENTER);
+
+		createdRowIndex += 1;
+		excelWriter.writeHeader(sheet, headList, 0, createdRowIndex);
+
+		headerTitles = new String [] {"","정규직", "비정규직", "자원봉사자", "정규직",  "비정규직", "유형별 고용인원", "재무현황", "영업 외 수익"};
+		mergeRanges = new int[] {2, 4, 4, 2, 4, 4, 7, 10, 4};
+
+		excelWriter.writeMergedHeader(sheet, headerTitles, mergeRanges, 0, createdRowIndex, HorizontalAlignment.CENTER);
+		createdRowIndex += 1;
 		excelWriter.writeHeader(sheet, headList, 0, createdRowIndex);
 
 

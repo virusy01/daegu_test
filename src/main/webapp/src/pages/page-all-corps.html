@@ -63,7 +63,7 @@
                 <tr>
                     <th rowspan='2' colspan='3' >기업</th>
                     <th colspan='10'>전체 고용현황</th>
-                    <th colspan='15'>취야계층 고용현황</th>
+                    <th colspan='15'>취약계층 고용현황</th>
                     <th colspan='14'>재무현황</th>
                 </tr>
                 <tr>
@@ -164,7 +164,14 @@
                         return [];
                     }
                 },
-
+                _hideTotal: {
+                    type: Boolean,
+                    value: false
+                },
+                _hideSum: {
+                    type: Boolean,
+                    value: false
+                },
                 _guideTop: {
                     type: Array,
                     value: function () {
@@ -294,18 +301,70 @@
                                 td.setAttribute("style", "text-align:center; width: 150px;");
                                 break;
                             default:
-                                td.innerHTML = value;
+                                td.innerHTML = accounting.formatNumber(value);
                                 td.setAttribute('id', prefix + '_' + guide[attribute] + i);
                                 td.setAttribute('name', prefix + '_' + guide[attribute]);
                                 td.setAttribute("style", "text-align:right; width: 100px; padding-right: 10px !important;");
                                 break;
                         }
+                        if (!total[guide[attribute]])
+                            total[guide[attribute]] = 0;
+
+                        total[guide[attribute]] += accounting.unformat(value);
 
                     }
 
                 }
+                this._drawFooter(prefix, table, total, this._data.length);
+            },
+
+            _drawFooter: function(prefix, table, total, length) {
+
+                var foot = table.querySelector('tfoot');
+                Polymer.dom(foot).innerHTML = '';
+
+                if (!this._hideTotal) {
+                    // total
+                    tr = document.createElement('tr');
+                    th = document.createElement('th');
+                    Polymer.dom(th).innerHTML = '합계';
+                    Polymer.dom(tr).appendChild(th);
+                    Polymer.dom(foot).appendChild(tr);
+
+                    for (var t in total) {
+                        td = document.createElement('td');
+                        td.setAttribute('id', 'total_' + prefix + '_' + t);
+                        if( t == 'CORP_NM' || t == 'CORP_TYPE_NM')
+                            td.innerHTML = "";
+                        else
+                            td.innerHTML = accounting.formatNumber(total[t]);
+
+                        Polymer.dom(tr).appendChild(td);
+                    }
+                }
+
+                if (!this._hideSum) {
+                    // sum
+                    tr = document.createElement('tr');
+                    th = document.createElement('th');
+                    Polymer.dom(th).innerHTML = '평균';
+                    Polymer.dom(tr).appendChild(th);
+                    Polymer.dom(foot).appendChild(tr);
+
+                    for (var t in total) {
+                        td = document.createElement('td');
+                        td.setAttribute('id', 'sum_' + prefix + '_' + t);
+                        if( t == 'CORP_NM' || t == 'CORP_TYPE_NM')
+                            td.innerHTML = "";
+                        else
+                            td.innerHTML = accounting.formatNumber(total[t] / length);
+
+                        Polymer.dom(tr).appendChild(td);
+                    }
+                }
 
             },
+
 
             _downloadExcel: function() {
                 this.$.excelCorpSeq.value = this._corpType;
