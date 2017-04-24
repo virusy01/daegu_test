@@ -899,16 +899,48 @@ public class CorpService {
 		switch (corpKind) {
 			case 0:
 				excelWriter.writeData(sheet, headList, allCorpsDataAll, 0, createdRowIndex); //전체
+				Map<String, Object> sumItem1 = Formula.sum(allCorpsDataAll, allCorpsDataColumns);
+				Map<String, Object> avgItem1 = Formula.avg(allCorpsDataAll, allCorpsDataColumns);
+				sumItem1.put("CORP_NM", "합계");
+				sumItem1.put("CORP_TYPE_NM", "");
+				avgItem1.put("CORP_NM", "평균");
+				avgItem1.put("CORP_TYPE_NM", "");
+				createdRowIndex += allCorpsDataAll.size();
+				excelWriter.writeFooter(sheet, headList, sumItem1, 0, createdRowIndex);
+				createdRowIndex += 1;
+				excelWriter.writeFooter(sheet, headList, avgItem1, 0, createdRowIndex);
 				break;
 			case 1:
 			case 2:
 			case 3:
 				excelWriter.writeData(sheet, headList, allCorpsDataEach, 0, createdRowIndex); //개별
+				Map<String, Object> sumItem2 = Formula.sum(allCorpsDataEach, allCorpsDataColumns);
+				Map<String, Object> avgItem2 = Formula.avg(allCorpsDataEach, allCorpsDataColumns);
+				sumItem2.put("CORP_NM", "합계");
+				sumItem2.put("CORP_TYPE_NM", "");
+				avgItem2.put("CORP_NM", "평균");
+				avgItem2.put("CORP_TYPE_NM", "");
+				createdRowIndex += allCorpsDataEach.size();
+				excelWriter.writeFooter(sheet, headList, sumItem2, 0, createdRowIndex);
+				createdRowIndex += 1;
+				excelWriter.writeFooter(sheet, headList, avgItem2, 0, createdRowIndex);
 				break;
 			default:
 				excelWriter.writeData(sheet, headList, allCorpsDataKeyword, 0, createdRowIndex); //키워드
+				Map<String, Object> sumItem3 = Formula.sum(allCorpsDataKeyword, allCorpsDataColumns);
+				Map<String, Object> avgItem3 = Formula.avg(allCorpsDataKeyword, allCorpsDataColumns);
+				sumItem3.put("CORP_NM", "합계");
+				sumItem3.put("CORP_TYPE_NM", "");
+				avgItem3.put("CORP_NM", "평균");
+				avgItem3.put("CORP_TYPE_NM", "");
+				createdRowIndex += allCorpsDataKeyword.size();
+				excelWriter.writeFooter(sheet, headList, sumItem3, 0, createdRowIndex);
+				createdRowIndex += 1;
+				excelWriter.writeFooter(sheet, headList, avgItem3, 0, createdRowIndex);
 				break;
 		}
+
+
 
 		/*************************************************************************************************************/
 		excelWriter.download(response);
