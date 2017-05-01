@@ -264,6 +264,7 @@
                 var tr, th, td, value;
                 var input;
                 var total = {};
+                var count = {};
 
                 Polymer.dom(body).innerHTML = '';
 
@@ -309,16 +310,19 @@
                         }
                         if (!total[guide[attribute]])
                             total[guide[attribute]] = 0;
+                        if (!count[guide[attribute]])
+                            count[guide[attribute]] = 0;
 
                         total[guide[attribute]] += accounting.unformat(value);
-
+                        if ( value != null)
+                         count[guide[attribute]] += 1;
                     }
 
                 }
-                this._drawFooter(prefix, table, total, this._data.length);
+                this._drawFooter(prefix, table, total, count);
             },
 
-            _drawFooter: function(prefix, table, total, length) {
+            _drawFooter: function(prefix, table, total, count) {
 
                 var foot = table.querySelector('tfoot');
                 Polymer.dom(foot).innerHTML = '';
@@ -357,10 +361,11 @@
                         if( t == 'CORP_NM' || t == 'CORP_TYPE_NM')
                             td.innerHTML = "";
                         else
-                            td.innerHTML = accounting.formatNumber(total[t] / length);
+                            td.innerHTML = accounting.formatNumber(total[t] / count[t]);
 
                         Polymer.dom(tr).appendChild(td);
                     }
+
                 }
 
             },
