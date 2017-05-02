@@ -41,11 +41,15 @@ public class Formula {
             for (String columnName : columns){
                 try {
                     Double value = Double.valueOf(item.get(columnName).toString());
-                    // if (value != null) {
-                    int count = (int) countItem.get(columnName) + 1;
-                    countItem.put(columnName, count);
-                    System.out.println(columnName + " : " + count);
-                    // }
+                    if (value != null){
+                        if (countItem.containsKey(columnName)) {
+                            double added = ((Double) countItem.get(columnName)).doubleValue() + 1;
+                            countItem.put(columnName, Double.valueOf(added));
+                            System.out.println("added: " + Double.valueOf(added));
+                        } else {
+                            countItem.put(columnName, 1);
+                        }
+                    }
                 } catch (Exception e){
                     //System.out.println("Column Name:[" + columnName + "] is not number in item index : " + source.indexOf(item));
                 }
@@ -61,11 +65,12 @@ public class Formula {
         for (String columnName : columns){
             try {
                 double sumValue = ((Double) sumItem.get(columnName)).doubleValue();
-                double avgValue = sumValue / (int) countItem.get(columnName);
+                double countValue = ((Double) countItem.get(columnName)).doubleValue();
+                double avgValue = sumValue / countValue;
                 avgItem.put(columnName, Double.valueOf(Math.round(avgValue)));
-                System.out.println("size : " + countItem.get(columnName));
+                System.out.println("size : " + countValue);
             } catch (Exception e) {
-                //System.out.println("Column Name:[" + columnName + "] is not number" );
+                System.out.println("Column Name:[" + columnName + "] is not number" );
             }
         }
         return avgItem;
