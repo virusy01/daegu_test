@@ -560,6 +560,24 @@ public class CorpService {
 		return repository.allCorpsKeyword(params,Security.user());
 	}
 
+	// 사회적기업 이력데이터 정보 조회
+	public List<Map<String, Object>>historyCorps(Map<String, Object> params,String corpKind) {
+		List<Map<String, Object>> result;
+		switch (corpKind) {
+			case "0":
+				result = repository.historyCorpsAll(params, Security.user()); //전체
+				break;
+			default:
+				result = repository.historyCorpsEach(params, Security.user()); //인증, 예비
+				break;
+		}
+		return result;
+	}
+
+	// 사회적기업 이력데이터 조회 키워드검색
+	public List<Map<String, Object>> historyCorpsKeyword(Map<String, Object> params) {
+		return repository.historyCorpsKeyword(params,Security.user());
+	}
 
 	// 성과지표 사회적목적 유형별 분석 - 등급항목 통계
 	//public List<Map<String, Object>> chartTypeGrade() {
@@ -963,5 +981,284 @@ public class CorpService {
 		return titleRow;
 	}
 
+
+	// 사회적기업 이력데이터  조회 -  엑셀
+	public void historyCorps2Excel(HttpServletResponse response, Map<String, Object> params, int corpKind) throws Exception {
+
+		ExcelWriter excelWriter = new ExcelWriter();
+
+		TachyonColumn seqColumn = new TachyonColumn("NO", "ORG_SEQ", false, 50, "center");
+		TachyonColumn corpNameColumn = new TachyonColumn("기업명", "ORG_NAME1", false, 200, "center");
+		TachyonColumn corpTypeColumn = new TachyonColumn("인증유형", "CERT_PRE_NM", false, 120, "center");
+		TachyonColumn region1Column = new TachyonColumn("시도", "REGION1", false, 120, "center");
+		TachyonColumn region2Column = new TachyonColumn("시군구", "REGION2", false, 120, "center");
+		TachyonColumn orgTypeColumn = new TachyonColumn("조직형태", "ORG_TYPE", false, 120, "center");
+		TachyonColumn certTypeColumn = new TachyonColumn("유형", "CERT_TYPE", false, 120, "center");
+		TachyonColumn bizTypeColumn = new TachyonColumn("업종(산업분류)", "BIZ_TYPE", false, 120, "center");
+		TachyonColumn certStatusColumn = new TachyonColumn("인증상황", "CERT_STATUS", false, 120, "center");
+		TachyonColumn certNoColumn = new TachyonColumn("인증번호", "CERT_NO", false, 120, "center");
+
+		DataFormatFunction dataFormatFunction = (item, column, columnIndex, rowIndex) -> {
+			Object value = item.get(column.dataField());
+			if (value == null) {
+				return null;
+			}
+
+			try {
+				double doubleValue = Double.valueOf(value.toString());
+				int intValue = (int) doubleValue;
+
+				if (intValue != doubleValue) {
+					return "#,##0.##";
+				} else {
+					return "#,##0";
+				}
+			} catch (Exception e) {
+				return null;
+			}
+		};
+
+
+		String sheetName = "사회적기업 이력데이터";
+		excelWriter.setFileName(sheetName);
+		SXSSFWorkbook workbook = excelWriter.workbook();
+		// Sheet 생성
+		Sheet sheet = workbook.createSheet(sheetName);
+
+		int createdRowIndex = 1;
+
+		// 제목생성
+
+		int[] topmergeRanges;
+		String[] headerTitles = {"< 사회적기업 이력데이터 >"};
+
+		int[] mergeRanges = {2};
+		Row row = excelWriter.writeMergedHeader(sheet, headerTitles, mergeRanges, 0, createdRowIndex, HorizontalAlignment.CENTER);
+		final XSSFFont fontHeader = (XSSFFont) workbook.createFont();
+		fontHeader.setColor(new XSSFColor(new java.awt.Color(255, 255, 255)));
+		fontHeader.setBold(true);
+		fontHeader.setFontHeight(16);
+		row.getCell(0).getCellStyle().setFont(fontHeader);
+
+		/*************************************************************************************************************/
+
+		List<Map<String, Object>> historyCorpsDataAll = repository.historyCorpsAll(params, Security.user());
+		List<Map<String, Object>> historyCorpsDataEach = repository.historyCorpsEach(params, Security.user());
+		List<Map<String, Object>> historyCorpsDataKeyword = repository.historyCorpsKeyword(params, Security.user());
+
+		String[] historyCorpsDataColumns = {
+				"ASSET2008"		/* 자산2008 */
+				, "ASSET2009"		/* 자산2009 */
+				, "ASSET2010"		/* 자산2010 */
+				, "ASSET2011"		/* 자산2011 */
+				, "ASSET2012"		/* 자산2012 */
+				, "ASSET2013"		/* 자산2013 */
+				, "CAPITAL2008"		/* 자본2008 */
+				, "CAPITAL2009"		/* 자본2009 */
+				, "CAPITAL2010"		/* 자본2010 */
+				, "CAPITAL2011"		/* 자본2011 */
+				, "CAPITAL2012"		/* 자본2012 */
+				, "CAPITAL2013"		/* 자본2013 */
+				, "DEBT2008"		/* 부채2008 */
+				, "DEBT2009"		/* 부채2009 */
+				, "DEBT2010"		/* 부채2010 */
+				, "DEBT2011"		/* 부채2011 */
+				, "DEBT2012"		/* 부채2012 */
+				, "DEBT2013"		/* 자본2013 */
+				, "SALES2008"		/* 매출액2008 */
+				, "SALES2009"		/* 매출액2009 */
+				, "SALES2010"		/* 매출액2010 */
+				, "SALES2011"		/* 매출액2011 */
+				, "SALES2012"		/* 매출액2012 */
+				, "SALES2013"		/* 매출액2013 */
+				, "SALES2014"		/* 매출액2014 */
+				, "SALES2015"		/* 매출액2015 */
+				, "SALES2016"		/* 매출액2016 */
+				, "GROSS_PROFIT2008"		/* 매출총이익2008 */
+				, "GROSS_PROFIT2009"		/* 매출총이익2009 */
+				, "GROSS_PROFIT2010"		/* 매출총이익2010 */
+				, "GROSS_PROFIT2011"		/* 매출총이익2011 */
+				, "GROSS_PROFIT2012"		/* 매출총이익2012 */
+				, "GROSS_PROFIT2013"		/* 매출총이익2013 */
+				, "LABOR_COSTS2008"		/* 노무비2008 */
+				, "LABOR_COSTS2009"		/* 노무비2009 */
+				, "LABOR_COSTS2010"		/* 노무비2010 */
+				, "LABOR_COSTS2011"		/* 노무비2011 */
+				, "LABOR_COSTS2012"		/* 노무비2012 */
+				, "LABOR_COSTS2013"		/* 노무비2013 */
+				, "LABOR_COSTS2014"		/* 노무비2014 */
+				, "LABOR_COSTS2015"		/* 노무비2015 */
+				, "LABOR_COSTS2016"		/* 노무비2016 */
+				, "OP_PROFIT2008"		/* 영업이익2008 */
+				, "OP_PROFIT2009"		/* 영업이익2009 */
+				, "OP_PROFIT2010"		/* 영업이익2010 */
+				, "OP_PROFIT2011"		/* 영업이익2011 */
+				, "OP_PROFIT2012"		/* 영업이익2012 */
+				, "OP_PROFIT2013"		/* 영업이익2013 */
+				, "OP_PROFIT2014"		/* 영업이익2014 */
+				, "OP_PROFIT2015"		/* 영업이익2015 */
+				, "OP_PROFIT2016"		/* 영업이익2016 */
+				, "NET_INCOME2008"		/* 당기순이익2008 */
+				, "NET_INCOME2009"		/* 당기순이익2009 */
+				, "NET_INCOME2010"		/* 당기순이익2010 */
+				, "NET_INCOME2011"		/* 당기순이익2011 */
+				, "NET_INCOME2012"		/* 당기순이익2012 */
+				, "NET_INCOME2013"		/* 당기순이익2013 */
+				, "NET_INCOME2014"		/* 당기순이익2014 */
+				, "NET_INCOME2015"		/* 당기순이익2015 */
+				, "NET_INCOME2016"		/* 당기순이익2016 */
+				, "EMP_CNT2013"		/* 전체근로자수2013 */
+				, "EMP_CNT2014"		/* 전체근로자수2014 */
+				, "EMP_CNT2015"		/* 전체근로자수2015 */
+				, "EMP_CNT2016"		/* 전체근로자수2016 */
+				, "WEAK_EMP_CNT2013"		/* 취약계층 근로자수2013 */
+				, "WEAK_EMP_CNT2014"		/* 취약계층 근로자수2014 */
+				, "WEAK_EMP_CNT2015"		/* 취약계층 근로자수2015 */
+				, "WEAK_EMP_CNT2016"		/* 당취약계층 근로자수2016 */
+		};
+		String[] historyCorpsDataLabels = {
+				"2008년",
+				"2009년",
+				"2010년",
+				"2011년",
+				"2012년",
+				"2013년",
+				"2008년",
+				"2009년",
+				"2010년",
+				"2011년",
+				"2012년",
+				"2013년",
+				"2008년",
+				"2009년",
+				"2010년",
+				"2011년",
+				"2012년",
+				"2013년",
+				"2008년",
+				"2009년",
+				"2010년",
+				"2011년",
+				"2012년",
+				"2013년",
+				"2014년",
+				"2015년",
+				"2016년",
+				"2008년",
+				"2009년",
+				"2010년",
+				"2011년",
+				"2012년",
+				"2013년",
+				"2008년",
+				"2009년",
+				"2010년",
+				"2011년",
+				"2012년",
+				"2013년",
+				"2014년",
+				"2015년",
+				"2016년",
+				"2008년",
+				"2009년",
+				"2010년",
+				"2011년",
+				"2012년",
+				"2013년",
+				"2014년",
+				"2015년",
+				"2016년",
+				"2008년",
+				"2009년",
+				"2010년",
+				"2011년",
+				"2012년",
+				"2013년",
+				"2014년",
+				"2015년",
+				"2016년",
+				"2013년",
+				"2014년",
+				"2015년",
+				"2016년",
+				"2013년",
+				"2014년",
+				"2015년",
+				"2016년"
+		};
+
+		List<TachyonColumn> headList = TachyonColumn.generateColumns(historyCorpsDataLabels, historyCorpsDataColumns, 120, "right");
+		headList.forEach(column -> column.setDataFormatFunction(dataFormatFunction));
+		headList.add(0, certNoColumn);
+		headList.add(0, certStatusColumn);
+		headList.add(0, bizTypeColumn);
+		headList.add(0, certTypeColumn);
+		headList.add(0, orgTypeColumn);
+		headList.add(0, region2Column);
+		headList.add(0, region1Column);
+		headList.add(0, corpTypeColumn);
+		headList.add(0, corpNameColumn);
+		headList.add(0, seqColumn);
+		// 헤더 생성
+		createdRowIndex += 3;
+
+		headerTitles = new String [] {"기업정보","자산", "자본", "부채", "매출액",  "매출총이익", "노무비", "영업이익", "당기순이익", "전체 근로자수", "취약계층 근로자수"};
+		mergeRanges = new int[] {10, 6, 6, 6, 9, 6, 9, 9, 9, 4, 4};
+
+		excelWriter.writeMergedHeader(sheet, headerTitles, mergeRanges, 0, createdRowIndex, HorizontalAlignment.CENTER);
+		createdRowIndex += 1;
+		excelWriter.writeHeader(sheet, headList, 0, createdRowIndex);
+
+
+		// 데이터 생성
+		createdRowIndex += 1;
+		switch (corpKind) {
+			case 0:
+				excelWriter.writeData(sheet, headList, historyCorpsDataAll, 0, createdRowIndex); //전체
+				Map<String, Object> sumItem1 = Formula.sum(historyCorpsDataAll, historyCorpsDataColumns);
+				Map<String, Object> avgItem1 = Formula.avg(historyCorpsDataAll, historyCorpsDataColumns);
+				sumItem1.put("ORG_SEQ", "합계");
+				sumItem1.put("CERT_PRE_NM", "");
+				avgItem1.put("ORG_SEQ", "평균");
+				avgItem1.put("CERT_PRE_NM", "");
+				createdRowIndex += historyCorpsDataAll.size();
+				excelWriter.writeFooter(sheet, headList, sumItem1, 0, createdRowIndex);
+				createdRowIndex += 1;
+				excelWriter.writeFooter(sheet, headList, avgItem1, 0, createdRowIndex);
+				break;
+			case 1:
+			case 2:
+				excelWriter.writeData(sheet, headList, historyCorpsDataEach, 0, createdRowIndex); //개별
+				Map<String, Object> sumItem2 = Formula.sum(historyCorpsDataEach, historyCorpsDataColumns);
+				Map<String, Object> avgItem2 = Formula.avg(historyCorpsDataEach, historyCorpsDataColumns);
+				sumItem2.put("ORG_SEQ", "합계");
+				sumItem2.put("CERT_PRE_NM", "");
+				avgItem2.put("ORG_SEQ", "평균");
+				avgItem2.put("CERT_PRE_NM", "");
+				createdRowIndex += historyCorpsDataEach.size();
+				excelWriter.writeFooter(sheet, headList, sumItem2, 0, createdRowIndex);
+				createdRowIndex += 1;
+				excelWriter.writeFooter(sheet, headList, avgItem2, 0, createdRowIndex);
+				break;
+			default:
+				excelWriter.writeData(sheet, headList, historyCorpsDataKeyword, 0, createdRowIndex); //키워드
+				Map<String, Object> sumItem3 = Formula.sum(historyCorpsDataKeyword, historyCorpsDataColumns);
+				Map<String, Object> avgItem3 = Formula.avg(historyCorpsDataKeyword, historyCorpsDataColumns);
+				sumItem3.put("ORG_SEQ", "합계");
+				sumItem3.put("CERT_PRE_NM", "");
+				avgItem3.put("ORG_SEQ", "평균");
+				avgItem3.put("CERT_PRE_NM", "");
+				createdRowIndex += historyCorpsDataKeyword.size();
+				excelWriter.writeFooter(sheet, headList, sumItem3, 0, createdRowIndex);
+				createdRowIndex += 1;
+				excelWriter.writeFooter(sheet, headList, avgItem3, 0, createdRowIndex);
+				break;
+		}
+
+
+
+		/*************************************************************************************************************/
+		excelWriter.download(response);
+	}
 
 	}

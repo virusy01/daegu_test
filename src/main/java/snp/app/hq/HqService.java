@@ -33,6 +33,11 @@ public class HqService
 		return repository.findCorpInfo(params, Security.user());
 	}
 
+	public Map<String, Object> findOrgName(Map<String, Object> params)
+	{
+		return repository.findOrgName(params, Security.user());
+	}
+
 	public int saveCorpInfo(Map<String, Object> params) {
 		int r;
 		Integer corpSeq = (Integer) params.get("CORP_SEQ");
@@ -49,6 +54,19 @@ public class HqService
 	public List<Map<String, Object>> findCorpListKeyword(Map<String, Object> params) {
 		return repository.findCorpListKeyword(params,Security.user());
 	}
+
+    // 사회적기업 이력데이터 기업리스트
+	public List<Map<String, Object>> findHistoryCorpList()
+	{
+		return repository.findHistoryCorpList();
+	}
+
+	// 사회적기업 이력데이터 기업리스트 - 키워드 검색
+	public List<Map<String, Object>> findHistoryCorpListKeyword(Map<String, Object> params) {
+		return repository.findHistoryCorpListKeyword(params,Security.user());
+	}
+
+
 
 
 	// 사회적기업 리스트
@@ -152,7 +170,44 @@ public class HqService
 	}
 
 
+	// 사회적기업 이력데이터 항목추이 조회
+	public List<Map<String, Object>> findTrend(Map<String, Object> params, String kpiKind) {
+		List<Map<String, Object>> result;
+		switch (kpiKind) {
+			case "0":
+				result = repository.findAsset(params, Security.user());
+				break;
+			case "1":
+				result = repository.findCapital(params, Security.user());
+				break;
+			case "2":
+				result = repository.findDebt(params, Security.user());
+				break;
+			case "3":
+				result = repository.findSales(params, Security.user());
+				break;
+			case "4":
+				result = repository.findGrossProfit(params, Security.user());
+				break;
+			case "5":
+				result = repository.findLaborCosts(params, Security.user());
+				break;
+			case "6":
+				result = repository.findOpProfit(params, Security.user());
+				break;
+			case "7":
+				result = repository.findNetIncome(params, Security.user());
+				break;
+			case "8":
+				result = repository.findEmpCnt(params, Security.user());
+				break;
+			default: // 9
+				result = repository.findWeakEmpCnt(params, Security.user());
+				break;
+		}
 
+		return result;
+	}
 
 
 

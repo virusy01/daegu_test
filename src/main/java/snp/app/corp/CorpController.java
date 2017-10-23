@@ -135,6 +135,17 @@ public class CorpController
 		return service.allCorpsKeyword(RequestParams.map());
 	}
 
+	// 사회적기업 이력데이터 정보 조회
+	@RequestMapping(value="/history/corps", method= RequestMethod.GET)
+	public List<Map<String, Object>>historyCorps(@RequestParam(name = "CORP_KIND") String corpKind){
+		return service.historyCorps(RequestParams.map(),corpKind);
+	}
+	// 사회적기업 이력데이터 정보 조회 키워드 검색
+	@RequestMapping(value="/history/keyword", method= RequestMethod.GET)
+	public List<Map<String, Object>>historyCorpsKeyword(@RequestParam(name = "KEYWORD") String keyword){
+		return service.historyCorpsKeyword(RequestParams.map());
+	}
+
 	// 사회적목적 유형별 분석 - 등급항목 통계
 	@RequestMapping(value="/chart-type/grade", method= RequestMethod.GET)
 	public Map<String, Object> chartTypeGrade(){
@@ -175,4 +186,11 @@ public class CorpController
 		service.allCorps2Excel(response,RequestParams.map(),corpKind);
 	}
 
+	// 사회적기업 이력데이터  조회 -  Excel
+	@RequestMapping(value="/history-corps/excel", method= RequestMethod.GET)
+	public void historyCorps2Excel(HttpServletResponse response, @RequestParam(name = "CORP_KIND") int corpKind,
+							   @RequestParam(name = "KEYWORD") String keyword) throws Exception{
+
+		service.historyCorps2Excel(response,RequestParams.map(),corpKind);
+	}
 }

@@ -30,6 +30,20 @@ public class HqController
 	}
 
 
+	// 사회적경제 이력데이터용 기업리스트
+	@RequestMapping(value="/history/type", method= RequestMethod.GET)
+	public List<Map<String, Object>> findHistoryCorpList()
+	{
+		return service.findHistoryCorpList();
+	}
+
+	// 성과지표 기업유형별 현황조회 - 키워드 검색
+	@RequestMapping(value="/historyKeyword", method= RequestMethod.GET)
+	public List<Map<String, Object>> findHistoryCorpListKeyword(@RequestParam(name = "KEYWORD") String keyword,
+														 @RequestParam(name = "CORP_TYPE") String corptype)
+	{
+		return service.findHistoryCorpListKeyword(RequestParams.map());
+	}
 
 	//
 	@RequestMapping(value="/corpInfo", method= RequestMethod.GET)
@@ -44,6 +58,10 @@ public class HqController
 		return service.saveCorpInfo(params);
 	}
 
+	@RequestMapping(value="/orgName", method= RequestMethod.GET)
+	public Map<String, Object>findOrgName(@RequestParam(name = "CORP_SEQ") int corpSeq) {
+		return service.findOrgName(RequestParams.map());
+	}
 
 	/**
 	 * 사회적기업정보 기본정보 목록
@@ -185,6 +203,16 @@ public class HqController
 	@RequestMapping(value="/centerMgm", method= RequestMethod.POST)
 	public int saveCenterMgm(@RequestBody List<Map<String, Object>> centerMgm){
 		return service.saveCenterMgm(centerMgm);
+	}
+
+
+	// 사회적기업 이력데이터 항목추이 조회
+	@RequestMapping(value="/trend", method= RequestMethod.GET)
+	public List<Map<String, Object>> findTrend(@RequestParam(name = "CORP_SEQ") int corpSeq,
+												 @RequestParam(name = "FROM_YEAR") int fromYear,
+												 @RequestParam(name = "TO_YEAR") int toYear,
+												 @RequestParam(name = "KPI_KIND") String kpiKind){
+		return service.findTrend(RequestParams.map(), kpiKind);
 	}
 
 }
