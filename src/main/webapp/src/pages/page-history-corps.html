@@ -1,0 +1,456 @@
+<link rel="import" href="/bower_components/iron-form/iron-form.html">
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="/src/components/common/normal-table.html">
+<link rel="import" href="/src/components/common/number-input.html">
+<link rel="import" href="/src/components/common/normal-input.html">
+<link rel="import" href="/src/components/common/normal-select.html">
+<link rel="import" href="/src/components/common/date-input.html">
+<link rel="import" href="/src/components/behaviors/behavior-grid.html">
+<link rel="import" href="/src/components/behaviors/behavior-loader.html">
+
+<dom-module id="page-history-corps">
+    <style>
+    </style>
+    <template >
+        <iron-ajax id="getData" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
+                   on-request="_startLoader"
+                   url="/api/corp/history/corps"
+                   on-response="_assignData">
+        </iron-ajax>
+        <iron-ajax id="getDataKeyword" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
+                   on-request="_startLoader"
+                   url="/api/corp/history/keyword"
+                   on-response="_assignData">
+        </iron-ajax>
+        <form id="excelForm" name="excelForm" action="/api/corp/history-corps/excel" target="excelframe">
+            <input id="excelCorpSeq" type="hidden" name="CORP_KIND">
+            <input id="excelCorpKeyword" type="hidden" name="KEYWORD">
+        </form>
+
+        <iframe id="excelframe" name="excelframe" width="0" height="0" style="visibility: hidden">
+        </iframe>
+
+
+        <div class="horizontal-margin-20"></div>
+
+        <div class="page-header">
+            <h2>사회적기업 이력데이터 조회<small> Social Enterprise History Data Information</small></h2>
+        </div>
+
+        <div class="horizontal-margin-20"></div>
+
+        <div class="row">
+            <div class="col-xs-2">
+                <normal-select id="year" on-change="_fetchData" value="{{_corpType}}" items="{{_corpTypeList}}"></normal-select>
+            </div>
+            <div class="col-xs-2">
+                <normal-input id="keyword" placeholder="기업명" on-keypress="_runFind" value="{{_keyword}}"></normal-input>
+            </div>
+            <div class="col-xs-1">
+                <button type="button" on-tap="_onSearch"  class="btn btn-sm btn-normal">검색</button>
+            </div>
+            <div class="col-xs-2">
+                <button type="button" on-tap="_downloadExcel" class="btn btn-sm btn-success">엑셀</button>
+            </div>
+        </div>
+
+        <div class="horizontal-margin-20"></div>
+        <div class="vertically-scrollable"  style="width: 8000px;">
+            <table id="corp_analytics" class="table table-bordered">
+                <thead>
+                <tr>
+                    <th colspan='10' >기업</th>
+                    <th colspan='6'>자산</th>
+                    <th colspan='6'>자본</th>
+                    <th colspan='6'>부채</th>
+                    <th colspan='9' >매출액</th>
+                    <th colspan='6'>매출총이익</th>
+                    <th colspan='9'>노무비</th>
+                    <th colspan='9'>영업이익</th>
+                    <th colspan='9'>당기순이익</th>
+                    <th colspan='4'>전체 근로자수</th>
+                    <th colspan='4'>취약계층 근로자수</th>
+                </tr>
+                <tr>
+                    <th>No</th>
+                    <th>기관명</th>
+                    <th>인증 구분</th>
+                    <th>시도</th>
+                    <th>시군구</th>
+                    <th>조직형태</th>
+                    <th>유형</th>
+                    <th>업종(산업분류)</th>
+                    <th>인증상황</th>
+                    <th>인증번호</th>
+                    <th>2008년</th>
+                    <th>2009년</th>
+                    <th>2010년</th>
+                    <th>2011년</th>
+                    <th>2012년</th>
+                    <th>2013년</th>
+                    <th>2008년</th>
+                    <th>2009년</th>
+                    <th>2010년</th>
+                    <th>2011년</th>
+                    <th>2012년</th>
+                    <th>2013년</th>
+                    <th>2008년</th>
+                    <th>2009년</th>
+                    <th>2010년</th>
+                    <th>2011년</th>
+                    <th>2012년</th>
+                    <th>2013년</th>
+                    <th>2008년</th>
+                    <th>2009년</th>
+                    <th>2010년</th>
+                    <th>2011년</th>
+                    <th>2012년</th>
+                    <th>2013년</th>
+                    <th>2014년</th>
+                    <th>2015년</th>
+                    <th>2016년</th>
+                    <th>2008년</th>
+                    <th>2009년</th>
+                    <th>2010년</th>
+                    <th>2011년</th>
+                    <th>2012년</th>
+                    <th>2013년</th>
+                    <th>2008년</th>
+                    <th>2009년</th>
+                    <th>2010년</th>
+                    <th>2011년</th>
+                    <th>2012년</th>
+                    <th>2013년</th>
+                    <th>2014년</th>
+                    <th>2015년</th>
+                    <th>2016년</th>
+                    <th>2008년</th>
+                    <th>2009년</th>
+                    <th>2010년</th>
+                    <th>2011년</th>
+                    <th>2012년</th>
+                    <th>2013년</th>
+                    <th>2014년</th>
+                    <th>2015년</th>
+                    <th>2016년</th>
+                    <th>2008년</th>
+                    <th>2009년</th>
+                    <th>2010년</th>
+                    <th>2011년</th>
+                    <th>2012년</th>
+                    <th>2013년</th>
+                    <th>2014년</th>
+                    <th>2015년</th>
+                    <th>2016년</th>
+                    <th>2013년</th>
+                    <th>2014년</th>
+                    <th>2015년</th>
+                    <th>2016년</th>
+                    <th>2013년</th>
+                    <th>2014년</th>
+                    <th>2015년</th>
+                    <th>2016년</th>
+               </tr>
+                </thead>
+                <tbody>
+                </tbody>
+                <tfoot>
+                </tfoot>
+            </table>
+        </div>
+    </template>
+    <script>
+        Polymer({
+            is: 'page-history-corps',
+
+            behaviors: [Lunch.GridBehavior, Lunch.LoaderBehavior],
+
+            properties: {
+                _corpTypeList: {
+                    type: Array,
+                    value: function() {
+                        return [
+                            {cdNm: '전체', cd: 0},
+                            {cdNm: '인증사회적기업', cd: 1},
+                            {cdNm: '예비사회적기업', cd: 2},
+                        ];
+                    }
+                },
+                _corpType: {
+                    type: Number,
+                    value: function() {
+                        return 0;
+                    }
+                },
+                _keyword: {
+                    type: String,
+                    value: function() {
+                        return "";
+                    }
+                },
+                _data: {
+                    type: Array,
+                    value: function () {
+                        return [];
+                    }
+                },
+                _hideTotal: {
+                    type: Boolean,
+                    value: false
+                },
+                _hideSum: {
+                    type: Boolean,
+                    value: false
+                },
+                _guideTop: {
+                    type: Array,
+                    value: function () {
+                        return [
+                              'CORP_SEQ'  /* 연번 */
+                            , 'ORG_NAME1' /* 기관명1 */
+                            , 'CERT_PRE_NM'	/*인증 구분 */
+                            , 'REGION1'	/* 시도 */
+                            , 'REGION2'	/* 시군구 */
+                            , 'ORG_TYPE'	/* 조직형태 */
+                            , 'CERT_TYPE'  /* 유형 */
+                            , 'BIZ_TYPE' /* 업종(산업분류)*/
+                            , 'CERT_STATUS' /* 인증상황 */
+                            , 'CERT_NO' /* 인증번호 */
+                            , 'ASSET2008'		/* 자산2008 */
+                            , 'ASSET2009'		/* 자산2009 */
+                            , 'ASSET2010'		/* 자산2010 */
+                            , 'ASSET2011'		/* 자산2011 */
+                            , 'ASSET2012'		/* 자산2012 */
+                            , 'ASSET2013'		/* 자산2013 */
+                            , 'CAPITAL2008'		/* 자본2008 */
+                            , 'CAPITAL2009'		/* 자본2009 */
+                            , 'CAPITAL2010'		/* 자본2010 */
+                            , 'CAPITAL2011'		/* 자본2011 */
+                            , 'CAPITAL2012'		/* 자본2012 */
+                            , 'CAPITAL2013'		/* 자본2013 */
+                            , 'DEBT2008'		/* 부채2008 */
+                            , 'DEBT2009'		/* 부채2009 */
+                            , 'DEBT2010'		/* 부채2010 */
+                            , 'DEBT2011'		/* 부채2011 */
+                            , 'DEBT2012'		/* 부채2012 */
+                            , 'DEBT2013'		/* 자본2013 */
+                            , 'SALES2008'		/* 매출액2008 */
+                            , 'SALES2009'		/* 매출액2009 */
+                            , 'SALES2010'		/* 매출액2010 */
+                            , 'SALES2011'		/* 매출액2011 */
+                            , 'SALES2012'		/* 매출액2012 */
+                            , 'SALES2013'		/* 매출액2013 */
+                            , 'SALES2014'		/* 매출액2014 */
+                            , 'SALES2015'		/* 매출액2015 */
+                            , 'SALES2016'		/* 매출액2016 */
+                            , 'GROSS_PROFIT2008'		/* 매출총이익2008 */
+                            , 'GROSS_PROFIT2009'		/* 매출총이익2009 */
+                            , 'GROSS_PROFIT2010'		/* 매출총이익2010 */
+                            , 'GROSS_PROFIT2011'		/* 매출총이익2011 */
+                            , 'GROSS_PROFIT2012'		/* 매출총이익2012 */
+                            , 'GROSS_PROFIT2013'		/* 매출총이익2013 */
+                            , 'LABOR_COSTS2008'		/* 노무비2008 */
+                            , 'LABOR_COSTS2009'		/* 노무비2009 */
+                            , 'LABOR_COSTS2010'		/* 노무비2010 */
+                            , 'LABOR_COSTS2011'		/* 노무비2011 */
+                            , 'LABOR_COSTS2012'		/* 노무비2012 */
+                            , 'LABOR_COSTS2013'		/* 노무비2013 */
+                            , 'LABOR_COSTS2014'		/* 노무비2014 */
+                            , 'LABOR_COSTS2015'		/* 노무비2015 */
+                            , 'LABOR_COSTS2016'		/* 노무비2016 */
+                            , 'OP_PROFIT2008'		/* 영업이익2008 */
+                            , 'OP_PROFIT2009'		/* 영업이익2009 */
+                            , 'OP_PROFIT2010'		/* 영업이익2010 */
+                            , 'OP_PROFIT2011'		/* 영업이익2011 */
+                            , 'OP_PROFIT2012'		/* 영업이익2012 */
+                            , 'OP_PROFIT2013'		/* 영업이익2013 */
+                            , 'OP_PROFIT2014'		/* 영업이익2014 */
+                            , 'OP_PROFIT2015'		/* 영업이익2015 */
+                            , 'OP_PROFIT2016'		/* 영업이익2016 */
+                            , 'NET_INCOME2008'		/* 당기순이익2008 */
+                            , 'NET_INCOME2009'		/* 당기순이익2009 */
+                            , 'NET_INCOME2010'		/* 당기순이익2010 */
+                            , 'NET_INCOME2011'		/* 당기순이익2011 */
+                            , 'NET_INCOME2012'		/* 당기순이익2012 */
+                            , 'NET_INCOME2013'		/* 당기순이익2013 */
+                            , 'NET_INCOME2014'		/* 당기순이익2014 */
+                            , 'NET_INCOME2015'		/* 당기순이익2015 */
+                            , 'NET_INCOME2016'		/* 당기순이익2016 */
+                            , 'EMP_CNT2013'		/* 전체근로자수2013 */
+                            , 'EMP_CNT2014'		/* 전체근로자수2014 */
+                            , 'EMP_CNT2015'		/* 전체근로자수2015 */
+                            , 'EMP_CNT2016'		/* 전체근로자수2016 */
+                            , 'WEAK_EMP_CNT2013'		/* 취약계층 근로자수2013 */
+                            , 'WEAK_EMP_CNT2014'		/* 취약계층 근로자수2014 */
+                            , 'WEAK_EMP_CNT2015'		/* 취약계층 근로자수2015 */
+                            , 'WEAK_EMP_CNT2016'		/* 당취약계층 근로자수2016 */
+                        ];
+                    }
+                },
+            },
+            _fetchData: function() {
+                this.$.getData.params = {
+                    CORP_KIND: this._corpType
+                };
+                this.$.getData.generateRequest();
+            },
+
+            _onSearch: function() {
+                this.$.getDataKeyword.params = {
+                    KEYWORD: this._keyword
+                };
+                this._corpType = 3;
+                this.$.getDataKeyword.generateRequest();
+            },
+            _runFind: function(e) {
+                if (e.keyCode == 13) {
+                    this._onSearch();
+                }
+            },
+
+            attached: function() {
+                this._fetchData();
+            },
+
+            _assignData: function(e) {
+                this._data = e.target.lastResponse;
+
+                if (this._data) {
+                    this._assignDataToTable('tableA', this.$.corp_analytics, this._data, this._guideTop);
+                    this._stopLoader();
+                }
+            },
+
+            _clearData: function() {
+                Polymer.dom(this.$.corp_analytics.querySelector('tbody')).innerHTML = '';
+                Polymer.dom(this.$.corp_analytics.querySelector('tfoot')).innerHTML = '';
+            },
+
+            _assignDataToTable: function(prefix, table, data, guide) {
+                var body = table.querySelector('tbody');
+                var tr, th, td, value;
+                var input;
+                var total = {};
+                var count = {};
+
+                Polymer.dom(body).innerHTML = '';
+
+
+                for (var i = 0; i < this._data.length; i++) {
+
+                    tr = document.createElement('tr');
+                    tr.setAttribute('id', 'row_' + prefix + '_' + i);
+
+                    this.listen(tr, 'tap', '_gotoURL');
+
+
+                    for (var attribute in guide) {
+
+                        td = document.createElement('td');
+                        Polymer.dom(tr).appendChild(td);
+
+                        value = data[i][guide[attribute]];
+
+                        switch (guide[attribute]) {
+                            case 'ORG_NAME1':
+                                td.innerHTML = value;
+                                td.setAttribute('id', prefix + '_' + guide[attribute] + i);
+                                td.setAttribute('name', prefix + '_' + guide[attribute]);
+                                td.setAttribute("style", "background-color:#ebe9e9; text-align:center;width: 400px;");
+                                break;
+                            case 'CORP_SEQ':
+                            case 'CERT_PRE_NM':
+                            case 'REGION1':
+                            case 'REGION2':
+                            case 'ORG_TYPE':
+                            case 'CERT_TYPE':
+                            case 'BIZ_TYPE':
+                            case 'CERT_STATUS':
+                            case 'CERT_NO':
+                                td.innerHTML = value;
+                                td.setAttribute('id', prefix + '_' + guide[attribute] + i);
+                                td.setAttribute('name', prefix + '_' + guide[attribute]);
+                                td.setAttribute("style", "text-align:center; width: 150px;");
+                                break;
+                            default:
+                                td.innerHTML = accounting.formatNumber(value);
+                                td.setAttribute('id', prefix + '_' + guide[attribute] + i);
+                                td.setAttribute('name', prefix + '_' + guide[attribute]);
+                                td.setAttribute("style", "background-color:#FFF; text-align:right; width: 100px; padding-right: 10px !important;");
+                                break;
+                        }
+                        if (!total[guide[attribute]])
+                            total[guide[attribute]] = 0;
+                        if (!count[guide[attribute]])
+                            count[guide[attribute]] = 0;
+
+                        total[guide[attribute]] += accounting.unformat(value);
+                        if ( value != null)
+                         count[guide[attribute]] += 1;
+                    }
+                    Polymer.dom(body).appendChild(tr);
+                }
+                this._drawFooter(prefix, table, total, count);
+            },
+
+            _drawFooter: function(prefix, table, total, count) {
+
+                var foot = table.querySelector('tfoot');
+                Polymer.dom(foot).innerHTML = '';
+
+                if (!this._hideTotal) {
+                    // total
+                    tr = document.createElement('tr');
+                    th = document.createElement('th');
+
+                    Polymer.dom(foot).appendChild(tr);
+
+                    for (var t in total) {
+                        td = document.createElement('td');
+                        td.setAttribute('id', 'total_' + prefix + '_' + t);
+                        if( t == 'CORP_SEQ' )
+                            td.innerHTML = "합계";
+                        else if( t == 'ORG_NAME1' || t == 'CERT_PRE_NM' || t == 'REGION1' || t == 'REGION2'
+                            || t == 'ORG_TYPE' || t == 'CERT_TYPE' || t == 'BIZ_TYPE' || t == 'CERT_STATUS' || t == 'CERT_NO')
+                            td.innerHTML = "";
+                        else
+                            td.innerHTML = accounting.formatNumber(total[t]);
+
+                        Polymer.dom(tr).appendChild(td);
+                    }
+                }
+
+                if (!this._hideSum) {
+                    // sum
+                    tr = document.createElement('tr');
+                    th = document.createElement('th');
+
+                    Polymer.dom(foot).appendChild(tr);
+
+                    for (var t in total) {
+                        td = document.createElement('td');
+                        td.setAttribute('id', 'sum_' + prefix + '_' + t);
+                        if( t == 'CORP_SEQ' )
+                            td.innerHTML = "평균";
+                        else if( t == 'ORG_NAME1' || t == 'CERT_PRE_NM' || t == 'REGION1' || t == 'REGION2'
+                            || t == 'ORG_TYPE' || t == 'CERT_TYPE' || t == 'BIZ_TYPE' || t == 'CERT_STATUS' || t == 'CERT_NO')
+                            td.innerHTML = "";
+                        else
+                            td.innerHTML = accounting.formatNumber(total[t] / count[t]);
+
+                        Polymer.dom(tr).appendChild(td);
+                    }
+
+                }
+
+            },
+            _downloadExcel: function() {
+                this.$.excelCorpSeq.value = this._corpType;
+                this.$.excelCorpKeyword.value = this._keyword;
+                this.$.excelForm.submit();
+            },
+
+        });
+    </script>
+</dom-module>
