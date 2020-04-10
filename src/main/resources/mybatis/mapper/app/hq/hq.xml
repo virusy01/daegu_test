@@ -42,13 +42,8 @@
 			,  CERT_PRE 	/*인증 구분 */
 			,  CASE CERT_PRE WHEN 1 THEN '인증사회적기업'
 			   ELSE '예비사회적기업' END AS CERT_PRE_NM
-			,  REGION1 	/* 시도 */
-			,  REGION2 	/* 시군구 */
+			,  CERT_STATUS	/* 인증상태*/
 			,  ORG_TYPE 	/* 조직형태 */
-			,  CERT_TYPE   /* 유형 */
-			,  BIZ_TYPE  /* 업종(산업분류)*/
-			,  CERT_STATUS  /* 인증상황 */
-			,  CERT_NO  /* 인증번호 */
 		FROM social_history_tbl
 		ORDER BY CORP_SEQ
     </select>
@@ -82,13 +77,8 @@
 			,  CERT_PRE 	/*인증 구분 */
 			,  CASE CERT_PRE WHEN 1 THEN '인증사회적기업'
 			   ELSE '예비사회적기업' END AS CERT_PRE_NM
-			,  REGION1 	/* 시도 */
-			,  REGION2 	/* 시군구 */
+			,  CERT_STATUS	/* 인증상태*/
 			,  ORG_TYPE 	/* 조직형태 */
-			,  CERT_TYPE   /* 유형 */
-			,  BIZ_TYPE  /* 업종(산업분류)*/
-			,  CERT_STATUS  /* 인증상황 */
-			,  CERT_NO  /* 인증번호 */
 		FROM social_history_tbl
         WHERE  ORG_NAME1 LIKE CONCAT('%',#{p.KEYWORD},'%')
         ORDER BY CORP_SEQ
@@ -2415,39 +2405,51 @@
 
     <!-- 사회적기업 이력데이터 추이(자산) -->
     <select id="findAsset" resultType="hashmap">
-     select * from
-       (
-            select '2008' AS YEAR, ASSET2008 AS VALUE
-            FROM social_history_tbl
-            WHERE CORP_SEQ = #{p.CORP_SEQ}
-            UNION ALL
-            select '2009', ASSET2009
-            FROM social_history_tbl
-            WHERE CORP_SEQ = #{p.CORP_SEQ}
-            UNION ALL
-            select '2010', ASSET2010
-            FROM social_history_tbl
-            WHERE CORP_SEQ = #{p.CORP_SEQ}
-            UNION ALL
-            select '2011', ASSET2011
-            FROM social_history_tbl
-            WHERE CORP_SEQ = #{p.CORP_SEQ}
-            UNION ALL
-            select '2012', ASSET2012
-            FROM social_history_tbl
-            WHERE CORP_SEQ = #{p.CORP_SEQ}
-            UNION ALL
-            select '2013', ASSET2013
-            FROM social_history_tbl
-            WHERE CORP_SEQ = #{p.CORP_SEQ}
-       )HISTORY
-      WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
+        select * from
+        (
+        select '2008' AS YEAR, ASSET2008 AS VALUE
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2009', ASSET2009
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2010', ASSET2010
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2011', ASSET2011
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2012', ASSET2012
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2013', ASSET2013
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2017', ASSET2017
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2018', ASSET2018
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2019', ASSET2019
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        )HISTORY
+        WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
     </select>
 
     <!-- 사회적기업 이력데이터 추이(자본) -->
     <select id="findCapital" resultType="hashmap">
-     select * from
-       (
+        select * from
+        (
         select '2008' AS YEAR, CAPITAL2008 AS VALUE
         FROM social_history_tbl
         WHERE CORP_SEQ = #{p.CORP_SEQ}
@@ -2471,14 +2473,26 @@
         select '2013', CAPITAL2013
         FROM social_history_tbl
         WHERE CORP_SEQ = #{p.CORP_SEQ}
-      )HISTORY
-      WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
+        UNION ALL
+        select '2017', CAPITAL2017
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2018', CAPITAL2018
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2019', CAPITAL2019
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        )HISTORY
+        WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
     </select>
 
     <!-- 사회적기업 이력데이터 추이(부채) -->
     <select id="findDebt" resultType="hashmap">
-     select * from
-       (
+        select * from
+        (
         select '2008' AS YEAR, DEBT2008 AS VALUE
         FROM social_history_tbl
         WHERE CORP_SEQ = #{p.CORP_SEQ}
@@ -2502,14 +2516,26 @@
         select '2013', DEBT2013
         FROM social_history_tbl
         WHERE CORP_SEQ = #{p.CORP_SEQ}
-      )HISTORY
-      WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
+        UNION ALL
+        select '2017', DEBT2017
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2018', DEBT2018
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2019', DEBT2019
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        )HISTORY
+        WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
     </select>
 
     <!-- 사회적기업 이력데이터 추이(매출액) -->
     <select id="findSales" resultType="hashmap">
-     select * from
-       (
+        select * from
+        (
         select '2008' AS YEAR, SALES2008 AS VALUE
         FROM social_history_tbl
         WHERE CORP_SEQ = #{p.CORP_SEQ}
@@ -2545,14 +2571,26 @@
         select '2016', SALES2016
         FROM social_history_tbl
         WHERE CORP_SEQ = #{p.CORP_SEQ}
-       )HISTORY
-      WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
+        UNION ALL
+        select '2017', SALES2017
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2018', SALES2018
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2019', SALES2019
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        )HISTORY
+        WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
     </select>
 
     <!-- 사회적기업 이력데이터 추이(매출총이익) -->
     <select id="findGrossProfit" resultType="hashmap">
-     select * from
-       (
+        select * from
+        (
         select '2008' AS YEAR, GROSS_PROFIT2008 AS VALUE
         FROM social_history_tbl
         WHERE CORP_SEQ = #{p.CORP_SEQ}
@@ -2576,14 +2614,26 @@
         select '2013', GROSS_PROFIT2013
         FROM social_history_tbl
         WHERE CORP_SEQ = #{p.CORP_SEQ}
-       )HISTORY
-      WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
+        UNION ALL
+        select '2017', GROSS_PROFIT2017
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2018', GROSS_PROFIT2018
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2019', GROSS_PROFIT2019
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        )HISTORY
+        WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
     </select>
 
     <!-- 사회적기업 이력데이터 추이(노무비) -->
     <select id="findLaborCosts" resultType="hashmap">
-     select * from
-       (
+        select * from
+        (
         select '2008' AS YEAR, LABOR_COSTS2008 AS VALUE
         FROM social_history_tbl
         WHERE CORP_SEQ = #{p.CORP_SEQ}
@@ -2619,14 +2669,26 @@
         select '2016', LABOR_COSTS2016
         FROM social_history_tbl
         WHERE CORP_SEQ = #{p.CORP_SEQ}
-      )HISTORY
-      WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
+        UNION ALL
+        select '2017', LABOR_COSTS2017
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2018', LABOR_COSTS2018
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2019', LABOR_COSTS2019
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        )HISTORY
+        WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
     </select>
 
     <!-- 사회적기업 이력데이터 추이(영업이익) -->
     <select id="findOpProfit" resultType="hashmap">
-     select * from
-       (
+        select * from
+        (
         select '2008' AS YEAR, OP_PROFIT2008 AS VALUE
         FROM social_history_tbl
         WHERE CORP_SEQ = #{p.CORP_SEQ}
@@ -2662,14 +2724,26 @@
         select '2016', OP_PROFIT2016
         FROM social_history_tbl
         WHERE CORP_SEQ = #{p.CORP_SEQ}
-       )HISTORY
-      WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
+        UNION ALL
+        select '2017', OP_PROFIT2017
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2018', OP_PROFIT2018
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2019', OP_PROFIT2019
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        )HISTORY
+        WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
     </select>
 
     <!-- 사회적기업 이력데이터 추이(당기순이익) -->
     <select id="findNetIncome" resultType="hashmap">
-     select * from
-       (
+        select * from
+        (
         select '2008' AS YEAR, NET_INCOME2008 AS VALUE
         FROM social_history_tbl
         WHERE CORP_SEQ = #{p.CORP_SEQ}
@@ -2705,15 +2779,27 @@
         select '2016', NET_INCOME2016
         FROM social_history_tbl
         WHERE CORP_SEQ = #{p.CORP_SEQ}
-      )HISTORY
-      WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
+        UNION ALL
+        select '2017', NET_INCOME2017
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2018', NET_INCOME2018
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2019', NET_INCOME2019
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        )HISTORY
+        WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
 
     </select>
 
     <!-- 사회적기업 이력데이터 추이(전체 종업원수) -->
     <select id="findEmpCnt" resultType="hashmap">
-     select * from
-       (
+        select * from
+        (
         select '2013' AS YEAR, EMP_CNT2013 AS VALUE
         FROM social_history_tbl
         WHERE CORP_SEQ = #{p.CORP_SEQ}
@@ -2729,15 +2815,27 @@
         select '2016', EMP_CNT2016
         FROM social_history_tbl
         WHERE CORP_SEQ = #{p.CORP_SEQ}
-      )HISTORY
-      WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
+        UNION ALL
+        select '2017', EMP_CNT2017
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2018', EMP_CNT2018
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2019', EMP_CNT2019
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        )HISTORY
+        WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
     </select>
 
     <!-- 사회적기업 이력데이터 추이(취약계층 종업원수) -->
     <select id="findWeakEmpCnt" resultType="hashmap">
 
-      select * from
-       (
+        select * from
+        (
         select '2013' AS YEAR, WEAK_EMP_CNT2013 AS VALUE
         FROM social_history_tbl
         WHERE CORP_SEQ = #{p.CORP_SEQ}
@@ -2753,8 +2851,22 @@
         select '2016', WEAK_EMP_CNT2016
         FROM social_history_tbl
         WHERE CORP_SEQ = #{p.CORP_SEQ}
-      )HISTORY
-      WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
+        UNION ALL
+        select '2017', WEAK_EMP_CNT2017
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2018', WEAK_EMP_CNT2018
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2019', WEAK_EMP_CNT2019
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        )HISTORY
+        WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
     </select>
+
+
 
 </mapper>
