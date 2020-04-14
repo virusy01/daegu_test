@@ -9,21 +9,21 @@
 <link rel="import" href="/src/components/behaviors/behavior-grid.html">
 <link rel="import" href="/src/components/behaviors/behavior-loader.html">
 
-<dom-module id="page-history-corps">
+<dom-module id="page-history-socialcorps">
     <style>
     </style>
     <template >
         <iron-ajax id="getData" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
                    on-request="_startLoader"
-                   url="/api/corp/history/corps"
+                   url="/api/corp/history/socialcorps"
                    on-response="_assignData">
         </iron-ajax>
         <iron-ajax id="getDataKeyword" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
                    on-request="_startLoader"
-                   url="/api/corp/history/keyword"
+                   url="/api/corp/history/socialkeyword"
                    on-response="_assignData">
         </iron-ajax>
-        <form id="excelForm" name="excelForm" action="/api/corp/history-corps/excel" target="excelframe">
+        <form id="excelForm" name="excelForm" action="/api/corp/history-socialcorps/excel" target="excelframe">
             <input id="excelCorpSeq" type="hidden" name="CORP_KIND">
             <input id="excelCorpKeyword" type="hidden" name="KEYWORD">
         </form>
@@ -187,7 +187,7 @@
     </template>
     <script>
         Polymer({
-            is: 'page-history-corps',
+            is: 'page-history-socialcorps',
 
             behaviors: [Lunch.GridBehavior, Lunch.LoaderBehavior],
 

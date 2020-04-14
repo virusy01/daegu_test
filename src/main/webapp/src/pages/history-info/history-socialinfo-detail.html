@@ -2,17 +2,17 @@
 <link rel="import" href="/src/components/common/normal-select.html">
 <link rel="import" href="/src/components/behaviors/behavior-loader.html">
 
-<dom-module id="history-info-detail">
+<dom-module id="history-socialinfo-detail">
 	<template>
 		<iron-ajax id="getOrgName"
 				   headers='{"X-Requested-With": "XMLHttpRequest"}'
 				   method="get"
-				   url="/api/hq/orgName"
+				   url="/api/hq/socialorgName"
 				   last-response="{{_orgName}}"></iron-ajax>
 
 		<iron-ajax id="getHistoryInfo" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
 				   on-request="_startLoader"
-				   url="/api/hq/trend"
+				   url="/api/hq/socialtrend"
 				   on-response="_drawChart">
 		</iron-ajax>
 		<div class="row">
@@ -53,7 +53,7 @@
 	</template>
 	<script>
         Polymer({
-            is: 'history-info-detail',
+            is: 'history-socialinfo-detail',
 
             behaviors: [Lunch.LoaderBehavior],
 

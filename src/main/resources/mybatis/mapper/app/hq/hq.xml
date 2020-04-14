@@ -25,7 +25,7 @@
     </select>
 
     <!-- 사회적기업 기업명 조회 -->
-    <select id="findOrgName" resultType="hashmap">
+    <select id="findSocialOrgName" resultType="hashmap">
         SELECT
         CORP_SEQ   /* 연번 */
         ,  ORG_NAME1  /* 기관명1 */
@@ -35,7 +35,7 @@
     </select>
 
     <!-- 사회적기업 이력데이터 기업목록 -->
-    <select id="findHistoryCorpList" resultType="hashmap">
+    <select id="findHistorySocialCorpList" resultType="hashmap">
 		SELECT
 			   CORP_SEQ   /* 연번 */
 			,  ORG_NAME1  /* 기관명1 */
@@ -50,7 +50,7 @@
 
 
     <!-- 기업 목록 키워드 검색 -->
-    <select id="findCorpListKeyword" resultType="hashmap">
+    <select id="findSocialCorpListKeyword" resultType="hashmap">
         SELECT
         CASE CORP_TYPE WHEN '1' THEN '사회적기업'
         WHEN '2' THEN '마을기업'
@@ -70,7 +70,7 @@
     </select>
 
     <!-- 사회적기업 이력데이터 기업목록 키워드 검색 -->
-    <select id="findHistoryCorpListKeyword" resultType="hashmap">
+    <select id="findHistorySocialCorpListKeyword" resultType="hashmap">
 		SELECT
 			   CORP_SEQ   /* 연번 */
 			,  ORG_NAME1  /* 기관명1 */
@@ -2404,7 +2404,7 @@
     </delete>
 
     <!-- 사회적기업 이력데이터 추이(자산) -->
-    <select id="findAsset" resultType="hashmap">
+    <select id="findSocialAsset" resultType="hashmap">
         select * from
         (
         select '2008' AS YEAR, ASSET2008 AS VALUE
@@ -2447,7 +2447,7 @@
     </select>
 
     <!-- 사회적기업 이력데이터 추이(자본) -->
-    <select id="findCapital" resultType="hashmap">
+    <select id="findSocialCapital" resultType="hashmap">
         select * from
         (
         select '2008' AS YEAR, CAPITAL2008 AS VALUE
@@ -2490,7 +2490,7 @@
     </select>
 
     <!-- 사회적기업 이력데이터 추이(부채) -->
-    <select id="findDebt" resultType="hashmap">
+    <select id="findSocialDebt" resultType="hashmap">
         select * from
         (
         select '2008' AS YEAR, DEBT2008 AS VALUE
@@ -2533,7 +2533,7 @@
     </select>
 
     <!-- 사회적기업 이력데이터 추이(매출액) -->
-    <select id="findSales" resultType="hashmap">
+    <select id="findSocialSales" resultType="hashmap">
         select * from
         (
         select '2008' AS YEAR, SALES2008 AS VALUE
@@ -2588,7 +2588,7 @@
     </select>
 
     <!-- 사회적기업 이력데이터 추이(매출총이익) -->
-    <select id="findGrossProfit" resultType="hashmap">
+    <select id="findSocialGrossProfit" resultType="hashmap">
         select * from
         (
         select '2008' AS YEAR, GROSS_PROFIT2008 AS VALUE
@@ -2631,7 +2631,7 @@
     </select>
 
     <!-- 사회적기업 이력데이터 추이(노무비) -->
-    <select id="findLaborCosts" resultType="hashmap">
+    <select id="findSocialLaborCosts" resultType="hashmap">
         select * from
         (
         select '2008' AS YEAR, LABOR_COSTS2008 AS VALUE
@@ -2686,7 +2686,7 @@
     </select>
 
     <!-- 사회적기업 이력데이터 추이(영업이익) -->
-    <select id="findOpProfit" resultType="hashmap">
+    <select id="findSocialOpProfit" resultType="hashmap">
         select * from
         (
         select '2008' AS YEAR, OP_PROFIT2008 AS VALUE
@@ -2741,7 +2741,7 @@
     </select>
 
     <!-- 사회적기업 이력데이터 추이(당기순이익) -->
-    <select id="findNetIncome" resultType="hashmap">
+    <select id="findSocialNetIncome" resultType="hashmap">
         select * from
         (
         select '2008' AS YEAR, NET_INCOME2008 AS VALUE
@@ -2797,7 +2797,7 @@
     </select>
 
     <!-- 사회적기업 이력데이터 추이(전체 종업원수) -->
-    <select id="findEmpCnt" resultType="hashmap">
+    <select id="findSocialEmpCnt" resultType="hashmap">
         select * from
         (
         select '2013' AS YEAR, EMP_CNT2013 AS VALUE
@@ -2832,7 +2832,7 @@
     </select>
 
     <!-- 사회적기업 이력데이터 추이(취약계층 종업원수) -->
-    <select id="findWeakEmpCnt" resultType="hashmap">
+    <select id="findSocialWeakEmpCnt" resultType="hashmap">
 
         select * from
         (

@@ -1,10 +1,10 @@
 <link rel="import" href="/bower_components/app-route/app-route.html">
 <link rel="import" href="/bower_components/iron-pages/iron-pages.html">
 
-<dom-module id="page-history-info">
+<dom-module id="page-history-socialinfo">
 <template>
 	<app-route route="{{route}}"
-		   pattern="/app/history-info/:mode/:id"
+		   pattern="/app/history-socialinfo/:mode/:id"
 		   data="{{routeData}}"
 		   active>
 	</app-route>
@@ -13,15 +13,15 @@
 		<h2>사회적기업 이력정보 상세 <small>Social Enterprise History Data Detail</small></h2>
 	</div>
 
-	<iron-pages id="history-info" selected="[[mode]]" attr-for-selected="name">
-		<history-info-list name="list"></history-info-list>
-		<history-info-view name="view" id="{{id}}"></history-info-view>
+	<iron-pages id="history-socialinfo" selected="[[mode]]" attr-for-selected="name">
+		<history-socialinfo-list name="list"></history-socialinfo-list>
+		<history-socialinfo-view name="view" id="{{id}}"></history-socialinfo-view>
 	</iron-pages>
 
 </template>
 <script>
 Polymer({
-	is: 'page-history-info',
+	is: 'page-history-socialinfo',
 
 	properties: {
 		mode: {
@@ -46,7 +46,7 @@ Polymer({
     },
 
     _importHTML: function(newValue) {
-		this.importHref(this.resolveUrl('history-info/history-info-' + newValue + '.html'), null, null, true);
+		this.importHref(this.resolveUrl('history-info/history-socialinfo-' + newValue + '.html'), null, null, true);
 	},
 });
 </script>

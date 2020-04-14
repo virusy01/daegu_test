@@ -806,22 +806,22 @@ public class CorpService {
 	}
 
 	// 사회적기업 이력데이터 정보 조회
-	public List<Map<String, Object>> historyCorps(Map<String, Object> params, String corpKind) {
+	public List<Map<String, Object>> historySocialCorps(Map<String, Object> params, String corpKind) {
 		List<Map<String, Object>> result;
 		switch (corpKind) {
 			case "0":
-				result = repository.historyCorpsAll(params, Security.user()); //전체
+				result = repository.historySocialCorpsAll(params, Security.user()); //전체
 				break;
 			default:
-				result = repository.historyCorpsEach(params, Security.user()); //인증, 예비
+				result = repository.historySocialCorpsEach(params, Security.user()); //인증, 예비
 				break;
 		}
 		return result;
 	}
 
 	// 사회적기업 이력데이터 조회 키워드검색
-	public List<Map<String, Object>> historyCorpsKeyword(Map<String, Object> params) {
-		return repository.historyCorpsKeyword(params, Security.user());
+	public List<Map<String, Object>> historySocialCorpsKeyword(Map<String, Object> params) {
+		return repository.historySocialCorpsKeyword(params, Security.user());
 	}
 
 	// 성과지표 사회적목적 유형별 분석 - 등급항목 통계
@@ -1240,7 +1240,7 @@ public class CorpService {
 
 
 	// 사회적기업 이력데이터  조회 -  엑셀
-	public void historyCorps2Excel(HttpServletResponse response, Map<String, Object> params, int corpKind) throws Exception {
+	public void historySocialCorps2Excel(HttpServletResponse response, Map<String, Object> params, int corpKind) throws Exception {
 
 		ExcelWriter excelWriter = new ExcelWriter();
 
@@ -1295,9 +1295,9 @@ public class CorpService {
 
 		/*************************************************************************************************************/
 
-		List<Map<String, Object>> historyCorpsDataAll = repository.historyCorpsAll(params, Security.user());
-		List<Map<String, Object>> historyCorpsDataEach = repository.historyCorpsEach(params, Security.user());
-		List<Map<String, Object>> historyCorpsDataKeyword = repository.historyCorpsKeyword(params, Security.user());
+		List<Map<String, Object>> historyCorpsDataAll = repository.historySocialCorpsAll(params, Security.user());
+		List<Map<String, Object>> historyCorpsDataEach = repository.historySocialCorpsEach(params, Security.user());
+		List<Map<String, Object>> historyCorpsDataKeyword = repository.historySocialCorpsKeyword(params, Security.user());
 
 		String[] historyCorpsDataColumns = {
 				"ASSET2008"		/* 자산2008 */

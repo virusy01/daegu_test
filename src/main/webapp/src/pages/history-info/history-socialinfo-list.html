@@ -3,16 +3,16 @@
 <link rel="import" href="/src/components/common/normal-input.html">
 <link rel="import" href="/src/components/behaviors/behavior-loader.html">
 
-<dom-module id="history-info-list">
+<dom-module id="history-socialinfo-list">
 <template>
 	<iron-ajax  auto id="getCorpList" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
-		       url="/api/hq/history/type"
+		       url="/api/hq/history/socialcorps"
 	 	       on-request="_startLoader"
 	  	       on-response="_stopLoader"
 		       last-response="{{_data}}">
 	</iron-ajax>
 	<iron-ajax  id="getCorpListKeyword" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
-				url="/api/hq/historyKeyword"
+				url="/api/hq/history/socialkeyword"
 				on-request="_startLoader"
 				on-response="_stopLoader"
 				last-response="{{_data}}">
@@ -32,7 +32,7 @@
 </template>
 <script>
 Polymer({
-	is: 'history-info-list',
+	is: 'history-socialinfo-list',
 
 	behaviors: [Lunch.LoaderBehavior],
 
@@ -64,7 +64,7 @@ Polymer({
 		},
 		_linkURL: {
 			type: String,
-			value: '/app/history-info/view/'
+			value: '/app/history-socialinfo/view/'
 		},
 
 	},
