@@ -1,11 +1,11 @@
 <link rel="import" href="/bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="/bower_components/iron-location/iron-location.html">
 
-<link rel="import" href="/src/pages/history-info/history-socialinfo-detail.html">
+<link rel="import" href="/src/pages/history-info/history-villageinfo-detail.html">
 
 <link rel="import" href="/src/components/common/normal-select.html">
 
-<dom-module id="history-socialinfo-view">
+<dom-module id="history-villageinfo-view">
 	<template>
 		<iron-location id="location"></iron-location>
 
@@ -19,14 +19,14 @@
 
 		<div class="panel panel-default">
 			<div class="panel-body">
-				<history-socialinfo-detail  read-id="{{id}}"></history-socialinfo-detail>
+				<history-villageinfo-detail  read-id="{{id}}"></history-villageinfo-detail>
 			</div>
 		</div>
 
 	</template>
 	<script>
         Polymer({
-            is: 'history-socialinfo-view',
+            is: 'history-villageinfo-view',
 
             properties: {
                 id: Number,
@@ -34,7 +34,7 @@
             },
 
             _toList: function(e) {
-                this.$.location.path = '/app/history-socialinfo/list/';
+                this.$.location.path = '/app/history-villageinfo/list/';
             },
         });
 	</script>

@@ -3,16 +3,16 @@
 <link rel="import" href="/src/components/common/normal-input.html">
 <link rel="import" href="/src/components/behaviors/behavior-loader.html">
 
-<dom-module id="history-socialinfo-list">
+<dom-module id="history-villageinfo-list">
 <template>
 	<iron-ajax  auto id="getCorpList" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
-		       url="/api/hq/history/socialcorps"
+		       url="/api/hq/history/villagecorps"
 	 	       on-request="_startLoader"
 	  	       on-response="_stopLoader"
 		       last-response="{{_data}}">
 	</iron-ajax>
 	<iron-ajax  id="getCorpListKeyword" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
-				url="/api/hq/history/socialkeyword"
+				url="/api/hq/history/villagekeyword"
 				on-request="_startLoader"
 				on-response="_stopLoader"
 				last-response="{{_data}}">
@@ -32,7 +32,7 @@
 </template>
 <script>
 Polymer({
-	is: 'history-socialinfo-list',
+	is: 'history-villageinfo-list',
 
 	behaviors: [Lunch.LoaderBehavior],
 
@@ -56,15 +56,14 @@ Polymer({
 				return {
 				    CORP_SEQ: 'NO',
 				    ORG_NAME1: '기업명',
-                    CERT_PRE_NM: '인증 구분',
-                    CERT_STATUS: '인증 상태',
-                    ORG_TYPE: '조직형태'
+                    CERT_PRE: '인증 구분',
+                    CERT_STATUS_NM: '인증 상태',
 				};
 			}
 		},
 		_linkURL: {
 			type: String,
-			value: '/app/history-socialinfo/view/'
+			value: '/app/history-villageinfo/view/'
 		},
 
 	},

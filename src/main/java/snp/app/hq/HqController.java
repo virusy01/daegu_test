@@ -30,20 +30,7 @@ public class HqController
 	}
 
 
-	// 사회적경제 이력데이터용 상세 기업리스트
-	@RequestMapping(value="/history/socialcorps", method= RequestMethod.GET)
-	public List<Map<String, Object>> findHistorySocialCorpList()
-	{
-		return service.findHistorySocialCorpList();
-	}
 
-	// 사회적경제 이력데이터용 상세 - 키워드 검색
-	@RequestMapping(value="/history/socialkeyword", method= RequestMethod.GET)
-	public List<Map<String, Object>> findHistorySocialCorpListKeyword(@RequestParam(name = "KEYWORD") String keyword,
-														 @RequestParam(name = "CORP_TYPE") String corptype)
-	{
-		return service.findHistorySocialCorpListKeyword(RequestParams.map());
-	}
 
 	//
 	@RequestMapping(value="/corpInfo", method= RequestMethod.GET)
@@ -59,12 +46,7 @@ public class HqController
 	}
 
 
-	//사회적기업 이력데이터 기업명 정보
 
-	@RequestMapping(value="/socialorgName", method= RequestMethod.GET)
-	public Map<String, Object>findSocialOrgName(@RequestParam(name = "CORP_SEQ") int corpSeq) {
-		return service.findSocialOrgName(RequestParams.map());
-	}
 
 	/**
 	 * 사회적기업정보 기본정보 목록
@@ -208,6 +190,30 @@ public class HqController
 		return service.saveCenterMgm(centerMgm);
 	}
 
+	// *************************************** 사회적기업 이력데이터 시작 *********************************************************************** //
+
+
+	// 사회적경제 이력데이터용 상세 기업리스트
+	@RequestMapping(value="/history/socialcorps", method= RequestMethod.GET)
+	public List<Map<String, Object>> findHistorySocialCorpList()
+	{
+		return service.findHistorySocialCorpList();
+	}
+
+	// 사회적경제 이력데이터용 상세 - 키워드 검색
+	@RequestMapping(value="/history/socialkeyword", method= RequestMethod.GET)
+	public List<Map<String, Object>> findHistorySocialCorpListKeyword(@RequestParam(name = "KEYWORD") String keyword,
+																	  @RequestParam(name = "CORP_TYPE") String corptype)
+	{
+		return service.findHistorySocialCorpListKeyword(RequestParams.map());
+	}
+
+	//사회적기업 이력데이터 기업명 정보
+
+	@RequestMapping(value="/socialorgName", method= RequestMethod.GET)
+	public Map<String, Object>findSocialOrgName(@RequestParam(name = "CORP_SEQ") int corpSeq) {
+		return service.findSocialOrgName(RequestParams.map());
+	}
 
 	// 사회적기업 이력데이터 항목추이 조회
 	@RequestMapping(value="/socialtrend", method= RequestMethod.GET)
@@ -217,5 +223,45 @@ public class HqController
 												 @RequestParam(name = "KPI_KIND") String kpiKind){
 		return service.findSocialTrend(RequestParams.map(), kpiKind);
 	}
+
+	// ***************************************   사회적기업 이력데이터  끝 *********************************************************************** //
+
+
+	// *************************************** 마을기업 이력데이터 시작 *********************************************************************** //
+
+	// 마을기업 이력데이터용 상세 기업리스트
+	@RequestMapping(value="/history/villagecorps", method= RequestMethod.GET)
+	public List<Map<String, Object>> findHistoryVillageCorpList()
+	{
+		return service.findHistoryVillageCorpList();
+	}
+
+	// 마을기업 이력데이터용 상세 - 키워드 검색
+	@RequestMapping(value="/history/villagekeyword", method= RequestMethod.GET)
+	public List<Map<String, Object>> findHistoryVillageCorpListKeyword(@RequestParam(name = "KEYWORD") String keyword,
+																	  @RequestParam(name = "CORP_TYPE") String corptype)
+	{
+		return service.findHistoryVillageCorpListKeyword(RequestParams.map());
+	}
+
+	// 마을기업 이력데이터 기업명 정보
+
+	@RequestMapping(value="/villageorgName", method= RequestMethod.GET)
+	public Map<String, Object>findVillageOrgName(@RequestParam(name = "CORP_SEQ") int corpSeq) {
+		return service.findVillageOrgName(RequestParams.map());
+	}
+
+	// 마을기업 이력데이터 항목추이 조회
+	@RequestMapping(value="/villagetrend", method= RequestMethod.GET)
+	public List<Map<String, Object>> findVillageTrend(@RequestParam(name = "CORP_SEQ") int corpSeq,
+													 @RequestParam(name = "FROM_YEAR") int fromYear,
+													 @RequestParam(name = "TO_YEAR") int toYear,
+													 @RequestParam(name = "KPI_KIND") String kpiKind){
+		return service.findVillageTrend(RequestParams.map(), kpiKind);
+	}
+
+	// ***************************************   마을기업 이력데이터  끝 *********************************************************************** //
+
+
 
 }

@@ -24,29 +24,7 @@
         ORDER BY CORP_NM
     </select>
 
-    <!-- 사회적기업 기업명 조회 -->
-    <select id="findSocialOrgName" resultType="hashmap">
-        SELECT
-        CORP_SEQ   /* 연번 */
-        ,  ORG_NAME1  /* 기관명1 */
-        FROM social_history_tbl
-        WHERE CORP_SEQ = #{p.CORP_SEQ}
-        ORDER BY CORP_SEQ
-    </select>
 
-    <!-- 사회적기업 이력데이터 기업목록 -->
-    <select id="findHistorySocialCorpList" resultType="hashmap">
-		SELECT
-			   CORP_SEQ   /* 연번 */
-			,  ORG_NAME1  /* 기관명1 */
-			,  CERT_PRE 	/*인증 구분 */
-			,  CASE CERT_PRE WHEN 1 THEN '인증사회적기업'
-			   ELSE '예비사회적기업' END AS CERT_PRE_NM
-			,  CERT_STATUS	/* 인증상태*/
-			,  ORG_TYPE 	/* 조직형태 */
-		FROM social_history_tbl
-		ORDER BY CORP_SEQ
-    </select>
 
 
     <!-- 기업 목록 키워드 검색 -->
@@ -69,20 +47,7 @@
         ORDER BY CORP_NM
     </select>
 
-    <!-- 사회적기업 이력데이터 기업목록 키워드 검색 -->
-    <select id="findHistorySocialCorpListKeyword" resultType="hashmap">
-		SELECT
-			   CORP_SEQ   /* 연번 */
-			,  ORG_NAME1  /* 기관명1 */
-			,  CERT_PRE 	/*인증 구분 */
-			,  CASE CERT_PRE WHEN 1 THEN '인증사회적기업'
-			   ELSE '예비사회적기업' END AS CERT_PRE_NM
-			,  CERT_STATUS	/* 인증상태*/
-			,  ORG_TYPE 	/* 조직형태 */
-		FROM social_history_tbl
-        WHERE  ORG_NAME1 LIKE CONCAT('%',#{p.KEYWORD},'%')
-        ORDER BY CORP_SEQ
-    </select>
+
 
 
 
@@ -2403,6 +2368,49 @@
 
     </delete>
 
+
+
+    <!-- *************************************** 사회적기업 이력데이터 시작 *********************************************************************** -->
+
+    <!-- 사회적기업 이력데이터 기업명 조회 -->
+    <select id="findSocialOrgName" resultType="hashmap">
+        SELECT
+        CORP_SEQ   /* 연번 */
+        ,  ORG_NAME1  /* 기관명1 */
+        FROM social_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        ORDER BY CORP_SEQ
+    </select>
+
+    <!-- 사회적기업 이력데이터 기업목록 -->
+    <select id="findHistorySocialCorpList" resultType="hashmap">
+        SELECT
+        CORP_SEQ   /* 연번 */
+        ,  ORG_NAME1  /* 기관명1 */
+        ,  CERT_PRE 	/*인증 구분 */
+        ,  CASE CERT_PRE WHEN 1 THEN '인증사회적기업'
+        ELSE '예비사회적기업' END AS CERT_PRE_NM
+        ,  CERT_STATUS	/* 인증상태*/
+        ,  ORG_TYPE 	/* 조직형태 */
+        FROM social_history_tbl
+        ORDER BY CORP_SEQ
+    </select>
+
+    <!-- 사회적기업 이력데이터 기업목록 키워드 검색 -->
+    <select id="findHistorySocialCorpListKeyword" resultType="hashmap">
+        SELECT
+        CORP_SEQ   /* 연번 */
+        ,  ORG_NAME1  /* 기관명1 */
+        ,  CERT_PRE 	/*인증 구분 */
+        ,  CASE CERT_PRE WHEN 1 THEN '인증사회적기업'
+        ELSE '예비사회적기업' END AS CERT_PRE_NM
+        ,  CERT_STATUS	/* 인증상태*/
+        ,  ORG_TYPE 	/* 조직형태 */
+        FROM social_history_tbl
+        WHERE  ORG_NAME1 LIKE CONCAT('%',#{p.KEYWORD},'%')
+        ORDER BY CORP_SEQ
+    </select>
+
     <!-- 사회적기업 이력데이터 추이(자산) -->
     <select id="findSocialAsset" resultType="hashmap">
         select * from
@@ -2868,5 +2876,235 @@
     </select>
 
 
+    <!-- ***************************************   사회적기업 이력데이터  끝 ***********************************************************************-->
+
+
+    <!-- *************************************** 마을기업 이력데이터 시작 *********************************************************************** -->
+
+    <!-- 마을기업 이력데이터 기업명 조회 -->
+    <select id="findVillageOrgName" resultType="hashmap">
+        SELECT
+        CORP_SEQ   /* 연번 */
+        ,  ORG_NAME1  /* 기관명1 */
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        ORDER BY CORP_SEQ
+    </select>
+
+    <!-- 마을기업 이력데이터 기업목록 -->
+    <select id="findHistoryVillageCorpList" resultType="hashmap">
+        SELECT
+        CORP_SEQ   /* 연번 */
+        ,  ORG_NAME1  /* 기관명1 */
+        ,  CERT_PRE 	/*인증 구분 */
+        ,  CERT_STATUS	/* 인증상태*/
+        ,  CASE CERT_STATUS WHEN 1 THEN '인증유지'
+        ELSE '인증취소' END AS CERT_STATUS_NM
+        FROM village_history_tbl
+        ORDER BY CORP_SEQ
+    </select>
+
+    <!-- 마을기업 이력데이터 기업목록 키워드 검색 -->
+    <select id="findHistoryVillageCorpListKeyword" resultType="hashmap">
+        SELECT
+        CORP_SEQ   /* 연번 */
+        ,  ORG_NAME1  /* 기관명1 */
+        ,  CERT_PRE 	/*인증 구분 */
+		,  CERT_STATUS	/* 인증상태*/
+		,  CASE CERT_STATUS WHEN 1 THEN '인증유지'
+		ELSE '인증취소' END AS CERT_STATUS_NM
+        FROM village_history_tbl
+        WHERE  ORG_NAME1 LIKE CONCAT('%',#{p.KEYWORD},'%')
+        ORDER BY CORP_SEQ
+    </select>
+
+    <!-- 마을기업 이력데이터 추이(자산) -->
+    <select id="findVillageAsset" resultType="hashmap">
+        select * from
+        (
+        select '2016' AS YEAR, ASSET2016 AS VALUE
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2017', ASSET2017
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2018', ASSET2018
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2019', ASSET2019
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        )HISTORY
+        WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
+    </select>
+
+    <!-- 마을기업 이력데이터 추이(자본) -->
+    <select id="findVillageCapital" resultType="hashmap">
+        select * from
+        (
+        select '2016' AS YEAR, CAPITAL2016 AS VALUE
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2017', CAPITAL2017
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2018', CAPITAL2018
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2019', CAPITAL2019
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        )HISTORY
+        WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
+    </select>
+
+    <!-- 마을기업 이력데이터 추이(부채) -->
+    <select id="findVillageDebt" resultType="hashmap">
+        select * from
+        (
+        select '2016' AS YEAR, DEBT2016 AS VALUE
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2017', DEBT2017
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2018', DEBT2018
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2019', DEBT2019
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        )HISTORY
+        WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
+    </select>
+
+    <!-- 마을기업 이력데이터 추이(매출액) -->
+    <select id="findVillageSales" resultType="hashmap">
+        select * from
+        (
+        select '2016' AS YEAR, SALES2016 AS VALUE
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2017', SALES2017
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2018', SALES2018
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2019', SALES2019
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        )HISTORY
+        WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
+    </select>
+
+    <!-- 마을기업 이력데이터 추이(매출총이익) -->
+    <select id="findVillageGrossProfit" resultType="hashmap">
+        select * from
+        (
+        select '2016' AS YEAR, GROSS_PROFIT2016 AS VALUE
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2017', GROSS_PROFIT2017
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2018', GROSS_PROFIT2018
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2019', GROSS_PROFIT2019
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        )HISTORY
+        WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
+    </select>
+
+    <!-- 마을기업 이력데이터 추이(노무비) -->
+    <select id="findVillageLaborCosts" resultType="hashmap">
+        select * from
+        (
+        select '2016' AS YEAR, LABOR_COSTS2016 AS VALUE
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2017', LABOR_COSTS2017
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2018', LABOR_COSTS2018
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2019', LABOR_COSTS2019
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        )HISTORY
+        WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
+    </select>
+
+    <!-- 마을기업 이력데이터 추이(영업이익) -->
+    <select id="findVillageOpProfit" resultType="hashmap">
+        select * from
+        (
+        select '2016' AS YEAR, OP_PROFIT2016 AS VALUE
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2017', OP_PROFIT2017
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2018', OP_PROFIT2018
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2019', OP_PROFIT2019
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        )HISTORY
+        WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
+    </select>
+
+    <!-- 마을기업 이력데이터 추이(당기순이익) -->
+    <select id="findVillageNetIncome" resultType="hashmap">
+        select * from
+        (
+        select '2016' AS YEAR, NET_INCOME2016 AS VALUE
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2017', NET_INCOME2017
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2018', NET_INCOME2018
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        UNION ALL
+        select '2019', NET_INCOME2019
+        FROM village_history_tbl
+        WHERE CORP_SEQ = #{p.CORP_SEQ}
+        )HISTORY
+        WHERE YEAR BETWEEN #{p.FROM_YEAR} AND #{p.TO_YEAR}
+
+    </select>
+
+
+
+    <!-- ***************************************   마을기업 이력데이터  끝 *********************************************************************** -->
 
 </mapper>

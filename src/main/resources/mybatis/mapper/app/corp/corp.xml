@@ -8979,8 +8979,6 @@
 		,  ORG_NAME1  /* 기관명1 */
 		,  CERT_PRE 	/*인증 구분 */
 		,  CERT_STATUS	/* 인증상태*/
-		,  CASE CERT_STATUS WHEN 1 THEN '인증유지'
-		ELSE '인증취소' END AS CERT_STATUS_NM
 		,  ASSET2016 		/* 자산2016 */
 		,  ASSET2017 		/* 자산2017 */
 		,  ASSET2018 		/* 자산2018 */
@@ -9026,8 +9024,6 @@
 		,  ORG_NAME1  /* 기관명1 */
 		,  CERT_PRE 	/*인증 구분 */
 		,  CERT_STATUS	/* 인증상태*/
-		,  CASE CERT_STATUS WHEN 1 THEN '인증유지'
-		ELSE '인증취소' END AS CERT_STATUS_NM
 		,  ASSET2016 		/* 자산2016 */
 		,  ASSET2017 		/* 자산2017 */
 		,  ASSET2018 		/* 자산2018 */

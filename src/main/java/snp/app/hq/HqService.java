@@ -33,10 +33,7 @@ public class HqService
 		return repository.findCorpInfo(params, Security.user());
 	}
 
-	public Map<String, Object> findSocialOrgName(Map<String, Object> params)
-	{
-		return repository.findSocialOrgName(params, Security.user());
-	}
+
 
 	public int saveCorpInfo(Map<String, Object> params) {
 		int r;
@@ -54,18 +51,6 @@ public class HqService
 	public List<Map<String, Object>> findCorpListKeyword(Map<String, Object> params) {
 		return repository.findCorpListKeyword(params,Security.user());
 	}
-
-    // 사회적기업 이력데이터 기업리스트
-	public List<Map<String, Object>> findHistorySocialCorpList()
-	{
-		return repository.findHistorySocialCorpList();
-	}
-
-	// 사회적기업 이력데이터 기업리스트 - 키워드 검색
-	public List<Map<String, Object>> findHistorySocialCorpListKeyword(Map<String, Object> params) {
-		return repository.findHistorySocialCorpListKeyword(params,Security.user());
-	}
-
 
 
 
@@ -170,6 +155,26 @@ public class HqService
 	}
 
 
+
+	// *************************************** 사회적기업 이력데이터 시작 *********************************************************************** //
+
+	// 사회적기업 이력데이터 기업리스트
+	public List<Map<String, Object>> findHistorySocialCorpList()
+	{
+		return repository.findHistorySocialCorpList();
+	}
+
+	// 사회적기업 이력데이터 기업리스트 - 키워드 검색
+	public List<Map<String, Object>> findHistorySocialCorpListKeyword(Map<String, Object> params) {
+		return repository.findHistorySocialCorpListKeyword(params,Security.user());
+	}
+
+	// 사회적기업 이력데이터 기업리스트 - 키워드 검색
+	public Map<String, Object> findSocialOrgName(Map<String, Object> params)
+	{
+		return repository.findSocialOrgName(params, Security.user());
+	}
+
 	// 사회적기업 이력데이터 항목추이 조회
 	public List<Map<String, Object>> findSocialTrend(Map<String, Object> params, String kpiKind) {
 		List<Map<String, Object>> result;
@@ -209,6 +214,62 @@ public class HqService
 		return result;
 	}
 
+	// ***************************************   사회적기업 이력데이터  끝 *********************************************************************** //
 
+
+	// *************************************** 마을기업 이력데이터 시작 *********************************************************************** //
+
+	// 마을기업 이력데이터 기업리스트
+	public List<Map<String, Object>> findHistoryVillageCorpList()
+	{
+		return repository.findHistoryVillageCorpList();
+	}
+
+	// 마을기업 이력데이터 기업리스트 - 키워드 검색
+	public List<Map<String, Object>> findHistoryVillageCorpListKeyword(Map<String, Object> params) {
+		return repository.findHistoryVillageCorpListKeyword(params,Security.user());
+	}
+
+	// 마을기업 이력데이터 기업리스트 - 키워드 검색
+	public Map<String, Object> findVillageOrgName(Map<String, Object> params)
+	{
+		return repository.findVillageOrgName(params, Security.user());
+	}
+
+	// 마을기업 이력데이터 항목추이 조회
+	public List<Map<String, Object>> findVillageTrend(Map<String, Object> params, String kpiKind) {
+		List<Map<String, Object>> result;
+		switch (kpiKind) {
+			case "0":
+				result = repository.findVillageAsset(params, Security.user());
+				break;
+			case "1":
+				result = repository.findVillageCapital(params, Security.user());
+				break;
+			case "2":
+				result = repository.findVillageDebt(params, Security.user());
+				break;
+			case "3":
+				result = repository.findVillageSales(params, Security.user());
+				break;
+			case "4":
+				result = repository.findVillageGrossProfit(params, Security.user());
+				break;
+			case "5":
+				result = repository.findVillageLaborCosts(params, Security.user());
+				break;
+			case "6":
+				result = repository.findVillageOpProfit(params, Security.user());
+				break;
+			default: //9
+				result = repository.findVillageNetIncome(params, Security.user());
+				break;
+		}
+
+		return result;
+	}
+
+
+	// ***************************************   마을기업 이력데이터  끝 *********************************************************************** //
 
 }
