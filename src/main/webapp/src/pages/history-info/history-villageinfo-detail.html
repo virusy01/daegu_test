@@ -1,0 +1,242 @@
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/src/components/common/normal-select.html">
+<link rel="import" href="/src/components/behaviors/behavior-loader.html">
+
+<dom-module id="history-socialinfo-detail">
+	<template>
+		<iron-ajax id="getOrgName"
+				   headers='{"X-Requested-With": "XMLHttpRequest"}'
+				   method="get"
+				   url="/api/hq/socialorgName"
+				   last-response="{{_orgName}}"></iron-ajax>
+
+		<iron-ajax id="getHistoryInfo" method="get" headers='{"X-Requested-With": "XMLHttpRequest"}'
+				   on-request="_startLoader"
+				   url="/api/hq/socialtrend"
+				   on-response="_drawChart">
+		</iron-ajax>
+		<div class="row">
+			<div class="col-xs-8">
+				<h3> {{_orgName.ORG_NAME1}}<small> _ 상세정보</small></h3>
+			</div>
+		</div>
+
+		<div class="horizontal-margin-20"></div>
+
+		<div class="row">
+
+			<div class="col-xs-2">
+				<normal-select name="dateFrom" value="{{_fromYear}}" items="{{_yearList}}"></normal-select>
+			</div>
+			<div class="col-xs-2">
+				<normal-select name="dateTo" value="{{_toYear}}" items="{{_yearList}}"></normal-select>
+			</div>
+			<div class="col-xs-2">
+				<normal-select id="year" value="{{_kpiType}}" items="{{_kpiTypeList}}"></normal-select>
+			</div>
+			<div class="col-xs-2">
+				<button on-tap="_fetchData" class="btn btn-sm btn-primary">조회</button>
+			</div>
+		</div>
+
+		<div class="horizontal-margin-20"></div>
+
+		<hr/>
+
+		<div class="row">
+			<div class="col-xs-12 kpiChartContainer">
+				<canvas id="kpiChart" height="400"></canvas>
+			</div>
+		</div>
+
+
+	</template>
+	<script>
+        Polymer({
+            is: 'history-socialinfo-detail',
+
+            behaviors: [Lunch.LoaderBehavior],
+
+            properties: {
+                readId: {
+                    type: Number,
+                    observer: '_callAPI'
+                },
+                _corpSeq: {
+                    type: Number,
+                    value: function() {
+                        return -1;
+                    },
+                    observer: '_getHistoryInfo'
+                },
+                _fromYear: {
+                    type: Number,
+                    value: function() {
+                        return '2008';
+                    }
+                },
+                _toYear: {
+                    type: Number,
+                    value: function() {
+                        return '2019';
+                    }
+                },
+                _yearList: {
+                    type: Array,
+                    value: function() {
+                        var list = [];
+
+                        for (var i = 2008; i <= 2019; i++) {
+                            list.push({cdNm:i, cd:i});
+                        }
+
+                        return list;
+                    }
+                },
+
+                _kpiTypeList: {
+                    type: Array,
+                    value: function() {
+                        return [
+                            {cdNm: '자산', cd: 0},
+                            {cdNm: '자본', cd: 1},
+                            {cdNm: '부채', cd: 2},
+                            {cdNm: '매출액', cd: 3},
+                            {cdNm: '매출총이익', cd: 4},
+                            {cdNm: '노무비', cd: 5},
+                            {cdNm: '영업이익', cd: 6},
+                            {cdNm: '당기순이익', cd: 7},
+                            {cdNm: '전체 근로자수', cd: 8},
+                            {cdNm: '취약계층 근로자수', cd: 9},
+                        ];
+                    }
+                },
+                _kpiType: {
+                    type: Number,
+                    value: function() {
+                        return 0;
+                    }
+                },
+                _data: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _orgName: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                _lineChart: Object,
+            },
+
+            _callAPI: function(value) {
+
+                if (value) {
+                    //this.readId = value;
+                    this._corpSeq = value;
+                }
+
+                this.$.getOrgName.params = {
+                    CORP_SEQ: this._corpSeq
+                };
+
+                this.$.getOrgName.generateRequest();
+
+            },
+
+            _fetchData: function() {
+                this.$.getHistoryInfo.params = {
+                    CORP_SEQ: this._corpSeq,
+                    FROM_YEAR: this._fromYear,
+                    TO_YEAR: this._toYear,
+                    KPI_KIND: this._kpiType
+                };
+
+                this.$.getHistoryInfo.generateRequest();
+            },
+
+            _getHistoryInfo: function(value) {
+
+                this.corpType = 1;
+                this.$.getHistoryInfo.params = {
+                    CORP_SEQ: this._corpSeq,
+                    FROM_YEAR: this._fromYear,
+                    TO_YEAR: this._toYear,
+                    KPI_KIND: this._kpiType
+                };
+
+                this.$.getHistoryInfo.generateRequest();
+            },
+            _drawChart: function(e) {
+                var labels = [];
+                var data = [];
+                this._data = e.currentTarget.lastResponse;
+
+                for (var key in this._data) {
+                    labels.push(this._data[key].YEAR);
+                    data.push(this._data[key].VALUE);
+                }
+
+                var data = {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: this._kpiTypeList[this._kpiType].cdNm,
+                            fill: false,
+                            lineTension: 0.1,
+                            backgroundColor: "rgba(75,192,192,0.4)",
+                            borderColor: "rgba(75,192,192,1)",
+                            borderCapStyle: 'butt',
+                            borderDash: [],
+                            borderDashOffset: 0.0,
+                            borderJoinStyle: 'miter',
+                            pointBorderColor: "rgba(75,192,192,1)",
+                            pointBackgroundColor: "#fff",
+                            pointBorderWidth: 1,
+                            pointHoverRadius: 5,
+                            pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                            pointHoverBorderColor: "rgba(220,220,220,1)",
+                            pointHoverBorderWidth: 2,
+                            pointRadius: 1,
+                            pointHitRadius: 10,
+                            data: data,
+                            spanGaps: false,
+                        }
+                    ]
+                };
+
+                if (this._lineChart)
+                    this._lineChart.destroy();
+
+                this._lineChart = new Chart(this.$.kpiChart, {
+                    type: 'line',
+                    data: data,
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    callback: function(value) {
+                                        return accounting.formatNumber(value);
+                                    }
+                                }
+                            }]
+                        },
+                        tooltips: {
+                            callbacks: {
+                                label: function(items) {
+                                    return accounting.formatNumber(items.yLabel);
+                                }
+                            }
+                        },
+                        maintainAspectRatio: false
+                    }
+                });
+
+                this._stopLoader();
+            },
+        });
+	</script>
+</dom-module>

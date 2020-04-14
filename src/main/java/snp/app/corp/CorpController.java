@@ -48,15 +48,6 @@ public class CorpController
 
 
 
-
-
-
-
-
-
-
-
-
 	// 성과지표 등급별 분석 - 등급항목별
 	@RequestMapping(value="/chart-grade/grade", method= RequestMethod.GET)
 	public List<Map<String, Object>>chartGradeGrade(@RequestParam(name = "CORP_KIND") String corpKind){
@@ -135,16 +126,6 @@ public class CorpController
 		return service.allCorpsKeyword(RequestParams.map());
 	}
 
-	// 사회적기업 이력데이터 정보 조회
-	@RequestMapping(value="/history/socialcorps", method= RequestMethod.GET)
-	public List<Map<String, Object>>historyCorps(@RequestParam(name = "CORP_KIND") String corpKind){
-		return service.historySocialCorps(RequestParams.map(),corpKind);
-	}
-	// 사회적기업 이력데이터 정보 조회 키워드 검색
-	@RequestMapping(value="/history/socialkeyword", method= RequestMethod.GET)
-	public List<Map<String, Object>>historySocialCorpsKeyword(@RequestParam(name = "KEYWORD") String keyword){
-		return service.historySocialCorpsKeyword(RequestParams.map());
-	}
 
 	// 사회적목적 유형별 분석 - 등급항목 통계
 	@RequestMapping(value="/chart-type/grade", method= RequestMethod.GET)
@@ -186,6 +167,20 @@ public class CorpController
 		service.allCorps2Excel(response,RequestParams.map(),corpKind);
 	}
 
+
+	// *************************************** 사회적기업 이력데이터 시작 *********************************************************************** //
+
+	// 사회적기업 이력데이터 정보 조회
+	@RequestMapping(value="/history/socialcorps", method= RequestMethod.GET)
+	public List<Map<String, Object>>historyCorps(@RequestParam(name = "CORP_KIND") String corpKind){
+		return service.historySocialCorps(RequestParams.map(),corpKind);
+	}
+	// 사회적기업 이력데이터 정보 조회 키워드 검색
+	@RequestMapping(value="/history/socialkeyword", method= RequestMethod.GET)
+	public List<Map<String, Object>>historySocialCorpsKeyword(@RequestParam(name = "KEYWORD") String keyword){
+		return service.historySocialCorpsKeyword(RequestParams.map());
+	}
+
 	// 사회적기업 이력데이터  조회 -  Excel
 	@RequestMapping(value="/history-socialcorps/excel", method= RequestMethod.GET)
 	public void historySocialCorps2Excel(HttpServletResponse response, @RequestParam(name = "CORP_KIND") int corpKind,
@@ -193,4 +188,34 @@ public class CorpController
 
 		service.historySocialCorps2Excel(response,RequestParams.map(),corpKind);
 	}
+
+	// *************************************** 사회적기업 이력데이터  끝 *********************************************************************** //
+
+
+
+
+	// *************************************** 마을기업 이력데이터 시작 *********************************************************************** //
+
+	// 마을기업 이력데이터 정보 조회
+	@RequestMapping(value="/history/villagecorps", method= RequestMethod.GET)
+	public List<Map<String, Object>>historyVillageCorps(@RequestParam(name = "CORP_KIND") String corpKind){
+		return service.historyVillageCorps(RequestParams.map(),corpKind);
+	}
+	// 마을기업 이력데이터 정보 조회 키워드 검색
+	@RequestMapping(value="/history/villagekeyword", method= RequestMethod.GET)
+	public List<Map<String, Object>>historyVillageCorpsKeyword(@RequestParam(name = "KEYWORD") String keyword){
+		return service.historyVillageCorpsKeyword(RequestParams.map());
+	}
+
+	// 마을기업 이력데이터  조회 -  Excel
+	@RequestMapping(value="/history-villagecorps/excel", method= RequestMethod.GET)
+	public void historyVillageorps2Excel(HttpServletResponse response, @RequestParam(name = "CORP_KIND") int corpKind,
+										 @RequestParam(name = "KEYWORD") String keyword) throws Exception{
+
+		service.historyVillageCorps2Excel(response,RequestParams.map(),corpKind);
+	}
+
+	// ***************************************   마을기업 이력데이터  끝 *********************************************************************** //
+
+
 }

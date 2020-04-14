@@ -1,0 +1,41 @@
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="/bower_components/iron-location/iron-location.html">
+
+<link rel="import" href="/src/pages/history-info/history-socialinfo-detail.html">
+
+<link rel="import" href="/src/components/common/normal-select.html">
+
+<dom-module id="history-socialinfo-view">
+	<template>
+		<iron-location id="location"></iron-location>
+
+		<div class="row">
+			<div class="col-xs-12 text-right">
+				<button type="button" on-tap="_toList" class="btn btn-sm btn-default">목록으로</button>
+			</div>
+		</div>
+
+		<div class="horizontal-margin-20"></div>
+
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<history-socialinfo-detail  read-id="{{id}}"></history-socialinfo-detail>
+			</div>
+		</div>
+
+	</template>
+	<script>
+        Polymer({
+            is: 'history-socialinfo-view',
+
+            properties: {
+                id: Number,
+
+            },
+
+            _toList: function(e) {
+                this.$.location.path = '/app/history-socialinfo/list/';
+            },
+        });
+	</script>
+</dom-module>

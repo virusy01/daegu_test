@@ -1,0 +1,53 @@
+<link rel="import" href="/bower_components/app-route/app-route.html">
+<link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+
+<dom-module id="page-history-socialinfo">
+<template>
+	<app-route route="{{route}}"
+		   pattern="/app/history-socialinfo/:mode/:id"
+		   data="{{routeData}}"
+		   active>
+	</app-route>
+
+	<div class="page-header">
+		<h2>사회적기업 이력정보 상세 <small>Social Enterprise History Data Detail</small></h2>
+	</div>
+
+	<iron-pages id="history-socialinfo" selected="[[mode]]" attr-for-selected="name">
+		<history-socialinfo-list name="list"></history-socialinfo-list>
+		<history-socialinfo-view name="view" id="{{id}}"></history-socialinfo-view>
+	</iron-pages>
+
+</template>
+<script>
+Polymer({
+	is: 'page-history-socialinfo',
+
+	properties: {
+		mode: {
+			type: String,
+			value: 'list',
+			observer: '_importHTML'
+		},
+		id: Number,
+	},
+
+	observers: [
+		'_determineMode(routeData.mode)',
+        '_idChanged(routeData.id)',
+	],
+
+	_determineMode: function(value) {
+		this.mode = value || 'list'; 
+	},
+
+    _idChanged: function(value) {
+        this.id = parseInt(value);
+    },
+
+    _importHTML: function(newValue) {
+		this.importHref(this.resolveUrl('history-info/history-socialinfo-' + newValue + '.html'), null, null, true);
+	},
+});
+</script>
+</dom-module>

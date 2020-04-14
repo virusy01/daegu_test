@@ -202,12 +202,6 @@ public interface CorpRepository
 	// 전체기업 상세정보 조회 키워드
 	List<Map<String, Object>>allCorpsKeyword(@Param("p") Map<String, Object> params,@Param("u") User user);
 
-	// 사회적기업 이력데이터 상세정보 조회
-	List<Map<String, Object>>historySocialCorpsAll(@Param("p") Map<String, Object> params,@Param("u") User user);
-	List<Map<String, Object>>historySocialCorpsEach(@Param("p") Map<String, Object> params,@Param("u") User user);
-
-	// 사회적기업 이력데이터 상세정보 조회 키워드
-	List<Map<String, Object>>historySocialCorpsKeyword(@Param("p") Map<String, Object> params,@Param("u") User user);
 
 
 	// 성과지표 사회적경제조직 유형별 분석 - 등급항목 통계 - 노동통합형, 문제해결형, 지역사회혁신형, 고용창출형
@@ -217,6 +211,33 @@ public interface CorpRepository
 	//List<Map<String, Object>>chartTypeRate(@Param("u") User user);
 
 
+	// *************************************** 사회적기업 이력데이터 시작 *********************************************************************** //
+
+
+	// 사회적기업 이력데이터 상세정보 조회
+	List<Map<String, Object>>historySocialCorpsAll(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>historySocialCorpsEach(@Param("p") Map<String, Object> params,@Param("u") User user);
+
+	// 사회적기업 이력데이터 상세정보 조회 키워드
+	List<Map<String, Object>>historySocialCorpsKeyword(@Param("p") Map<String, Object> params,@Param("u") User user);
+
+
+	// ***************************************   사회적기업 이력데이터  끝 *********************************************************************** //
+
+
+
+	// *************************************** 마을기업 이력데이터 시작 *********************************************************************** //
+
+
+	// 사회적기업 이력데이터 상세정보 조회
+	List<Map<String, Object>>historyVillageCorpsAll(@Param("p") Map<String, Object> params,@Param("u") User user);
+	List<Map<String, Object>>historyVillageCorpsEach(@Param("p") Map<String, Object> params,@Param("u") User user);
+
+	// 사회적기업 이력데이터 상세정보 조회 키워드
+	List<Map<String, Object>>historyVillageCorpsKeyword(@Param("p") Map<String, Object> params,@Param("u") User user);
+
+
+	// ***************************************   마을기업 이력데이터  끝 *********************************************************************** //
 
 
 }
